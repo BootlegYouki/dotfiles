@@ -172,7 +172,7 @@ StyledRect {
                 DelegateChoice {
                     roleValue: "ethernet"
                     delegate: Toggle {
-                        icon: Nmcli.activeEthernet !== null ? "lan" : "settings_ethernet"
+                        icon: "lan"
                         checked: Nmcli.activeEthernet !== null
                         onClicked: {
                             if (Nmcli.activeEthernet) {
