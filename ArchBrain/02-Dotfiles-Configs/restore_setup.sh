@@ -101,6 +101,16 @@ if [ -f "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" ]; then
     ln -sfn "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" "$TARGET_HOME/.config/quickshell/shell.qml"
 fi
 
+# Strip DefaultEnv pragmas on older Quickshell (e.g. noctalia-qs < 0.3.0)
+QS_VERSION=$(qs --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
+QS_MAJOR=$(echo "$QS_VERSION" | cut -d. -f1)
+QS_MINOR=$(echo "$QS_VERSION" | cut -d. -f2)
+if [ -n "$QS_VERSION" ] && { [ "$QS_MAJOR" -eq 0 ] && [ "$QS_MINOR" -lt 3 ]; }; then
+    echo "  ⚠ Quickshell $QS_VERSION detected (older) — stripping unsupported DefaultEnv pragmas..."
+    sudo sed -i '/pragma DefaultEnv/d' /etc/xdg/quickshell/caelestia/shell.qml
+    echo "  ✓ Pragmas removed"
+fi
+
 echo "3. Copying bin files to $TARGET_HOME/.local/bin/..."
 mkdir -p "$TARGET_HOME/.local/bin"
 cp "$DOTFILES_DIR/.local/bin/"* "$TARGET_HOME/.local/bin/"
