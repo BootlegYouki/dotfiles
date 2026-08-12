@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Bluetooth
 import Quickshell.Io
+import Caelestia
 import Caelestia.Components
 import Caelestia.Config
 import qs.components
@@ -36,11 +37,12 @@ StyledRect {
         }
     }
 
+    readonly property string toggleScript: Paths.toLocalFile(Qt.resolvedUrl("../../../../utils/scripts/toggle_monitor.py"))
     property bool secondMonitorOn: true
 
     Process {
         id: dpmsCheckProc
-        command: ["python", "-c", "import subprocess, json, sys; sys.exit(0 if any(m['dpmsStatus'] for m in json.loads(subprocess.check_output(['hyprctl', 'monitors', '-j'])) if m['name'] != 'HDMI-A-1') else 1)"]
+        command: [toggleScript, "status"]
         running: true
         onExited: (code) => {
             root.secondMonitorOn = (code === 0);
@@ -185,14 +187,8 @@ StyledRect {
                         icon: "desktop_windows"
                         checked: root.secondMonitorOn
                         onClicked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1");
-                            const name = sec ? sec.name : "DP-1";
                             const nextState = !root.secondMonitorOn;
-                            if (nextState) {
-                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'on', monitor = '${name}' }))`]);
-                            } else {
-                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'off', monitor = '${name}' }))`]);
-                            }
+                            procCmd.run([toggleScript, nextState ? "on" : "off"]);
                             root.secondMonitorOn = nextState;
                         }
                     }
@@ -203,14 +199,8 @@ StyledRect {
                         icon: "desktop_windows"
                         checked: root.secondMonitorOn
                         onClicked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1");
-                            const name = sec ? sec.name : "DP-1";
                             const nextState = !root.secondMonitorOn;
-                            if (nextState) {
-                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'on', monitor = '${name}' }))`]);
-                            } else {
-                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'off', monitor = '${name}' }))`]);
-                            }
+                            procCmd.run([toggleScript, nextState ? "on" : "off"]);
                             root.secondMonitorOn = nextState;
                         }
                     }
