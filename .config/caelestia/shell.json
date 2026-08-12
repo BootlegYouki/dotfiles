@@ -43,6 +43,9 @@
             ]
         }
     },
+    "general": {
+        "logo": "caelestia"
+    },
     "launcher": {
         "favouriteApps": [
             "brave-browser",
@@ -76,6 +79,23 @@
         "enabled": true
     },
     "utilities": {
+        "quickToggles": [
+            {
+                "id": "wifi"
+            },
+            {
+                "id": "bluetooth"
+            },
+            {
+                "id": "nightlight"
+            },
+            {
+                "id": "mic"
+            },
+            {
+                "id": "settings"
+            }
+        ],
         "toasts": {
             "capsLockChanged": false
         }
