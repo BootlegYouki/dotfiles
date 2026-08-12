@@ -177,8 +177,8 @@ if [ ! -f "$PROFILE_FILE" ]; then
     PROFILE_FILE="$TARGET_HOME/.profile"
 fi
 
-if ! grep -q "exec Hyprland" "$PROFILE_FILE" 2>/dev/null; then
-    echo -e "\nif [ -z \"\$DISPLAY\" ] && [ \"\$(tty)\" = \"/dev/tty1\" ]; then\n  exec Hyprland\nfi" >> "$PROFILE_FILE"
+if ! grep -q "uwsm start" "$PROFILE_FILE" 2>/dev/null; then
+    echo -e "\n# Auto-start Hyprland via UWSM on tty1 login\nif [ -z \"\$DISPLAY\" ] && [ \"\$(tty)\" = \"/dev/tty1\" ]; then\n  exec uwsm start hyprland-uwsm.desktop\nfi" >> "$PROFILE_FILE"
     chown "$TARGET_USER:$TARGET_USER" "$PROFILE_FILE"
 fi
 
