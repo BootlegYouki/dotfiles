@@ -71,7 +71,12 @@ if qs -c caelestia kill 2>/dev/null; then
         }
     fi
 else
-    echo "  ℹ Shell was not running — run manually if needed: caelestia shell -d"
+    echo "  ℹ Shell was not running — starting it..."
+    if command -v uwsm &>/dev/null; then
+        uwsm app -- caelestia shell -d && echo "  ✓ Shell started via uwsm" || echo "  ⚠ Could not start shell — run manually: caelestia shell -d"
+    else
+        caelestia shell -d && echo "  ✓ Shell started" || echo "  ⚠ Could not start shell — run manually: caelestia shell -d"
+    fi
 fi
 
 echo ""
