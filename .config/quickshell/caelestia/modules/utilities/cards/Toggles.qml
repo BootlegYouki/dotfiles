@@ -20,6 +20,14 @@ StyledRect {
     property bool hasBluetoothHardware: false
 
     Process {
+        id: procCmd
+        function run(args) {
+            command = args;
+            running = true;
+        }
+    }
+
+    Process {
         id: btCheckProc
         command: ["sh", "-c", "rfkill list bluetooth 2>/dev/null | grep -qi bluetooth"]
         running: true
@@ -168,8 +176,8 @@ StyledRect {
                         onClicked: {
                             const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
                             if (sec) {
-                                const action = sec.dpmsStatus ? "disable" : "enable";
-                                Hypr.dispatch(`eval hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`);
+                                const action = sec.dpmsStatus ? "off" : "on";
+                                procCmd.run(["hyprctl", "eval", `hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`]);
                             }
                         }
                     }
@@ -185,8 +193,8 @@ StyledRect {
                         onClicked: {
                             const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
                             if (sec) {
-                                const action = sec.dpmsStatus ? "disable" : "enable";
-                                Hypr.dispatch(`eval hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`);
+                                const action = sec.dpmsStatus ? "off" : "on";
+                                procCmd.run(["hyprctl", "eval", `hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`]);
                             }
                         }
                     }
