@@ -10,7 +10,8 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 echo "Dotfiles directory: $DOTFILES_DIR"
 
 echo "1. Installing system dependencies & user applications..."
-sudo pacman -Sy --noconfirm
+sudo cachyos-rate-mirrors 2>/dev/null || true
+sudo pacman -Sy --noconfirm || true
 
 # Ensure yay (AUR helper) is available
 if ! command -v yay &>/dev/null; then
