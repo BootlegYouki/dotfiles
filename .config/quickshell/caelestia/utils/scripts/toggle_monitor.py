@@ -30,6 +30,10 @@ def main():
         
     action = sys.argv[1]
     monitors = get_monitors()
+    
+    if action == "detect":
+        sys.exit(0 if len(monitors) > 1 else 1)
+        
     sec = get_secondary_monitor(monitors)
     
     if not sec:
