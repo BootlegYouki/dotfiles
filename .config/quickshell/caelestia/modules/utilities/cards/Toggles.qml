@@ -94,6 +94,10 @@ StyledRect {
                 return Nmcli.ethernetDevices.length > 0;
             }
 
+            if (item.id === "wifi") {
+                return Nmcli.wirelessInterfaces.length > 0;
+            }
+
             seenIds.add(item.id);
             return true;
         });
