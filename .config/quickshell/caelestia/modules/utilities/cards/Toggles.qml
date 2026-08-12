@@ -36,6 +36,24 @@ StyledRect {
         }
     }
 
+    property bool secondMonitorOn: true
+
+    Process {
+        id: dpmsCheckProc
+        command: ["python", "-c", "import subprocess, json, sys; sys.exit(0 if any(m['dpmsStatus'] for m in json.loads(subprocess.check_output(['hyprctl', 'monitors', '-j'])) if m['name'] != 'HDMI-A-1') else 1)"]
+        running: true
+        onExited: (code) => {
+            root.secondMonitorOn = (code === 0);
+        }
+    }
+
+    Connections {
+        target: Hypr
+        function onMonitorsChanged() {
+            dpmsCheckProc.running = true;
+        }
+    }
+
     readonly property var quickToggles: {
         const seenIds = new Set();
         const rawToggles = Config.utilities.quickToggles.values ?? Array.from(Config.utilities.quickToggles ?? []);
@@ -165,19 +183,17 @@ StyledRect {
                     roleValue: "display"
                     delegate: Toggle {
                         icon: "desktop_windows"
-                        checked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1");
-                            return sec ? sec.dpmsStatus : true;
-                        }
+                        checked: root.secondMonitorOn
                         onClicked: {
                             const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1");
                             const name = sec ? sec.name : "DP-1";
-                            const isPoweredOn = sec ? sec.dpmsStatus : true;
-                            if (isPoweredOn) {
-                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'off', monitor = '${name}' }))`]);
-                            } else {
+                            const nextState = !root.secondMonitorOn;
+                            if (nextState) {
                                 procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'on', monitor = '${name}' }))`]);
+                            } else {
+                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'off', monitor = '${name}' }))`]);
                             }
+                            root.secondMonitorOn = nextState;
                         }
                     }
                 }
@@ -185,19 +201,17 @@ StyledRect {
                     roleValue: "monitor"
                     delegate: Toggle {
                         icon: "desktop_windows"
-                        checked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1");
-                            return sec ? sec.dpmsStatus : true;
-                        }
+                        checked: root.secondMonitorOn
                         onClicked: {
                             const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1");
                             const name = sec ? sec.name : "DP-1";
-                            const isPoweredOn = sec ? sec.dpmsStatus : true;
-                            if (isPoweredOn) {
-                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'off', monitor = '${name}' }))`]);
-                            } else {
+                            const nextState = !root.secondMonitorOn;
+                            if (nextState) {
                                 procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'on', monitor = '${name}' }))`]);
+                            } else {
+                                procCmd.run(["hyprctl", "eval", `hl.dispatch(hl.dsp.dpms({ action = 'off', monitor = '${name}' }))`]);
                             }
+                            root.secondMonitorOn = nextState;
                         }
                     }
                 }
