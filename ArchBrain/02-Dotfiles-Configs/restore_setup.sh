@@ -55,7 +55,7 @@ pacman -Rdd --noconfirm jack2 caelestia-shell quickshell noctalia-qs 2>/dev/null
 
 echo -e "\n[1.2/8] Installing official packages, fonts & CLI tools..."
 pacman -S --noconfirm --needed \
-    seahorse \
+    seahorse stacer \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
     hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring \
     flatpak polkit-kde-agent python-evdev python-pykakasi discord zed vlc cava \
