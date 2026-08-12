@@ -5,6 +5,7 @@ echo "=========================================================="
 echo "🚀 Caelestia + Hyprland Complete Restoration Script (Paru)"
 echo "=========================================================="
 
+# Ensure running with root privileges
 if [ "$EUID" -ne 0 ]; then
   echo "❌ Error: Please run this script with sudo."
   exit 1
@@ -14,10 +15,12 @@ TARGET_USER="${SUDO_USER:-$USER}"
 TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 TARGET_UID="$(id -u "$TARGET_USER")"
 
+# Determine dotfiles root directory
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 echo "Dotfiles directory: $DOTFILES_DIR"
 echo "Target User: $TARGET_USER ($TARGET_HOME)"
 
+# Helper function to run commands as non-root user
 run_as_user() {
     sudo -u "$TARGET_USER" XDG_RUNTIME_DIR="/run/user/$TARGET_UID" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$TARGET_UID/bus" "$@"
 }
@@ -46,6 +49,7 @@ if ! command -v paru &>/dev/null; then
     fi
 fi
 
+# Resolve package conflicts (replace jack2 with pipewire-jack)
 if pacman -Qi jack2 &>/dev/null; then
     echo "Replacing jack2 with pipewire-jack..."
     pacman -Rdd --noconfirm jack2 || true
@@ -62,7 +66,7 @@ pacman -S --noconfirm --needed \
     jq socat fd ripgrep fzf zoxide direnv eza
 
 echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies via Paru..."
-run_as_user paru -S --noconfirm --needed \
+run_as_user paru -S --noconfirm --needed --provides=false \
     caelestia-shell-git \
     quickshell-git \
     caelestia-cli \
@@ -131,6 +135,7 @@ if [ -d "$DOTFILES_DIR/ArchBrain" ]; then
     cp -a "$DOTFILES_DIR/ArchBrain/." "$TARGET_HOME/ArchBrain/"
 fi
 
+# Fix ownership across home directory
 chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config" "$TARGET_HOME/.local" "$TARGET_HOME/Pictures" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py" 2>/dev/null || true
 
 echo -e "\n[7/8] Configuring system locale & services..."
