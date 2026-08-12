@@ -11,6 +11,18 @@ echo "🔄 Dotfiles Updater"
 echo "=========================================="
 echo "Dotfiles directory: $DOTFILES_DIR"
 
+# 0. Ensure proper Quickshell is installed (not the outdated CachyOS noctalia-qs fork)
+if pacman -Qi noctalia-qs &>/dev/null; then
+    echo ""
+    echo "0. Upgrading Quickshell (removing noctalia-qs, building quickshell-git from AUR)..."
+    sudo pacman -Rdd --noconfirm noctalia-qs
+    rm -rf /tmp/qs-aur-build
+    git clone https://aur.archlinux.org/quickshell-git.git /tmp/qs-aur-build
+    (cd /tmp/qs-aur-build && makepkg -si --noconfirm)
+    rm -rf /tmp/qs-aur-build
+    echo "  ✓ quickshell-git installed from AUR"
+fi
+
 # 1. Pull latest from GitHub
 echo ""
 echo "1. Pulling latest changes from GitHub..."
@@ -54,16 +66,6 @@ echo ""
 echo "3. Syncing Quickshell QML to /etc/xdg/quickshell/caelestia (requires sudo)..."
 sudo cp -R "$DOTFILES_DIR/.config/quickshell/caelestia/." /etc/xdg/quickshell/caelestia/
 echo "  ✓ /etc/xdg/quickshell/caelestia"
-
-# 3.1 Strip DefaultEnv pragmas on older Quickshell (e.g. noctalia-qs < 0.3.0)
-QS_VERSION=$(qs --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
-QS_MAJOR=$(echo "$QS_VERSION" | cut -d. -f1)
-QS_MINOR=$(echo "$QS_VERSION" | cut -d. -f2)
-if [ -n "$QS_VERSION" ] && { [ "$QS_MAJOR" -eq 0 ] && [ "$QS_MINOR" -lt 3 ]; }; then
-    echo "  ⚠ Quickshell $QS_VERSION detected (older) — stripping unsupported DefaultEnv pragmas..."
-    sudo sed -i '/pragma DefaultEnv/d' /etc/xdg/quickshell/caelestia/shell.qml
-    echo "  ✓ Pragmas removed"
-fi
 
 # 4. Reload Caelestia shell if it's running
 echo ""

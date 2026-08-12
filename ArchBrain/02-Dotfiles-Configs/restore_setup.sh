@@ -47,9 +47,17 @@ sudo pacman -S --noconfirm --needed \
     jq socat fd ripgrep fzf zoxide direnv eza
 
 echo "1.3. Installing Caelestia & AUR dependencies..."
+# Remove noctalia-qs (CachyOS fork) if present — it's outdated and missing features
+if pacman -Qi noctalia-qs &>/dev/null; then
+    echo "  Removing outdated noctalia-qs (CachyOS Quickshell fork)..."
+    sudo pacman -Rdd --noconfirm noctalia-qs || true
+fi
 if ! pacman -Qi quickshell-git &>/dev/null; then
-    echo "Installing quickshell-git from AUR..."
-    su - "$TARGET_USER" -c "yay -S --noconfirm quickshell-git" || true
+    echo "  Building quickshell-git from AUR (this takes a few minutes)..."
+    rm -rf /tmp/qs-aur-build
+    git clone https://aur.archlinux.org/quickshell-git.git /tmp/qs-aur-build
+    (cd /tmp/qs-aur-build && sudo -u "$TARGET_USER" makepkg -si --noconfirm) || true
+    rm -rf /tmp/qs-aur-build
 fi
 if ! pacman -Qi caelestia-cli &>/dev/null; then
     echo "Installing caelestia-cli from AUR..."
@@ -99,16 +107,6 @@ fi
 if [ -f "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" ]; then
     mkdir -p "$TARGET_HOME/.config/quickshell"
     ln -sfn "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" "$TARGET_HOME/.config/quickshell/shell.qml"
-fi
-
-# Strip DefaultEnv pragmas on older Quickshell (e.g. noctalia-qs < 0.3.0)
-QS_VERSION=$(qs --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
-QS_MAJOR=$(echo "$QS_VERSION" | cut -d. -f1)
-QS_MINOR=$(echo "$QS_VERSION" | cut -d. -f2)
-if [ -n "$QS_VERSION" ] && { [ "$QS_MAJOR" -eq 0 ] && [ "$QS_MINOR" -lt 3 ]; }; then
-    echo "  ⚠ Quickshell $QS_VERSION detected (older) — stripping unsupported DefaultEnv pragmas..."
-    sudo sed -i '/pragma DefaultEnv/d' /etc/xdg/quickshell/caelestia/shell.qml
-    echo "  ✓ Pragmas removed"
 fi
 
 echo "3. Copying bin files to $TARGET_HOME/.local/bin/..."
