@@ -49,11 +49,9 @@ if ! command -v paru &>/dev/null; then
     fi
 fi
 
-# Resolve package conflicts (replace jack2 with pipewire-jack)
-if pacman -Qi jack2 &>/dev/null; then
-    echo "Replacing jack2 with pipewire-jack..."
-    pacman -Rdd --noconfirm jack2 || true
-fi
+# Force remove any conflicting legacy packages from the local database before building
+echo "Clearing potential conflicting packages..."
+pacman -Rdd --noconfirm jack2 caelestia-shell quickshell 2>/dev/null || true
 
 echo -e "\n[1.2/8] Installing official packages, fonts & CLI tools..."
 pacman -S --noconfirm --needed \
@@ -66,13 +64,14 @@ pacman -S --noconfirm --needed \
     jq socat fd ripgrep fzf zoxide direnv eza
 
 echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies via Paru..."
-run_as_user paru -S --noconfirm --needed --provides=false \
+# Use --useask and echo 1 to automatically select option 1 (caelestia-shell-git) if prompted
+run_as_user bash -c "echo '1' | paru -S --noconfirm --needed --useask --skipreview \
     caelestia-shell-git \
     quickshell-git \
     caelestia-cli \
     ttf-material-symbols-variable-git \
     brave-bin \
-    spotify || true
+    spotify" || true
 
 echo -e "\n[2/8] Restoring user configurations..."
 mkdir -p "$TARGET_HOME/.config"
