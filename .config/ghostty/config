@@ -34,3 +34,6 @@ palette = 12=#dcdcdc
 palette = 13=#e0e0e0
 palette = 14=#eaeaea
 palette = 15=#ffffff
+
+# Default Shell
+command = /bin/fish
