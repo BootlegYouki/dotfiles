@@ -38,6 +38,7 @@ StyledRect {
     }
 
     property bool secondMonitorOn: true
+    property bool hasMultipleMonitors: false
 
     Process {
         id: dpmsCheckProc
@@ -48,10 +49,20 @@ StyledRect {
         }
     }
 
+    Process {
+        id: monitorCheckProc
+        command: ["sh", "-c", "if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py detect; else \"$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py\" detect; fi"]
+        running: true
+        onExited: (code) => {
+            root.hasMultipleMonitors = (code === 0);
+        }
+    }
+
     Connections {
         target: Hypr
         function onMonitorsChanged() {
             dpmsCheckProc.running = true;
+            monitorCheckProc.running = true;
         }
     }
 
@@ -73,6 +84,10 @@ StyledRect {
 
             if (item.id === "bluetooth") {
                 return root.hasBluetoothHardware;
+            }
+
+            if (item.id === "display" || item.id === "monitor") {
+                return root.hasMultipleMonitors;
             }
 
             seenIds.add(item.id);
