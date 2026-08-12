@@ -90,6 +90,10 @@ StyledRect {
                 return root.hasMultipleMonitors;
             }
 
+            if (item.id === "ethernet") {
+                return Nmcli.ethernetDevices.length > 0;
+            }
+
             seenIds.add(item.id);
             return true;
         });
