@@ -6,7 +6,7 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import Caelestia.Config
 import qs.components
-import qs.services
+import qs.services as Services
 
 Item {
     id: root
@@ -37,7 +37,7 @@ Item {
             name: "network"
             sourceComponent: Network {
                 popouts: root.popouts
-                view: Nmcli.activeEthernet !== null ? "ethernet" : "wireless"
+                view: Services.Nmcli.activeEthernet !== null ? "ethernet" : "wireless"
             }
         }
 
