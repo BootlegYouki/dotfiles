@@ -15,7 +15,7 @@ if pacman -Qi noctalia-qs &>/dev/null; then
     echo ""
     echo "0. Upgrading Quickshell (removing noctalia-qs, installing quickshell-git from AUR)..."
     sudo pacman -Rdd --noconfirm noctalia-qs
-    paru -S --noconfirm --skipreview aur/quickshell-git
+    paru -S --noconfirm --skipreview quickshell-git
     echo "  ✓ quickshell-git installed from AUR"
 fi
 
@@ -63,6 +63,7 @@ echo "3. Syncing Quickshell QML to /etc/xdg/quickshell/caelestia..."
 sudo mkdir -p /etc/xdg/quickshell/caelestia
 if [ -d "$DOTFILES_DIR/.config/quickshell/caelestia" ]; then
     sudo cp -R "$DOTFILES_DIR/.config/quickshell/caelestia/." /etc/xdg/quickshell/caelestia/
+    sudo find /etc/xdg/quickshell/caelestia/ -name "*.qml" -exec sed -i 's/\/\/@ pragma/\/\/ pragma/g' {} + 2>/dev/null || true
     echo "  ✓ /etc/xdg/quickshell/caelestia"
 fi
 
