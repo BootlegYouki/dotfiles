@@ -58,7 +58,10 @@ echo "  ✓ /etc/xdg/quickshell/caelestia"
 # 4. Reload Caelestia shell if it's running
 echo ""
 echo "4. Reloading Caelestia shell..."
-if qs -c caelestia kill 2>/dev/null; then
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    echo "  ⚠ Running over SSH — cannot restart Wayland shell remotely."
+    echo "  → Run this on your machine: caelestia shell -d"
+elif qs -c caelestia kill 2>/dev/null; then
     sleep 1
     # Launch via uwsm so it inherits the correct Wayland environment
     if command -v uwsm &>/dev/null; then
