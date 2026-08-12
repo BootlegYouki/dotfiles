@@ -34,7 +34,8 @@ StyledRect {
             }
 
             if (item.id === "bluetooth") {
-                return Bluetooth.defaultAdapter !== null && (Bluetooth.adapters?.values?.length ?? 0) > 0;
+                const adapter = Bluetooth.defaultAdapter;
+                return adapter !== null && (adapter.adapterId ?? "") !== "" && (adapter.dbusPath ?? "") !== "";
             }
 
             seenIds.add(item.id);

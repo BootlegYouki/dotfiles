@@ -185,7 +185,7 @@ StyledRect {
             Layout.preferredHeight: implicitHeight
 
             name: "bluetooth"
-            active: (Config.bar?.status?.showBluetooth ?? true) && (Bluetooth.defaultAdapter !== null && (Bluetooth.adapters?.values?.length ?? 0) > 0)
+            active: (Config.bar?.status?.showBluetooth ?? true) && (Bluetooth.defaultAdapter !== null && (Bluetooth.defaultAdapter.adapterId ?? "") !== "" && (Bluetooth.defaultAdapter.dbusPath ?? "") !== "")
 
             sourceComponent: ColumnLayout {
                 spacing: Tokens.spacing.medium / 2
