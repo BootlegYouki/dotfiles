@@ -41,6 +41,8 @@ CONFIGS=(
     ".config/uwsm"
     ".config/spicetify/Themes/caelestia"
     ".config/zed/themes"
+    ".local/bin"
+    ".local/share/applications"
 )
 
 for cfg in "${CONFIGS[@]}"; do

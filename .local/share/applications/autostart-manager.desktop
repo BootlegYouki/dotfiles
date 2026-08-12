@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Autostart Manager
+Comment=Toggle applications on/off for startup
+Exec=autostart-manager
+Icon=system-run
+Categories=Settings;System;Utility;
+Keywords=startup;autostart;apps;manage;

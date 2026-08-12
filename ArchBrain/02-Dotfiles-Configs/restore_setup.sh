@@ -112,6 +112,11 @@ if [ -d "$DOTFILES_DIR/.local/bin" ]; then
     chmod +x "$TARGET_HOME/.local/bin/"* 2>/dev/null || true
 fi
 
+if [ -d "$DOTFILES_DIR/.local/share/applications" ]; then
+    mkdir -p "$TARGET_HOME/.local/share/applications"
+    cp -a "$DOTFILES_DIR/.local/share/applications/." "$TARGET_HOME/.local/share/applications/"
+fi
+
 if [ -d "$DOTFILES_DIR/.local/state/caelestia" ]; then
     mkdir -p "$TARGET_HOME/.local/state/caelestia"
     cp -a "$DOTFILES_DIR/.local/state/caelestia/." "$TARGET_HOME/.local/state/caelestia/"
