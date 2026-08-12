@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Bluetooth
+import Quickshell.Io
 import Caelestia.Components
 import Caelestia.Config
 import qs.components
@@ -16,6 +17,16 @@ StyledRect {
 
     required property ScreenState screenState
     required property BarPopouts.Wrapper popouts
+    property bool hasBluetoothHardware: false
+
+    Process {
+        id: btCheckProc
+        command: ["sh", "-c", "rfkill list bluetooth 2>/dev/null | grep -qi bluetooth"]
+        running: true
+        onExited: (code) => {
+            root.hasBluetoothHardware = (code === 0);
+        }
+    }
 
     readonly property var quickToggles: {
         const seenIds = new Set();
@@ -34,8 +45,7 @@ StyledRect {
             }
 
             if (item.id === "bluetooth") {
-                const adapter = Bluetooth.defaultAdapter;
-                return adapter !== null && (adapter.adapterId ?? "") !== "" && (adapter.dbusPath ?? "") !== "";
+                return root.hasBluetoothHardware;
             }
 
             seenIds.add(item.id);

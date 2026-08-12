@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
+import Quickshell.Io
 import Quickshell.Services.UPower
 import Caelestia.Config
 import qs.components
@@ -15,6 +16,16 @@ StyledRect {
 
     property color colour: Colours.palette.m3secondary
     readonly property alias items: iconColumn
+    property bool hasBluetoothHardware: false
+
+    Process {
+        id: btCheckProc
+        command: ["sh", "-c", "rfkill list bluetooth 2>/dev/null | grep -qi bluetooth"]
+        running: true
+        onExited: (code) => {
+            root.hasBluetoothHardware = (code === 0);
+        }
+    }
 
     color: Colours.tPalette.m3surfaceContainer
     radius: Tokens.rounding.full
@@ -185,7 +196,7 @@ StyledRect {
             Layout.preferredHeight: implicitHeight
 
             name: "bluetooth"
-            active: (Config.bar?.status?.showBluetooth ?? true) && (Bluetooth.defaultAdapter !== null && (Bluetooth.defaultAdapter.adapterId ?? "") !== "" && (Bluetooth.defaultAdapter.dbusPath ?? "") !== "")
+            active: (Config.bar?.status?.showBluetooth ?? true) && root.hasBluetoothHardware
 
             sourceComponent: ColumnLayout {
                 spacing: Tokens.spacing.medium / 2
