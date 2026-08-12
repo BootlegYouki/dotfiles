@@ -56,10 +56,6 @@ StyledRect {
                 return root.hasBluetoothHardware;
             }
 
-            if (item.id === "display" || item.id === "monitor") {
-                return Hypr.monitors.values.length > 1;
-            }
-
             seenIds.add(item.id);
             return true;
         });
