@@ -58,12 +58,20 @@ echo "  ✓ /etc/xdg/quickshell/caelestia"
 # 4. Reload Caelestia shell if it's running
 echo ""
 echo "4. Reloading Caelestia shell..."
-if caelestia shell -k 2>/dev/null; then
-    sleep 0.5
-    caelestia shell -d && echo "  ✓ Shell reloaded" || echo "  ⚠ Shell reload failed — try manually: caelestia shell -d"
+if qs -c caelestia kill 2>/dev/null; then
+    sleep 1
+    # Launch via uwsm so it inherits the correct Wayland environment
+    if command -v uwsm &>/dev/null; then
+        uwsm app -- caelestia shell -d && echo "  ✓ Shell reloaded via uwsm" || {
+            echo "  ⚠ uwsm launch failed — run manually: caelestia shell -d"
+        }
+    else
+        caelestia shell -d && echo "  ✓ Shell reloaded" || {
+            echo "  ⚠ Shell reload failed — run manually: caelestia shell -d"
+        }
+    fi
 else
-    echo "  ⚠ Shell was not running — starting it..."
-    caelestia shell -d && echo "  ✓ Shell started" || echo "  ⚠ Could not start shell — try manually: caelestia shell -d"
+    echo "  ℹ Shell was not running — run manually if needed: caelestia shell -d"
 fi
 
 echo ""
