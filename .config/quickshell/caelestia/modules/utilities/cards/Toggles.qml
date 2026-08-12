@@ -140,14 +140,10 @@ StyledRect {
                 DelegateChoice {
                     roleValue: "wifi"
                     delegate: Toggle {
-                        icon: Nmcli.activeEthernet !== null ? "lan" : (Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off"))
-                        checked: Nmcli.activeEthernet !== null || Nmcli.wifiEnabled
+                        icon: Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off")
+                        checked: Nmcli.wifiEnabled
                         onClicked: {
-                            if (Nmcli.activeEthernet !== null) {
-                                Nmcli.disconnectEthernet(Nmcli.activeEthernet.connection, () => {});
-                            } else {
-                                Nmcli.enableWifi(!Nmcli.wifiEnabled);
-                            }
+                            Nmcli.enableWifi(!Nmcli.wifiEnabled);
                         }
                     }
                 }
