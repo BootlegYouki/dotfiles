@@ -48,6 +48,10 @@ StyledRect {
                 return root.hasBluetoothHardware;
             }
 
+            if (item.id === "display" || item.id === "monitor") {
+                return Hypr.monitors.values.length > 1;
+            }
+
             seenIds.add(item.id);
             return true;
         });
@@ -150,6 +154,40 @@ StyledRect {
                         onClicked: {
                             if (Bluetooth.defaultAdapter)
                                 Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled;
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "display"
+                    delegate: Toggle {
+                        icon: "desktop_windows"
+                        checked: {
+                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
+                            return sec ? sec.dpmsStatus : true;
+                        }
+                        onClicked: {
+                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
+                            if (sec) {
+                                const action = sec.dpmsStatus ? "disable" : "enable";
+                                Hypr.dispatch(`eval hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`);
+                            }
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "monitor"
+                    delegate: Toggle {
+                        icon: "desktop_windows"
+                        checked: {
+                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
+                            return sec ? sec.dpmsStatus : true;
+                        }
+                        onClicked: {
+                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
+                            if (sec) {
+                                const action = sec.dpmsStatus ? "disable" : "enable";
+                                Hypr.dispatch(`eval hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`);
+                            }
                         }
                     }
                 }
