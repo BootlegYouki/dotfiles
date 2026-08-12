@@ -20,7 +20,7 @@ StyledRect {
 
     Process {
         id: btCheckProc
-        command: ["sh", "-c", "rfkill list bluetooth 2>/dev/null | grep -qi bluetooth"]
+        command: ["sh", "-c", "/usr/bin/rfkill list bluetooth 2>/dev/null | grep -qi bluetooth"]
         running: true
         onExited: (code) => {
             root.hasBluetoothHardware = (code === 0);
@@ -155,26 +155,14 @@ StyledRect {
             }
         }
 
-        // Network icon (Wi-Fi)
+        // Network icon (Wi-Fi or LAN)
         WrappedLoader {
             name: "network"
-            active: (Config.bar?.status?.showNetwork ?? true) && (!Nmcli.activeEthernet || Nmcli.active !== null || Nmcli.wirelessInterfaces.length > 0)
+            active: Config.bar?.status?.showNetwork ?? true
 
             sourceComponent: MaterialIcon {
                 animate: true
-                text: Nmcli.active ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off")
-                color: root.colour
-            }
-        }
-
-        // Ethernet icon
-        WrappedLoader {
-            name: "ethernet"
-            active: (Config.bar?.status?.showNetwork ?? true) && Nmcli.activeEthernet
-
-            sourceComponent: MaterialIcon {
-                animate: true
-                text: "cable"
+                text: Nmcli.activeEthernet !== null ? "cable" : (Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off"))
                 color: root.colour
             }
         }
@@ -196,7 +184,7 @@ StyledRect {
             Layout.preferredHeight: implicitHeight
 
             name: "bluetooth"
-            active: (Config.bar?.status?.showBluetooth ?? true) && root.hasBluetoothHardware
+            active: (Config.bar?.status?.showBluetooth ?? true) && (root.hasBluetoothHardware || Bluetooth.defaultAdapter !== null)
 
             sourceComponent: ColumnLayout {
                 spacing: Tokens.spacing.medium / 2
