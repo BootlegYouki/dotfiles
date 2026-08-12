@@ -4,9 +4,9 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Bluetooth
 import Quickshell.Io
-import Caelestia
 import Caelestia.Components
 import Caelestia.Config
+import qs.utils
 import qs.components
 import qs.components.controls
 import qs.services
