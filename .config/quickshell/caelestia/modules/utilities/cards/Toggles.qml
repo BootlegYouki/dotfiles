@@ -175,14 +175,12 @@ StyledRect {
                         icon: "lan"
                         checked: Nmcli.activeEthernet !== null
                         onClicked: {
-                            if (Nmcli.activeEthernet) {
+                            if (Nmcli.activeEthernet !== null) {
                                 Nmcli.disconnectEthernet(Nmcli.activeEthernet.connection, () => {});
                             } else {
-                                const eth = Nmcli.ethernetDevices.find(d => d.connection);
+                                const eth = Nmcli.ethernetDevices[0];
                                 if (eth) {
-                                    Nmcli.connectEthernet(eth.connection, eth.iface, () => {});
-                                } else {
-                                    Nmcli.getEthernetInterfaces(() => {});
+                                    Nmcli.connectEthernet(eth.connection ?? "", eth.iface, () => {});
                                 }
                             }
                         }
