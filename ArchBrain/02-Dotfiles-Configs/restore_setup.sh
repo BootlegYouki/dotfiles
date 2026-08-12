@@ -2,7 +2,7 @@
 set -eo pipefail
 
 echo "=========================================================="
-echo "🚀 Caelestia + Hyprland Complete Self-Cleaning Restoration"
+echo "🚀 Caelestia + Hyprland Complete Restoration Script (Paru)"
 echo "=========================================================="
 
 if [ "$EUID" -ne 0 ]; then
@@ -14,18 +14,15 @@ TARGET_USER="${SUDO_USER:-$USER}"
 TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 TARGET_UID="$(id -u "$TARGET_USER")"
 
-# Determine dotfiles root directory
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 echo "Dotfiles directory: $DOTFILES_DIR"
 echo "Target User: $TARGET_USER ($TARGET_HOME)"
 
-# Helper function to run commands as non-root user
 run_as_user() {
     sudo -u "$TARGET_USER" XDG_RUNTIME_DIR="/run/user/$TARGET_UID" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$TARGET_UID/bus" "$@"
 }
 
 echo -e "\n[0/8] 🧹 Wiping existing configurations & cached files..."
-# Remove old dotfiles/states to prevent git/copy collisions
 rm -rf "$TARGET_HOME/.config" "$TARGET_HOME/.local/state/caelestia" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py"
 rm -rf /etc/xdg/quickshell/caelestia /etc/systemd/system/getty@tty1.service.d/autologin.conf
 mkdir -p "$TARGET_HOME/.config" "$TARGET_HOME/.local/bin"
@@ -34,22 +31,21 @@ echo -e "\n[1/8] Refreshing package databases & updating mirrors..."
 cachyos-rate-mirrors 2>/dev/null || true
 pacman -Sy --noconfirm || true
 
-echo -e "\n[1.1/8] Installing build tools & AUR helper..."
+echo -e "\n[1.1/8] Installing build tools & Paru..."
 pacman -S --noconfirm --needed base-devel git || true
 
-if ! command -v yay &>/dev/null; then
-    echo "Installing yay-bin..."
-    if pacman -Si yay &>/dev/null; then
-        pacman -S --noconfirm --needed yay
+if ! command -v paru &>/dev/null; then
+    echo "Installing paru-bin..."
+    if pacman -Si paru &>/dev/null; then
+        pacman -S --noconfirm --needed paru
     else
-        git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-        chown -R "$TARGET_USER:$TARGET_USER" /tmp/yay-bin
-        (cd /tmp/yay-bin && run_as_user makepkg -si --noconfirm)
-        rm -rf /tmp/yay-bin
+        git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin
+        chown -R "$TARGET_USER:$TARGET_USER" /tmp/paru-bin
+        (cd /tmp/paru-bin && run_as_user makepkg -si --noconfirm)
+        rm -rf /tmp/paru-bin
     fi
 fi
 
-# Resolve package conflicts (replace jack2 with pipewire-jack)
 if pacman -Qi jack2 &>/dev/null; then
     echo "Replacing jack2 with pipewire-jack..."
     pacman -Rdd --noconfirm jack2 || true
@@ -65,31 +61,21 @@ pacman -S --noconfirm --needed \
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
     jq socat fd ripgrep fzf zoxide direnv eza
 
-echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies..."
-AUR_PKGS=()
-pacman -Qi quickshell-git &>/dev/null || AUR_PKGS+=("quickshell-git")
-pacman -Qi caelestia-cli &>/dev/null || AUR_PKGS+=("caelestia-cli")
-pacman -Qi ttf-material-symbols-variable-git &>/dev/null || pacman -Qi ttf-material-symbols-variable &>/dev/null || AUR_PKGS+=("ttf-material-symbols-variable-git")
-pacman -Qi brave-bin &>/dev/null || AUR_PKGS+=("brave-bin")
-pacman -Qi spotify &>/dev/null || AUR_PKGS+=("spotify")
-
-if [ ${#AUR_PKGS[@]} -gt 0 ]; then
-    run_as_user yay -S --noconfirm "${AUR_PKGS[@]}" || true
-fi
+echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies via Paru..."
+run_as_user paru -S --noconfirm --needed \
+    caelestia-shell-git \
+    quickshell-git \
+    caelestia-cli \
+    ttf-material-symbols-variable-git \
+    brave-bin \
+    spotify || true
 
 echo -e "\n[2/8] Restoring user configurations..."
+mkdir -p "$TARGET_HOME/.config"
 if [ -d "$DOTFILES_DIR/.config" ]; then
-    shopt -s dotglob
-    for item in "$DOTFILES_DIR/.config/"*; do
-        if [ -e "$item" ]; then
-            basename_item="$(basename "$item")"
-            if [ "$basename_item" != "rclone" ] && [ "$basename_item" != "." ] && [ "$basename_item" != ".." ]; then
-                mkdir -p "$TARGET_HOME/.config/$basename_item"
-                cp -a "$item/." "$TARGET_HOME/.config/$basename_item/" 2>/dev/null || true
-            fi
-        fi
-    done
-    shopt -u dotglob
+    rm -rf "$TARGET_HOME/.config/starship.toml" 2>/dev/null || true
+    cp -a "$DOTFILES_DIR/.config/." "$TARGET_HOME/.config/" 2>/dev/null || true
+    rm -rf "$TARGET_HOME/.config/rclone" 2>/dev/null || true
 fi
 
 echo -e "\n[2.5/8] Deploying system-wide Quickshell QML files..."
@@ -145,7 +131,6 @@ if [ -d "$DOTFILES_DIR/ArchBrain" ]; then
     cp -a "$DOTFILES_DIR/ArchBrain/." "$TARGET_HOME/ArchBrain/"
 fi
 
-# Fix ownership
 chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config" "$TARGET_HOME/.local" "$TARGET_HOME/Pictures" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py" 2>/dev/null || true
 
 echo -e "\n[7/8] Configuring system locale & services..."
@@ -176,7 +161,6 @@ EOF
 systemctl daemon-reload
 systemctl enable getty@tty1.service
 
-# Inject Hyprland trigger
 PROFILE_FILE="$TARGET_HOME/.bash_profile"
 if [ ! -f "$PROFILE_FILE" ]; then
     PROFILE_FILE="$TARGET_HOME/.profile"
