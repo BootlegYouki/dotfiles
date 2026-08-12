@@ -102,12 +102,15 @@ except Exception:
 
 def send_notification(enabled):
     state = "Enabled" if enabled else "Disabled"
+    icon_path = os.path.expanduser(f"~{target_user}/.local/share/icons/loot_macro_keyboard.svg")
+    if not os.path.exists(icon_path):
+        icon_path = "/usr/share/icons/Papirus/22x22/devices/input-keyboard.svg"
     cmd = [
         "sudo", "-u", target_user,
         f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{target_uid}/bus",
         "notify-send",
         "-a", "Loot Macro",
-        "-i", "/usr/share/icons/Papirus/22x22/devices/input-keyboard.svg",
+        "-i", icon_path,
         "Loot Macro",
         state,
         "-h", "string:x-canonical-private-synchronous:loot-macro"
