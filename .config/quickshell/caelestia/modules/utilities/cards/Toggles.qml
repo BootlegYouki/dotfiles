@@ -34,7 +34,7 @@ StyledRect {
             }
 
             if (item.id === "bluetooth") {
-                return Bluetooth.defaultAdapter !== null;
+                return Bluetooth.defaultAdapter !== null && (Bluetooth.adapters?.values?.length ?? 0) > 0;
             }
 
             seenIds.add(item.id);
