@@ -10,10 +10,10 @@ echo "🔄 Dotfiles Updater"
 echo "=========================================="
 echo "Dotfiles directory: $DOTFILES_DIR"
 
-# 0. Ensure proper Quickshell is installed (not the outdated CachyOS noctalia-qs fork)
+# 0. Ensure proper Quickshell is installed (not outdated CachyOS noctalia-qs fork)
 if pacman -Qi noctalia-qs &>/dev/null; then
     echo ""
-    echo "0. Upgrading Quickshell (removing noctalia-qs, installing quickshell-git from AUR)..."
+    echo "0. Upgrading Quickshell (removing noctalia-qs, installing quickshell-git)..."
     sudo pacman -Rdd --noconfirm noctalia-qs
     paru -S --noconfirm --skipreview quickshell-git
     echo "  ✓ quickshell-git installed from AUR"
