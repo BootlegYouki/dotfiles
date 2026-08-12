@@ -11,7 +11,6 @@ Scope {
 
     WlSessionLock {
         id: lock
-        locked: true
 
         signal unlock
 

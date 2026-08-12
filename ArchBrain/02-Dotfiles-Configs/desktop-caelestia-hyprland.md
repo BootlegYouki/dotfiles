@@ -26,6 +26,7 @@ hl.monitor({
 })
 ```
 - **Secondary Screen Bar Exclusion**: Configured `"excludedScreens": ["DP-1"]` under `bar` in [`shell.json`](file:///home/youki/.config/caelestia/shell.json#L17) so the Caelestia status bar renders cleanly on your main monitor (`HDMI-A-1`) only.
+- **Caelestia Logo Override**: Configured `"general": { "logo": "caelestia" }` in [`shell.json`](file:///home/youki/.config/caelestia/shell.json#L2-L4) to replace the distro (CachyOS) logo with the native Caelestia logo across the top bar, dashboard user card, and lockscreen fetch.
 - **Secondary Screen Lockscreen Exclusion**: Updated [`LockSurface.qml`](file:///home/youki/.config/quickshell/caelestia/modules/lock/LockSurface.qml#L17) so that interactive lock UI elements (clock, password input, avatar) only render on your primary monitor (`HDMI-A-1`), while secondary monitor (`DP-1`) renders a clean blurred lock overlay without duplicating the lockscreen UI.
 
 ### 1. Hyprland Windows-Style Keybindings (`~/.config/hypr/userprefs.conf`)
@@ -273,6 +274,7 @@ fi
 ---
 
 ## 5. Related Notes
+- [[caelestia-weather-locale-date-fix]]
 - [[caelestia-nightlight-widget]]
 - [[hyprland-screenshot-direct-save]]
 - [[hyprland-workspace-hover-focus]]

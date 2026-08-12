@@ -1,60 +1,43 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -e
 
 echo "=========================================================="
-echo "🚀 Caelestia + Hyprland Complete Restoration Script (Paru)"
+echo "🚀 Caelestia + Hyprland Complete Restoration Script"
 echo "=========================================================="
-
-# Ensure running with root privileges
-if [ "$EUID" -ne 0 ]; then
-  echo "❌ Error: Please run this script with sudo."
-  exit 1
-fi
 
 TARGET_USER="${SUDO_USER:-$USER}"
-TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
-TARGET_UID="$(id -u "$TARGET_USER")"
+TARGET_HOME="$(eval echo "~$TARGET_USER")"
 
 # Determine dotfiles root directory
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 echo "Dotfiles directory: $DOTFILES_DIR"
 echo "Target User: $TARGET_USER ($TARGET_HOME)"
 
-# Helper function to run commands as non-root user
-run_as_user() {
-    sudo -u "$TARGET_USER" XDG_RUNTIME_DIR="/run/user/$TARGET_UID" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$TARGET_UID/bus" "$@"
-}
+echo "1. Refreshing package databases & updating mirrors..."
+sudo cachyos-rate-mirrors 2>/dev/null || true
+sudo pacman -Sy --noconfirm || true
 
-echo -e "\n[0/8] 🧹 Wiping existing configurations & cached files..."
-rm -rf "$TARGET_HOME/.config" "$TARGET_HOME/.local/state/caelestia" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py"
-rm -rf /etc/xdg/quickshell/caelestia /etc/systemd/system/getty@tty1.service.d/autologin.conf
-mkdir -p "$TARGET_HOME/.config" "$TARGET_HOME/.local/bin"
+# Ensure base-devel, git, and yay (AUR helper) are available
+echo "1.1. Installing build tools & AUR helper..."
+sudo pacman -S --noconfirm --needed base-devel git || true
 
-echo -e "\n[1/8] Refreshing package databases & updating mirrors..."
-cachyos-rate-mirrors 2>/dev/null || true
-pacman -Sy --noconfirm || true
-
-echo -e "\n[1.1/8] Installing build tools & Paru..."
-pacman -S --noconfirm --needed base-devel git || true
-
-if ! command -v paru &>/dev/null; then
-    echo "Installing paru-bin..."
-    if pacman -Si paru &>/dev/null; then
-        pacman -S --noconfirm --needed paru
-    else
-        git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin
-        chown -R "$TARGET_USER:$TARGET_USER" /tmp/paru-bin
-        (cd /tmp/paru-bin && run_as_user makepkg -si --noconfirm)
-        rm -rf /tmp/paru-bin
-    fi
+if ! command -v yay &>/dev/null; then
+    echo "Installing yay-bin..."
+    sudo pacman -S --noconfirm --needed yay || {
+        git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
+        (cd /tmp/yay-bin && makepkg -si --noconfirm)
+        rm -rf /tmp/yay-bin
+    }
 fi
 
-# Force remove any conflicting legacy packages from the local database before building
-echo "Clearing potential conflicting packages..."
-pacman -Rdd --noconfirm jack2 caelestia-shell quickshell 2>/dev/null || true
+# Resolve package conflicts (replace jack2 with pipewire-jack for Caelestia)
+if pacman -Qi jack2 &>/dev/null; then
+    echo "Replacing jack2 with pipewire-jack..."
+    sudo pacman -Rdd --noconfirm jack2 || true
+fi
 
-echo -e "\n[1.2/8] Installing official packages, fonts & CLI tools..."
-pacman -S --noconfirm --needed \
+echo "1.2. Installing official packages, fonts, CLI tools & multimedia stack..."
+sudo pacman -S --noconfirm --needed \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
     hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring \
     flatpak polkit-kde-agent python-evdev python-pykakasi discord zed vlc cava \
@@ -63,137 +46,138 @@ pacman -S --noconfirm --needed \
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
     jq socat fd ripgrep fzf zoxide direnv eza
 
-echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies..."
-AUR_LIST=(
-    "quickshell-git"
-    "caelestia-shell-git"
-    "caelestia-cli"
-    "ttf-material-symbols-variable-git"
-    "brave-bin"
-    "spotify"
-)
+echo "1.3. Installing Caelestia & AUR dependencies..."
+if ! pacman -Qi quickshell-git &>/dev/null; then
+    echo "Installing quickshell-git from AUR..."
+    su - "$TARGET_USER" -c "yay -S --noconfirm quickshell-git" || true
+fi
+if ! pacman -Qi caelestia-cli &>/dev/null; then
+    echo "Installing caelestia-cli from AUR..."
+    su - "$TARGET_USER" -c "yay -S --noconfirm caelestia-cli" || true
+fi
+if ! pacman -Qi ttf-material-symbols-variable-git &>/dev/null && ! pacman -Qi ttf-material-symbols-variable &>/dev/null; then
+    echo "Installing Material Symbols font from AUR..."
+    su - "$TARGET_USER" -c "yay -S --noconfirm ttf-material-symbols-variable-git" || true
+fi
+if ! pacman -Qi brave-bin &>/dev/null; then
+    echo "Installing Brave Browser from AUR..."
+    su - "$TARGET_USER" -c "yay -S --noconfirm brave-bin" || true
+fi
+if ! pacman -Qi spotify &>/dev/null; then
+    echo "Installing Spotify from AUR..."
+    su - "$TARGET_USER" -c "yay -S --noconfirm spotify" || true
+fi
 
-for pkg in "${AUR_LIST[@]}"; do
-    echo "--> Installing $pkg..."
-    run_as_user paru -S --noconfirm --needed --skipreview "$pkg" || \
-    run_as_user paru -S --noconfirm --needed --nodeps --skipreview "$pkg" || true
+echo "1.4. Executing Caelestia CLI component initialization..."
+if command -v caelestia &>/dev/null; then
+    su - "$TARGET_USER" -c "caelestia install --noconfirm" || true
+fi
+
+echo "2. Copying user configurations to $TARGET_HOME/.config/..."
+for item in "$DOTFILES_DIR/.config/"*; do
+    if [ -e "$item" ]; then
+        basename_item="$(basename "$item")"
+        if [ "$basename_item" != "rclone" ]; then
+            echo " - Restoring $TARGET_HOME/.config/$basename_item"
+            if [ -d "$item" ]; then
+                mkdir -p "$TARGET_HOME/.config/$basename_item"
+                cp -R "$item/"* "$TARGET_HOME/.config/$basename_item/"
+            else
+                cp "$item" "$TARGET_HOME/.config/"
+            fi
+        fi
+    fi
 done
 
-echo -e "\n[2/8] Restoring user configurations..."
-mkdir -p "$TARGET_HOME/.config"
-if [ -d "$DOTFILES_DIR/.config" ]; then
-    rm -rf "$TARGET_HOME/.config/starship.toml" 2>/dev/null || true
-    cp -a "$DOTFILES_DIR/.config/." "$TARGET_HOME/.config/" 2>/dev/null || true
-    rm -rf "$TARGET_HOME/.config/rclone" 2>/dev/null || true
-fi
-
-echo -e "\n[2.5/8] Deploying system-wide Quickshell QML files..."
-mkdir -p /etc/xdg/quickshell/caelestia
+echo "2.5. Installing system-wide Quickshell QML files (/etc/xdg/quickshell/caelestia)..."
+sudo mkdir -p /etc/xdg/quickshell/caelestia
 if [ -d "$TARGET_HOME/.config/quickshell/caelestia" ]; then
-    cp -a "$TARGET_HOME/.config/quickshell/caelestia/." /etc/xdg/quickshell/caelestia/
-    find /etc/xdg/quickshell/caelestia/ -name "*.qml" -exec sed -i 's/\/\/@ pragma/\/\/ pragma/g' {} + 2>/dev/null || true
+    sudo cp -R "$TARGET_HOME/.config/quickshell/caelestia/"* /etc/xdg/quickshell/caelestia/
 fi
 
+# Ensure quickshell default symlink
 if [ -f "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" ]; then
     mkdir -p "$TARGET_HOME/.config/quickshell"
     ln -sfn "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" "$TARGET_HOME/.config/quickshell/shell.qml"
 fi
 
-echo -e "\n[3/8] Executing Caelestia CLI component initialization..."
-# Skipped to avoid redundant Paru provider conflict prompts
-# if command -v caelestia &>/dev/null; then
-#     run_as_user caelestia install --noconfirm || true
-# fi
+echo "3. Copying bin files to $TARGET_HOME/.local/bin/..."
+mkdir -p "$TARGET_HOME/.local/bin"
+cp "$DOTFILES_DIR/.local/bin/"* "$TARGET_HOME/.local/bin/"
+chmod +x "$TARGET_HOME/.local/bin/"* 2>/dev/null || true
 
-echo -e "\n[4/8] Restoring local binaries & Caelestia state..."
-if [ -d "$DOTFILES_DIR/.local/bin" ]; then
-    cp -a "$DOTFILES_DIR/.local/bin/." "$TARGET_HOME/.local/bin/"
-    chmod +x "$TARGET_HOME/.local/bin/"* 2>/dev/null || true
-fi
-
+echo "3.5. Restoring Caelestia state & themes..."
 if [ -d "$DOTFILES_DIR/.local/state/caelestia" ]; then
     mkdir -p "$TARGET_HOME/.local/state/caelestia"
-    cp -a "$DOTFILES_DIR/.local/state/caelestia/." "$TARGET_HOME/.local/state/caelestia/"
+    cp -R "$DOTFILES_DIR/.local/state/caelestia/"* "$TARGET_HOME/.local/state/caelestia/"
 fi
 
-echo -e "\n[5/8] Restoring Wallpapers & symlinks..."
+echo "3.6. Restoring Wallpapers repository & fixing path symlinks..."
 if [ ! -d "$TARGET_HOME/Pictures/Wallpapers" ]; then
     mkdir -p "$TARGET_HOME/Pictures"
-    run_as_user git clone https://github.com/laustoic/laustoic-wallpaper-repo.git "$TARGET_HOME/Pictures/Wallpapers" || true
+    git clone https://github.com/laustoic/laustoic-wallpaper-repo.git "$TARGET_HOME/Pictures/Wallpapers" || true
 fi
 
+# Re-link wallpaper symlinks dynamically for target user
 if [ -f "$TARGET_HOME/Pictures/Wallpapers/wallhaven-zywgxy.jpg" ]; then
     mkdir -p "$TARGET_HOME/.local/state/caelestia/wallpaper"
     ln -sfn "$TARGET_HOME/Pictures/Wallpapers/wallhaven-zywgxy.jpg" "$TARGET_HOME/.local/state/caelestia/wallpaper/current"
     echo "$TARGET_HOME/Pictures/Wallpapers/wallhaven-zywgxy.jpg" > "$TARGET_HOME/.local/state/caelestia/wallpaper/path.txt"
 fi
 
-echo -e "\n[6/8] Restoring scripts & extra vaults..."
-if [ -f "$DOTFILES_DIR/scripts/genshin_f_macro.py" ]; then
-    cp "$DOTFILES_DIR/scripts/genshin_f_macro.py" "$TARGET_HOME/genshin_f_macro.py"
-fi
-if [ -f "$DOTFILES_DIR/systemd-system/genshin-f-macro.service" ]; then
-    cp "$DOTFILES_DIR/systemd-system/genshin-f-macro.service" "/etc/systemd/system/genshin-f-macro.service"
-    sed -i "s|/home/youki|$TARGET_HOME|g" "/etc/systemd/system/genshin-f-macro.service"
-fi
+chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config" "$TARGET_HOME/.local" "$TARGET_HOME/Pictures" 2>/dev/null || true
 
-if [ -d "$DOTFILES_DIR/ArchBrain" ]; then
-    mkdir -p "$TARGET_HOME/ArchBrain"
-    cp -a "$DOTFILES_DIR/ArchBrain/." "$TARGET_HOME/ArchBrain/"
-fi
-
-# Fix ownership across home directory
-chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config" "$TARGET_HOME/.local" "$TARGET_HOME/Pictures" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py" 2>/dev/null || true
-
-echo -e "\n[7/8] Configuring system locale & services..."
-tee /etc/locale.conf > /dev/null << 'EOF'
+echo "3.7. Configuring system locale (/etc/locale.conf -> en_US.UTF-8)..."
+sudo tee /etc/locale.conf > /dev/null << 'EOF'
 LANG=en_US.UTF-8
 LC_TIME=en_US.UTF-8
+LC_NUMERIC=en_US.UTF-8
+LC_MONETARY=en_US.UTF-8
+LC_PAPER=en_US.UTF-8
+LC_NAME=en_US.UTF-8
+LC_ADDRESS=en_US.UTF-8
+LC_TELEPHONE=en_US.UTF-8
+LC_MEASUREMENT=en_US.UTF-8
+LC_IDENTIFICATION=en_US.UTF-8
 EOF
 
-run_as_user systemctl --user daemon-reload 2>/dev/null || true
-run_as_user systemctl --user enable --now caelestia-romaji.service 2>/dev/null || true
+echo "4. Restoring Genshin F-Macro..."
+cp "$DOTFILES_DIR/scripts/genshin_f_macro.py" "$TARGET_HOME/genshin_f_macro.py"
+sudo cp "$DOTFILES_DIR/systemd-system/genshin-f-macro.service" "/etc/systemd/system/genshin-f-macro.service"
 
-systemctl daemon-reload
-if [ -f "/etc/systemd/system/genshin-f-macro.service" ]; then
-    systemctl enable --now genshin-f-macro.service || true
+echo "5. Restoring ArchBrain vault..."
+mkdir -p "$TARGET_HOME/ArchBrain"
+cp -R "$DOTFILES_DIR/ArchBrain/"* "$TARGET_HOME/ArchBrain/"
+chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py" 2>/dev/null || true
+
+echo "6. Reloading and enabling systemd user services..."
+if [ -n "$SUDO_USER" ]; then
+    su - "$TARGET_USER" -c "XDG_RUNTIME_DIR=/run/user/$(id -u "$TARGET_USER") systemctl --user daemon-reload" 2>/dev/null || true
+    su - "$TARGET_USER" -c "XDG_RUNTIME_DIR=/run/user/$(id -u "$TARGET_USER") systemctl --user enable --now caelestia-romaji.service" 2>/dev/null || true
+else
+    systemctl --user daemon-reload 2>/dev/null || true
+    systemctl --user enable --now caelestia-romaji.service 2>/dev/null || true
 fi
 
-# Convert all Wi-Fi connections to system-wide to avoid GNOME Keyring popups on autologin
-if command -v nmcli &>/dev/null; then
-    echo "Adjusting NetworkManager Wi-Fi connections to be system-wide..."
-    nmcli -g NAME,TYPE connection show | while IFS=: read -r name type; do
-        if [ "$type" = "802-11-wireless" ]; then
-            nmcli connection modify "$name" connection.permissions "" 2>/dev/null || true
-            nmcli connection modify "$name" 802-11-wireless-security.psk-flags 0 2>/dev/null || true
-        fi
-    done
-fi
+echo "7. Reloading and enabling systemd system services..."
+sudo systemctl daemon-reload
+sudo systemctl enable --now genshin-f-macro.service || true
 
-echo -e "\n[8/8] Configuring TTY1 Autologin & Boot Pipeline..."
-systemctl disable sddm 2>/dev/null || true
-systemctl disable gdm 2>/dev/null || true
+echo "7.5. Configuring Getty tty1 Autologin (0-RAM Display Manager Replacement)..."
+sudo systemctl disable sddm 2>/dev/null || true
+sudo systemctl disable gdm 2>/dev/null || true
 
-mkdir -p /etc/systemd/system/getty@tty1.service.d
-tee /etc/systemd/system/getty@tty1.service.d/autologin.conf > /dev/null << EOF
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf > /dev/null << EOF
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty -o "-p -f -- \u" --noclear --autologin $TARGET_USER %I \$TERM
 EOF
 
-systemctl daemon-reload
-systemctl enable getty@tty1.service
-
-PROFILE_FILE="$TARGET_HOME/.bash_profile"
-if [ ! -f "$PROFILE_FILE" ]; then
-    PROFILE_FILE="$TARGET_HOME/.profile"
-fi
-
-if ! grep -q "uwsm start" "$PROFILE_FILE" 2>/dev/null; then
-    echo -e "\n# Auto-start Hyprland via UWSM on tty1 login\nif [ -z \"\$DISPLAY\" ] && [ \"\$(tty)\" = \"/dev/tty1\" ]; then\n  exec uwsm start hyprland-uwsm.desktop\nfi" >> "$PROFILE_FILE"
-    chown "$TARGET_USER:$TARGET_USER" "$PROFILE_FILE"
-fi
+sudo systemctl daemon-reload
+sudo systemctl enable getty@tty1.service
 
 echo "=========================================================="
-echo "✨ Restoration Complete! Reboot now: sudo reboot"
+echo "✨ Restoration Complete!"
+echo "Please reboot your system (sudo reboot) to launch into Caelestia Shell."
 echo "=========================================================="

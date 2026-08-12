@@ -33,7 +33,6 @@ local system_monitor_tag = "system_monitor"
 local music_player_tag = "music_player"
 local communication_app_tag = "communication_app"
 local todo_app_tag = "todo_app"
-local dev_app_tag = "dev_app"
 
 
 ----------------------
@@ -62,6 +61,7 @@ hl.window_rule({
 
 -- Opaque apps
 tagged_rule(opaque_tag, {
+    "foot",                          -- Terminal
     "equibop",                       -- Discord client
     "org.quickshell",                -- Quickshell
     "feh|imv|swappy",                -- Image viewers
@@ -117,10 +117,9 @@ tagged_rule(float_50_60_tag, {
 
 -- Games
 tagged_rule(game_tag, {
-    "steam_app_[0-9]+",                                                    -- Steam games
-    "steam_app_default",                                                   -- Lutris games
-    "gamescope",                                                           -- Gamescope
-    "Twintaillauncher|app.twintaillauncher.ttl|com.github.an-anime-game-launcher|steam", -- Game launchers & Steam
+    "steam_app_[0-9]+",  -- Steam games
+    "steam_app_default", -- Lutris games
+    "gamescope",         -- Gamescope
 }, "class")
 
 
@@ -148,9 +147,6 @@ tagged_rule(communication_app_tag, {
 }, "class")
 tagged_rule(todo_app_tag, {
     "todoist" -- Todoist
-}, "class")
-tagged_rule(dev_app_tag, {
-    "dev.zed.Zed|zed|zeditor|code|Code" -- Dev editors
 }, "class")
 
 
@@ -197,7 +193,6 @@ create_tag(system_monitor_tag, { workspace = "special:sysmon" })
 create_tag(music_player_tag, { workspace = "special:music" })
 create_tag(communication_app_tag, { workspace = "special:communication" })
 create_tag(todo_app_tag, { workspace = "special:todo" })
-create_tag(dev_app_tag, { workspace = "special:dev" })
 
 
 -------------------------

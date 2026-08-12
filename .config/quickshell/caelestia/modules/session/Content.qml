@@ -26,6 +26,17 @@ Column {
         command: Config.session.commands.logout
 
         KeyNavigation.down: shutdown
+
+        Component.onCompleted: forceActiveFocus()
+
+        Connections {
+            function onLauncherChanged(): void {
+                if (!root.screenState.launcher)
+                    logout.forceActiveFocus();
+            }
+
+            target: root.screenState
+        }
     }
 
     SessionButton {
@@ -36,17 +47,6 @@ Column {
 
         KeyNavigation.up: logout
         KeyNavigation.down: hibernate
-
-        Component.onCompleted: forceActiveFocus()
-
-        Connections {
-            function onLauncherChanged(): void {
-                if (!root.screenState.launcher)
-                    shutdown.forceActiveFocus();
-            }
-
-            target: root.screenState
-        }
     }
 
     AnimatedImage {

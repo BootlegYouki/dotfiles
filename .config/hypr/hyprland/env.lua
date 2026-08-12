@@ -1,19 +1,14 @@
 local vars = require("variables")
 
--- Locale / Language (English)
+-- Locales & Themes
 hl.env("LANG", "en_US.UTF-8")
 hl.env("LC_TIME", "en_US.UTF-8")
-hl.env("LC_MESSAGES", "en_US.UTF-8")
 hl.env("LC_ALL", "en_US.UTF-8")
-
--- Themes
 hl.env("QT_QPA_PLATFORMTHEME", "qtengine")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 hl.env("XCURSOR_THEME", vars.cursorTheme)
 hl.env("XCURSOR_SIZE", vars.cursorSize)
-hl.env("HYPRCURSOR_THEME", vars.cursorTheme)
-hl.env("HYPRCURSOR_SIZE", vars.cursorSize)
 
 -- Toolkit backends
 hl.env("GDK_BACKEND", "wayland,x11")

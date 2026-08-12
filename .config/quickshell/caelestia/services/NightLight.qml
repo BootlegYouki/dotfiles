@@ -55,6 +55,18 @@ Singleton {
         }
     }
 
+    Timer {
+        id: checkTimer
+        interval: 2000
+        repeat: true
+        running: true
+        onTriggered: {
+            if (!procCheck.running) {
+                procCheck.running = true;
+            }
+        }
+    }
+
     IpcHandler {
         function isEnabled(): bool {
             return root.enabled;
