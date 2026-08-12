@@ -13,11 +13,14 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 echo "Dotfiles directory: $DOTFILES_DIR"
 echo "Target User: $TARGET_USER ($TARGET_HOME)"
 
-echo "1. Installing system dependencies & user applications..."
+echo "1. Refreshing package databases & updating mirrors..."
 sudo cachyos-rate-mirrors 2>/dev/null || true
 sudo pacman -Sy --noconfirm || true
 
-# Ensure yay (AUR helper) is available
+# Ensure base-devel, git, and yay (AUR helper) are available
+echo "1.1. Installing build tools & AUR helper..."
+sudo pacman -S --noconfirm --needed base-devel git || true
+
 if ! command -v yay &>/dev/null; then
     echo "Installing yay-bin..."
     sudo pacman -S --noconfirm --needed yay || {
@@ -33,13 +36,16 @@ if pacman -Qi jack2 &>/dev/null; then
     sudo pacman -Rdd --noconfirm jack2 || true
 fi
 
-# Install official packages & core dependencies
+echo "1.2. Installing official packages, fonts & multimedia stack..."
 sudo pacman -S --noconfirm --needed \
-    pipewire-jack hyprland uwsm ghostty waybar fish starship fastfetch \
-    gnome-keyring flatpak polkit-kde-agent python-evdev python-pykakasi \
-    discord zed vlc cava sunshine hyprsunset cliphist pamixer wl-clipboard \
-    python-pillow python-pip
+    pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
+    hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring \
+    flatpak polkit-kde-agent python-evdev python-pykakasi discord zed vlc cava \
+    sunshine hyprsunset cliphist pamixer wl-clipboard playerctl grim slurp \
+    hyprpicker brightnessctl python-pillow python-pip \
+    ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk
 
+echo "1.3. Installing Caelestia & AUR dependencies..."
 # Install AUR dependencies via yay if missing
 if ! pacman -Qi quickshell-git &>/dev/null; then
     echo "Installing quickshell-git from AUR..."
@@ -48,6 +54,10 @@ fi
 if ! pacman -Qi caelestia-cli &>/dev/null; then
     echo "Installing caelestia-cli from AUR..."
     su - "$TARGET_USER" -c "yay -S --noconfirm caelestia-cli" || true
+fi
+if ! pacman -Qi ttf-material-symbols-variable-git &>/dev/null && ! pacman -Qi ttf-material-symbols-variable &>/dev/null; then
+    echo "Installing Material Symbols font from AUR..."
+    su - "$TARGET_USER" -c "yay -S --noconfirm ttf-material-symbols-variable-git" || true
 fi
 if ! pacman -Qi brave-bin &>/dev/null; then
     echo "Installing Brave Browser from AUR..."
@@ -58,7 +68,7 @@ if ! pacman -Qi spotify &>/dev/null; then
     su - "$TARGET_USER" -c "yay -S --noconfirm spotify" || true
 fi
 
-echo "2. Copying configurations to $TARGET_HOME/.config/..."
+echo "2. Copying user configurations to $TARGET_HOME/.config/..."
 for item in "$DOTFILES_DIR/.config/"*; do
     if [ -e "$item" ]; then
         basename_item="$(basename "$item")"
