@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # update.sh — Pull latest dotfiles from GitHub and apply them to the system.
-# Run as your normal user (no sudo needed at the start).
 
 set -e
 
@@ -60,34 +59,35 @@ done
 
 # 3. Sync system-wide Quickshell QML files
 echo ""
-echo "3. Syncing Quickshell QML to /etc/xdg/quickshell/caelestia (requires sudo)..."
-sudo cp -R "$DOTFILES_DIR/.config/quickshell/caelestia/." /etc/xdg/quickshell/caelestia/
-echo "  ✓ /etc/xdg/quickshell/caelestia"
+echo "3. Syncing Quickshell QML to /etc/xdg/quickshell/caelestia..."
+sudo mkdir -p /etc/xdg/quickshell/caelestia
+if [ -d "$DOTFILES_DIR/.config/quickshell/caelestia" ]; then
+    sudo cp -R "$DOTFILES_DIR/.config/quickshell/caelestia/." /etc/xdg/quickshell/caelestia/
+    echo "  ✓ /etc/xdg/quickshell/caelestia"
+fi
 
 # 4. Reload Caelestia shell if it's running
 echo ""
 echo "4. Reloading Caelestia shell..."
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     echo "  ⚠ Running over SSH — cannot restart Wayland shell remotely."
-    echo "  → Run this on your machine: caelestia shell -d"
 elif qs -c caelestia kill 2>/dev/null; then
     sleep 1
-    # Launch via uwsm so it inherits the correct Wayland environment
     if command -v uwsm &>/dev/null; then
-        uwsm app -- caelestia shell -d && echo "  ✓ Shell reloaded via uwsm" || {
-            echo "  ⚠ uwsm launch failed — run manually: caelestia shell -d"
-        }
+        uwsm app -- caelestia shell -d >/dev/null 2>&1 &
+        echo "  ✓ Shell reloaded via uwsm"
     else
-        caelestia shell -d && echo "  ✓ Shell reloaded" || {
-            echo "  ⚠ Shell reload failed — run manually: caelestia shell -d"
-        }
+        caelestia shell -d >/dev/null 2>&1 &
+        echo "  ✓ Shell reloaded"
     fi
 else
     echo "  ℹ Shell was not running — starting it..."
     if command -v uwsm &>/dev/null; then
-        uwsm app -- caelestia shell -d && echo "  ✓ Shell started via uwsm" || echo "  ⚠ Could not start shell — run manually: caelestia shell -d"
+        uwsm app -- caelestia shell -d >/dev/null 2>&1 &
+        echo "  ✓ Shell started via uwsm"
     else
-        caelestia shell -d && echo "  ✓ Shell started" || echo "  ⚠ Could not start shell — run manually: caelestia shell -d"
+        caelestia shell -d >/dev/null 2>&1 &
+        echo "  ✓ Shell started"
     fi
 fi
 
