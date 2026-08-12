@@ -162,7 +162,7 @@ StyledRect {
 
             sourceComponent: MaterialIcon {
                 animate: true
-                text: Nmcli.activeEthernet !== null ? "cable" : (Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off"))
+                text: Nmcli.activeEthernet !== null ? "lan" : (Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off"))
                 color: root.colour
             }
         }
