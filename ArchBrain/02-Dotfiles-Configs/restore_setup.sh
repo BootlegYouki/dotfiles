@@ -162,11 +162,6 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable getty@tty1.service
 
-echo "8. Applying Caelestia Monochrome Scheme..."
-if command -v caelestia &>/dev/null; then
-    su - "$TARGET_USER" -c "caelestia scheme set -n dynamic -v monochrome" 2>/dev/null || true
-fi
-
 echo "=========================================================="
 echo "✨ Restoration Complete!"
 echo "Please reboot your system (sudo reboot) to launch into Caelestia Shell."
