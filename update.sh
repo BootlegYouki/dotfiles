@@ -14,12 +14,9 @@ echo "Dotfiles directory: $DOTFILES_DIR"
 # 0. Ensure proper Quickshell is installed (not the outdated CachyOS noctalia-qs fork)
 if pacman -Qi noctalia-qs &>/dev/null; then
     echo ""
-    echo "0. Upgrading Quickshell (removing noctalia-qs, building quickshell-git from AUR)..."
+    echo "0. Upgrading Quickshell (removing noctalia-qs, installing quickshell-git from AUR)..."
     sudo pacman -Rdd --noconfirm noctalia-qs
-    rm -rf /tmp/qs-aur-build
-    git clone https://aur.archlinux.org/quickshell-git.git /tmp/qs-aur-build
-    (cd /tmp/qs-aur-build && makepkg -si --noconfirm)
-    rm -rf /tmp/qs-aur-build
+    paru -S --noconfirm --skipreview aur/quickshell-git
     echo "  ✓ quickshell-git installed from AUR"
 fi
 

@@ -17,16 +17,16 @@ echo "1. Refreshing package databases & updating mirrors..."
 sudo cachyos-rate-mirrors 2>/dev/null || true
 sudo pacman -Sy --noconfirm || true
 
-# Ensure base-devel, git, and yay (AUR helper) are available
+# Ensure base-devel, git, and paru (AUR helper) are available
 echo "1.1. Installing build tools & AUR helper..."
 sudo pacman -S --noconfirm --needed base-devel git || true
 
-if ! command -v yay &>/dev/null; then
-    echo "Installing yay-bin..."
-    sudo pacman -S --noconfirm --needed yay || {
-        git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-        (cd /tmp/yay-bin && makepkg -si --noconfirm)
-        rm -rf /tmp/yay-bin
+if ! command -v paru &>/dev/null; then
+    echo "Installing paru-bin..."
+    sudo pacman -S --noconfirm --needed paru || {
+        git clone https://aur.archlinux.org/paru-bin.git /tmp/paru-bin
+        (cd /tmp/paru-bin && makepkg -si --noconfirm)
+        rm -rf /tmp/paru-bin
     }
 fi
 
@@ -53,27 +53,24 @@ if pacman -Qi noctalia-qs &>/dev/null; then
     sudo pacman -Rdd --noconfirm noctalia-qs || true
 fi
 if ! pacman -Qi quickshell-git &>/dev/null; then
-    echo "  Building quickshell-git from AUR (this takes a few minutes)..."
-    rm -rf /tmp/qs-aur-build
-    git clone https://aur.archlinux.org/quickshell-git.git /tmp/qs-aur-build
-    (cd /tmp/qs-aur-build && sudo -u "$TARGET_USER" makepkg -si --noconfirm) || true
-    rm -rf /tmp/qs-aur-build
+    echo "  Installing quickshell-git from AUR via paru..."
+    sudo -u "$TARGET_USER" paru -S --noconfirm --skipreview aur/quickshell-git || true
 fi
 if ! pacman -Qi caelestia-cli &>/dev/null; then
     echo "Installing caelestia-cli from AUR..."
-    su - "$TARGET_USER" -c "yay -S --noconfirm caelestia-cli" || true
+    su - "$TARGET_USER" -c "paru -S --noconfirm --skipreview caelestia-cli" || true
 fi
 if ! pacman -Qi ttf-material-symbols-variable-git &>/dev/null && ! pacman -Qi ttf-material-symbols-variable &>/dev/null; then
     echo "Installing Material Symbols font from AUR..."
-    su - "$TARGET_USER" -c "yay -S --noconfirm ttf-material-symbols-variable-git" || true
+    su - "$TARGET_USER" -c "paru -S --noconfirm --skipreview ttf-material-symbols-variable-git" || true
 fi
 if ! pacman -Qi brave-bin &>/dev/null; then
     echo "Installing Brave Browser from AUR..."
-    su - "$TARGET_USER" -c "yay -S --noconfirm brave-bin" || true
+    su - "$TARGET_USER" -c "paru -S --noconfirm --skipreview brave-bin" || true
 fi
 if ! pacman -Qi spotify &>/dev/null; then
     echo "Installing Spotify from AUR..."
-    su - "$TARGET_USER" -c "yay -S --noconfirm spotify" || true
+    su - "$TARGET_USER" -c "paru -S --noconfirm --skipreview spotify" || true
 fi
 
 echo "1.4. Executing Caelestia CLI component initialization..."
