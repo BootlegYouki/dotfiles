@@ -134,6 +134,7 @@ if [ -f "$DOTFILES_DIR/scripts/genshin_f_macro.py" ]; then
 fi
 if [ -f "$DOTFILES_DIR/systemd-system/genshin-f-macro.service" ]; then
     cp "$DOTFILES_DIR/systemd-system/genshin-f-macro.service" "/etc/systemd/system/genshin-f-macro.service"
+    sed -i "s|/home/youki|$TARGET_HOME|g" "/etc/systemd/system/genshin-f-macro.service"
 fi
 
 if [ -d "$DOTFILES_DIR/ArchBrain" ]; then

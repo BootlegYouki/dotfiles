@@ -3,6 +3,8 @@ from evdev import ecodes, InputDevice, UInput
 import threading
 import time
 import sys
+import os
+import pwd
 import signal
 import select
 import subprocess
@@ -88,11 +90,21 @@ ctrl_pressed = any(
     for kb in keyboards
 )
 
+# Automatically detect target user and UID based on file ownership
+# Defaults to "youki" (UID 1000) if any lookup fails
+try:
+    file_owner_uid = os.stat(os.path.abspath(__file__)).st_uid
+    target_user = pwd.getpwuid(file_owner_uid).pw_name
+    target_uid = file_owner_uid
+except Exception:
+    target_user = "youki"
+    target_uid = 1000
+
 def send_notification(enabled):
     state = "Enabled" if enabled else "Disabled"
     cmd = [
-        "sudo", "-u", "youki",
-        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus",
+        "sudo", "-u", target_user,
+        f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{target_uid}/bus",
         "notify-send",
         "-a", "Loot Macro",
         "-i", "/usr/share/icons/Papirus/22x22/devices/input-keyboard.svg",
