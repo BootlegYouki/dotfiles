@@ -166,7 +166,15 @@ def run_fuzzel_gui(apps):
 
 def main():
     apps = get_installed_apps()
-    run_fuzzel_gui(apps)
+    if len(sys.argv) > 1 and sys.argv[1] in ["--list", "-l"]:
+        sorted_apps = sorted(apps.values(), key=lambda x: x["name"].lower())
+        print("Installed Applications Autostart Status:")
+        for app in sorted_apps:
+            enabled = is_autostart_enabled(app["filename"])
+            status = "[✓] ENABLED " if enabled else "[ ] DISABLED"
+            print(f"{status}  {app['name']}")
+    else:
+        run_fuzzel_gui(apps)
 
 if __name__ == "__main__":
     main()
