@@ -33,6 +33,10 @@ StyledRect {
                 return GlobalConfig.utilities.vpn.provider.some(p => typeof p === "object" ? (p.enabled === true) : false);
             }
 
+            if (item.id === "bluetooth") {
+                return Bluetooth.defaultAdapter !== null;
+            }
+
             seenIds.add(item.id);
             return true;
         });
@@ -83,7 +87,35 @@ StyledRect {
                 DelegateChoice {
                     roleValue: "wifi"
                     delegate: Toggle {
-                        icon: Nmcli.activeEthernet ? "lan" : "settings_ethernet"
+                        icon: Nmcli.activeEthernet !== null ? "lan" : (Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off"))
+                        checked: Nmcli.activeEthernet !== null || Nmcli.wifiEnabled
+                        onClicked: {
+                            if (Nmcli.activeEthernet !== null) {
+                                Nmcli.disconnectEthernet(Nmcli.activeEthernet.connection, () => {});
+                            } else {
+                                Nmcli.enableWifi(!Nmcli.wifiEnabled);
+                            }
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "network"
+                    delegate: Toggle {
+                        icon: Nmcli.activeEthernet !== null ? "lan" : (Nmcli.active !== null ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off"))
+                        checked: Nmcli.activeEthernet !== null || Nmcli.wifiEnabled
+                        onClicked: {
+                            if (Nmcli.activeEthernet !== null) {
+                                Nmcli.disconnectEthernet(Nmcli.activeEthernet.connection, () => {});
+                            } else {
+                                Nmcli.enableWifi(!Nmcli.wifiEnabled);
+                            }
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "ethernet"
+                    delegate: Toggle {
+                        icon: Nmcli.activeEthernet !== null ? "lan" : "settings_ethernet"
                         checked: Nmcli.activeEthernet !== null
                         onClicked: {
                             if (Nmcli.activeEthernet) {
@@ -102,7 +134,7 @@ StyledRect {
                 DelegateChoice {
                     roleValue: "bluetooth"
                     delegate: Toggle {
-                        icon: "bluetooth"
+                        icon: !Bluetooth.defaultAdapter?.enabled ? "bluetooth_disabled" : (Bluetooth.devices.values.some(d => d.connected) ? "bluetooth_connected" : "bluetooth")
                         checked: Bluetooth.defaultAdapter?.enabled ?? false
                         onClicked: {
                             if (Bluetooth.defaultAdapter)

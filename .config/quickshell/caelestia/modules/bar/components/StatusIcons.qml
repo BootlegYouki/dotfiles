@@ -147,11 +147,11 @@ StyledRect {
         // Network icon (Wi-Fi)
         WrappedLoader {
             name: "network"
-            active: false
+            active: (Config.bar?.status?.showNetwork ?? true) && (!Nmcli.activeEthernet || Nmcli.active !== null || Nmcli.wirelessInterfaces.length > 0)
 
             sourceComponent: MaterialIcon {
                 animate: true
-                text: Nmcli.active ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : "wifi_off"
+                text: Nmcli.active ? Icons.getNetworkIcon(Nmcli.active.strength ?? 0) : (Nmcli.wifiEnabled ? "wifi" : "wifi_off")
                 color: root.colour
             }
         }
@@ -185,7 +185,7 @@ StyledRect {
             Layout.preferredHeight: implicitHeight
 
             name: "bluetooth"
-            active: false
+            active: (Config.bar?.status?.showBluetooth ?? true) && (Bluetooth.defaultAdapter !== null)
 
             sourceComponent: ColumnLayout {
                 spacing: Tokens.spacing.medium / 2
