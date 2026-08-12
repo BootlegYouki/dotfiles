@@ -158,6 +158,17 @@ if [ -f "/etc/systemd/system/genshin-f-macro.service" ]; then
     systemctl enable --now genshin-f-macro.service || true
 fi
 
+# Convert all Wi-Fi connections to system-wide to avoid GNOME Keyring popups on autologin
+if command -v nmcli &>/dev/null; then
+    echo "Adjusting NetworkManager Wi-Fi connections to be system-wide..."
+    nmcli -g NAME,TYPE connection show | while IFS=: read -r name type; do
+        if [ "$type" = "802-11-wireless" ]; then
+            nmcli connection modify "$name" connection.permissions "" 2>/dev/null || true
+            nmcli connection modify "$name" 802-11-wireless-security.psk-flags 0 2>/dev/null || true
+        fi
+    done
+fi
+
 echo -e "\n[8/8] Configuring TTY1 Autologin & Boot Pipeline..."
 systemctl disable sddm 2>/dev/null || true
 systemctl disable gdm 2>/dev/null || true
