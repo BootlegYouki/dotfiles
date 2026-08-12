@@ -37,12 +37,11 @@ StyledRect {
         }
     }
 
-    readonly property string toggleScript: Paths.toLocalFile(Qt.resolvedUrl("../../../../utils/scripts/toggle_monitor.py"))
     property bool secondMonitorOn: true
 
     Process {
         id: dpmsCheckProc
-        command: [toggleScript, "status"]
+        command: ["sh", "-c", "if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py status; else \"$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py\" status; fi"]
         running: true
         onExited: (code) => {
             root.secondMonitorOn = (code === 0);
@@ -188,7 +187,8 @@ StyledRect {
                         checked: root.secondMonitorOn
                         onClicked: {
                             const nextState = !root.secondMonitorOn;
-                            procCmd.run([toggleScript, nextState ? "on" : "off"]);
+                            const action = nextState ? "on" : "off";
+                            procCmd.run(["sh", "-c", `if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else "$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py" ${action}; fi`]);
                             root.secondMonitorOn = nextState;
                         }
                     }
@@ -200,7 +200,8 @@ StyledRect {
                         checked: root.secondMonitorOn
                         onClicked: {
                             const nextState = !root.secondMonitorOn;
-                            procCmd.run([toggleScript, nextState ? "on" : "off"]);
+                            const action = nextState ? "on" : "off";
+                            procCmd.run(["sh", "-c", `if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else "$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py" ${action}; fi`]);
                             root.secondMonitorOn = nextState;
                         }
                     }
