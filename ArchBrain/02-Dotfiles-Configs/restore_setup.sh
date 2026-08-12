@@ -63,15 +63,21 @@ pacman -S --noconfirm --needed \
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
     jq socat fd ripgrep fzf zoxide direnv eza
 
-echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies via Paru..."
-# Use --useask and echo 1 to automatically select option 1 (caelestia-shell-git) if prompted
-run_as_user bash -c "echo '1' | paru -S --noconfirm --needed --useask --skipreview \
-    caelestia-shell-git \
-    quickshell-git \
-    caelestia-cli \
-    ttf-material-symbols-variable-git \
-    brave-bin \
-    spotify" || true
+echo -e "\n[1.3/8] Installing Caelestia & AUR dependencies..."
+AUR_LIST=(
+    "quickshell-git"
+    "caelestia-shell-git"
+    "caelestia-cli"
+    "ttf-material-symbols-variable-git"
+    "brave-bin"
+    "spotify"
+)
+
+for pkg in "${AUR_LIST[@]}"; do
+    echo "--> Installing $pkg..."
+    run_as_user paru -S --noconfirm --needed --skipreview "$pkg" || \
+    run_as_user paru -S --noconfirm --needed --nodeps --skipreview "$pkg" || true
+done
 
 echo -e "\n[2/8] Restoring user configurations..."
 mkdir -p "$TARGET_HOME/.config"
@@ -94,9 +100,10 @@ if [ -f "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" ]; then
 fi
 
 echo -e "\n[3/8] Executing Caelestia CLI component initialization..."
-if command -v caelestia &>/dev/null; then
-    run_as_user caelestia install --noconfirm || true
-fi
+# Skipped to avoid redundant Paru provider conflict prompts
+# if command -v caelestia &>/dev/null; then
+#     run_as_user caelestia install --noconfirm || true
+# fi
 
 echo -e "\n[4/8] Restoring local binaries & Caelestia state..."
 if [ -d "$DOTFILES_DIR/.local/bin" ]; then
