@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly Dotfiles Sync Timer
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

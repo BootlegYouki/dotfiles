@@ -1,0 +1,18 @@
+# Logs
+*.log
+*.swp
+*~
+.DS_Store
+
+# User-specific runtime sockets or locks
+*.sock
+*.lock
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude local rclone keys if they exist
+.config/rclone/

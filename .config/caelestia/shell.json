@@ -1,0 +1,83 @@
+{
+    "appearance": {
+        "rounding": {
+            "scale": 1
+        },
+        "transparency": {
+            "enabled": true
+        }
+    },
+    "background": {
+        "desktopClock": {
+            "enabled": true,
+            "position": "bottom-right"
+        },
+        "wallpaperEnabled": true
+    },
+    "bar": {
+        "clock": {
+            "showDate": true
+        },
+        "excludedScreens": [
+            "DP-1"
+        ],
+        "tray": {
+            "compact": true
+        },
+        "workspaces": {
+            "specialWorkspaceIcons": [
+                {
+                    "icon": "terminal",
+                    "name": "dev"
+                }
+            ],
+            "windowIcons": [
+                {
+                    "icon": "diamond",
+                    "regex": "obsidian|Obsidian|md.obsidian.Obsidian"
+                },
+                {
+                    "icon": "sports_esports",
+                    "regex": "Twintaillauncher|twintaillauncher|app.twintaillauncher.ttl"
+                }
+            ]
+        }
+    },
+    "launcher": {
+        "favouriteApps": [
+            "brave-browser",
+            "ghostty",
+            "org.gnome.Nautilus"
+        ],
+        "hiddenApps": [
+            "org\\.gnome\\..*",
+            "avahi-discover",
+            "bssh",
+            "bvnc",
+            "lstopo",
+            "nm-connection-editor",
+            "qv4l2",
+            "qvidcap",
+            "xgps.*",
+            "uuctl",
+            "xfce4-about"
+        ]
+    },
+    "paths": {
+        "wallpaperDir": "~/Pictures/Wallpapers"
+    },
+    "services": {
+        "useFahrenheit": false,
+        "useFahrenheitPerformance": false,
+        "useTwelveHourClock": false
+    },
+    "sidebar": {
+        "dragThreshold": 80,
+        "enabled": true
+    },
+    "utilities": {
+        "toasts": {
+            "capsLockChanged": false
+        }
+    }
+}

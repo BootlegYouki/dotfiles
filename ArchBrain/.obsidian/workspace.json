@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "2081496d923f1e42",
+    "type": "split",
+    "children": [
+      {
+        "id": "158c74f5931090b1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7921b451066a5cdf",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02-Dotfiles-Configs/PROMPT-FOR-FUTURE-AGENT.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "PROMPT-FOR-FUTURE-AGENT"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5e702d6847aef283",
+    "type": "split",
+    "children": [
+      {
+        "id": "e489d01c4d42a5bd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "99e7c5b5564f758a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "39f01765436c0761",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "superwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "1b029c241f13b189",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "ca809da5c2271c00",
+    "type": "split",
+    "children": [
+      {
+        "id": "8ffb4d892661feb9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b9fc59f2b05c54e5",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "01-Cheatsheets/systemd-services.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "d10b47fd97872dbc",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "01-Cheatsheets/systemd-services.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "85b3aba1084cf527",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "33ea7ac9c50f61f0",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "429edf8e51373de2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "01-Cheatsheets/systemd-services.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "39f01765436c0761",
+  "lastOpenFiles": [
+    "03-Troubleshooting/hyprland-screenshot-direct-save.md",
+    "02-Dotfiles-Configs/caelestia-nightlight-widget.md",
+    "01-Cheatsheets/gaming-steam-overwatch2.md",
+    "02-Dotfiles-Configs/00-AGENT-SYSTEM-RESTORE-GUIDE.md",
+    "02-Dotfiles-Configs/kde-connect.md",
+    "02-Dotfiles-Configs/PROMPT-FOR-FUTURE-AGENT.md",
+    "02-Dotfiles-Configs/01-GNOME-TO-UWSM-HYPRLAND.md",
+    "00-Meta/README.md",
+    "00-Meta/system-customizations-master-blueprint.md",
+    "Untitled.canvas",
+    "01-Cheatsheets/linux-essential-commands.md",
+    "02-Dotfiles-Configs/desktop-caelestia-hyprland.md",
+    "01-Cheatsheets/systemd-services.md",
+    "01-Cheatsheets/refind-bootloader-instant-boot.md",
+    "01-Cheatsheets/pacman-aur.md",
+    "01-Cheatsheets/installed-applications.md",
+    "01-Cheatsheets/hardware-and-kernel.md",
+    "01-Cheatsheets/gaming-genshin-impact-cachyos.md",
+    "01-Cheatsheets/btrfs-multi-device-drive-merge.md",
+    "02-Dotfiles-Configs/fish-and-starship.md",
+    "02-Dotfiles-Configs/fastfetch.md",
+    "02-Dotfiles-Configs/ghostty-and-terminals.md",
+    "02-Dotfiles-Configs/hyprland-workspace-hover-focus.md",
+    "02-Dotfiles-Configs/xdg-autostart-apps.md",
+    "02-Dotfiles-Configs/romaji-lyrics-daemon.md",
+    "01-Cheatsheets/audio-pipewire-sunshine.md",
+    "01-Cheatsheets/btrfs-live-partition-expansion.md",
+    "Untitled 1.canvas",
+    "04-Package-Log",
+    "02-Dotfiles-Configs"
+  ]
+}

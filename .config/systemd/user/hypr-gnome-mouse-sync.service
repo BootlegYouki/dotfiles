@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync GNOME Settings Mouse Sensitivity to Hyprland
+After=graphical-session.target
+
+[Service]
+ExecStart=/home/youki/.local/bin/hypr-gnome-mouse-sync
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

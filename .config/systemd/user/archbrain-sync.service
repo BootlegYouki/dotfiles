@@ -1,0 +1,8 @@
+[Unit]
+Description=Sync ArchBrain Desktop to Google Drive via rclone
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/youki/.local/bin/rclone sync /home/youki/ArchBrain gdrive:ArchBrain-Desktop --exclude ".obsidian/**" --quiet

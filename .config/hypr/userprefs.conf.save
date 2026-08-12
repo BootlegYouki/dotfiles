@@ -1,0 +1,9 @@
+# ============================================
+# WINDOWS-STYLE SHORTCUTS
+# ============================================
+
+# Windows + E -> File Manager
+bind = SUPER, E, exec, thunar
+
+# Alt + F4 -> Close Active Window
+bind = ALT, F4, killa

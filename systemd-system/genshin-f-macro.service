@@ -1,0 +1,13 @@
+[Unit]
+Description=Genshin Impact Rapid F Macro Daemon
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -u /home/youki/genshin_f_macro.py
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=3
+
+[Install]
+WantedBy=multi-user.target

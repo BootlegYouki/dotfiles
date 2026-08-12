@@ -1,0 +1,6 @@
+[Unit]
+Description=Nightly Dotfiles Sync to GitHub
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/dotfiles-sync

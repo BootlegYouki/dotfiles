@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Caelestia Wallpaper Switcher Script (Shift Prev/Next)
+
+WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+STATE_FILE="$HOME/.local/state/caelestia/wallpaper/path.txt"
+DIR="${1:-next}"
+
+if [ ! -d "$WALLPAPER_DIR" ]; then
+    notify-send -u low "Wallpaper Switcher" "Directory $WALLPAPER_DIR does not exist."
+    exit 1
+fi
+
+mapfile -t WALLPAPERS < <(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) | sort)
+
+TOTAL=${#WALLPAPERS[@]}
+if [ "$TOTAL" -eq 0 ]; then
+    notify-send -u low "Wallpaper Switcher" "No wallpapers found in $WALLPAPER_DIR"
+    exit 1
+fi
+
+CURRENT=""
+if [ -f "$STATE_FILE" ]; then
+    CURRENT=$(cat "$STATE_FILE")
+fi
+
+CURR_IDX=-1
+for i in "${!WALLPAPERS[@]}"; do
+    if [ "${WALLPAPERS[$i]}" = "$CURRENT" ]; then
+        CURR_IDX=$i
+        break
+    fi
+done
+
+if [ "$CURR_IDX" -eq -1 ]; then
+    NEXT_IDX=0
+elif [ "$DIR" = "next" ]; then
+    NEXT_IDX=$(( (CURR_IDX + 1) % TOTAL ))
+else
+    NEXT_IDX=$(( (CURR_IDX - 1 + TOTAL) % TOTAL ))
+fi
+
+TARGET="${WALLPAPERS[$NEXT_IDX]}"
+caelestia wallpaper -f "$TARGET"

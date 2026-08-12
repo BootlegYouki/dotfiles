@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for ArchBrain Desktop Google Drive Sync
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+
+[Install]
+WantedBy=timers.target

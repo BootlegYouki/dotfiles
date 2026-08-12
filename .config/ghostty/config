@@ -1,0 +1,36 @@
+# Ghostty Configuration for Caelestia / Hyprland (Monochrome)
+
+font-family = JetBrainsMono Nerd Font
+font-size = 12
+
+# Window Padding & Opacity for Hyprland Blur
+window-padding-x = 20
+window-padding-y = 20
+background-opacity = 0.78
+
+# Cursor
+cursor-style = bar
+cursor-style-blink = false
+
+# Monochrome Colors matching Caelestia scheme
+background = 131313
+foreground = e2e2e2
+selection-background = 383838
+selection-foreground = ffffff
+
+palette = 0=#1c1c1c
+palette = 1=#adadad
+palette = 2=#c8c8c8
+palette = 3=#d8d8d8
+palette = 4=#cfcfcf
+palette = 5=#cfcfcf
+palette = 6=#d7d7d7
+palette = 7=#e2e2e2
+palette = 8=#555555
+palette = 9=#b5b5b5
+palette = 10=#d4d4d4
+palette = 11=#e4e4e4
+palette = 12=#dcdcdc
+palette = 13=#e0e0e0
+palette = 14=#eaeaea
+palette = 15=#ffffff
