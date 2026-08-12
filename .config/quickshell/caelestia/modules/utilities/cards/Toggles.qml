@@ -169,15 +169,13 @@ StyledRect {
                     roleValue: "display"
                     delegate: Toggle {
                         icon: "desktop_windows"
-                        checked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
-                            return sec ? sec.dpmsStatus : true;
-                        }
+                        checked: Hypr.monitors.values.some(m => m.name === "DP-1")
                         onClicked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
-                            if (sec) {
-                                const action = sec.dpmsStatus ? "off" : "on";
-                                procCmd.run(["hyprctl", "eval", `hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`]);
+                            const isEnabled = Hypr.monitors.values.some(m => m.name === "DP-1");
+                            if (isEnabled) {
+                                procCmd.run(["hyprctl", "eval", "hl.monitor({ output = 'DP-1', disabled = true })"]);
+                            } else {
+                                procCmd.run(["hyprctl", "eval", "hl.monitor({ output = 'DP-1', disabled = false, mode = '1920x1080@74.0', position = '1920x498', scale = 1, transform = 3 })"]);
                             }
                         }
                     }
@@ -186,15 +184,13 @@ StyledRect {
                     roleValue: "monitor"
                     delegate: Toggle {
                         icon: "desktop_windows"
-                        checked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
-                            return sec ? sec.dpmsStatus : true;
-                        }
+                        checked: Hypr.monitors.values.some(m => m.name === "DP-1")
                         onClicked: {
-                            const sec = Hypr.monitors.values.find(m => m.name !== "HDMI-A-1" && m.name !== "eDP-1") ?? (Hypr.monitors.values.length > 1 ? Hypr.monitors.values[1] : null);
-                            if (sec) {
-                                const action = sec.dpmsStatus ? "off" : "on";
-                                procCmd.run(["hyprctl", "eval", `hl.dsp.dpms({ action = '${action}', monitor = '${sec.name}' })`]);
+                            const isEnabled = Hypr.monitors.values.some(m => m.name === "DP-1");
+                            if (isEnabled) {
+                                procCmd.run(["hyprctl", "eval", "hl.monitor({ output = 'DP-1', disabled = true })"]);
+                            } else {
+                                procCmd.run(["hyprctl", "eval", "hl.monitor({ output = 'DP-1', disabled = false, mode = '1920x1080@74.0', position = '1920x498', scale = 1, transform = 3 })"]);
                             }
                         }
                     }
