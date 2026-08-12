@@ -1,3 +1,10 @@
+# Auto-start Hyprland via UWSM on tty1 login
+if status is-login
+    if test -z "$DISPLAY" -a "$XDG_VTNR" = 1
+        exec uwsm start hyprland-uwsm.desktop
+    end
+end
+
 if status is-interactive
     # Starship custom prompt
     command -v starship &> /dev/null && starship init fish | source
@@ -43,17 +50,4 @@ if status is-interactive
     # Custom fish config
     set -q XDG_CONFIG_HOME && set -l cConf $XDG_CONFIG_HOME/caelestia || set -l cConf $HOME/.config/caelestia
     source $cConf/user-config.fish 2> /dev/null
-end
-
-
-# Added by Antigravity CLI installer
-set -gx PATH "$HOME/.local/bin" $PATH
-
-fish_add_path ~/.local/bin
-
-
-
-# Auto-start Hyprland via UWSM on tty1 login
-if status is-login; and test -z "$DISPLAY"; and test "$(tty)" = "/dev/tty1"
-    exec uwsm start hyprland-uwsm.desktop
 end
