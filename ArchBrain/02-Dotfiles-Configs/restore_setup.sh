@@ -55,6 +55,7 @@ pacman -Rdd --noconfirm jack2 caelestia-shell quickshell noctalia-qs 2>/dev/null
 
 echo -e "\n[1.2/8] Installing official packages, fonts & CLI tools..."
 pacman -S --noconfirm --needed \
+    seahorse \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
     hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring \
     flatpak polkit-kde-agent python-evdev python-pykakasi discord zed vlc cava \
@@ -115,6 +116,14 @@ if [ -d "$DOTFILES_DIR/.local/state/caelestia" ]; then
     mkdir -p "$TARGET_HOME/.local/state/caelestia"
     cp -a "$DOTFILES_DIR/.local/state/caelestia/." "$TARGET_HOME/.local/state/caelestia/"
 fi
+
+echo -e "\n[4.5/8] Resetting GNOME Keyring stores..."
+rm -rf "$TARGET_HOME/.local/share/keyrings"
+mkdir -p "$TARGET_HOME/.local/share/keyrings"
+tee "$TARGET_HOME/.local/share/keyrings/default" > /dev/null << 'EOF'
+Default
+EOF
+chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.local/share/keyrings"
 
 echo -e "\n[5/8] Restoring Wallpapers & symlinks..."
 if [ ! -d "$TARGET_HOME/Pictures/Wallpapers" ]; then
@@ -193,5 +202,7 @@ if [ -d "$TARGET_HOME/.config/fish" ]; then
 fi
 
 echo "=========================================================="
-echo "✨ Restoration Complete! Reboot now: sudo reboot"
+echo "✨ Restoration Complete! Rebooting in 3 seconds..."
 echo "=========================================================="
+sleep 3
+sudo reboot
