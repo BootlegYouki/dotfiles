@@ -36,17 +36,17 @@ if pacman -Qi jack2 &>/dev/null; then
     sudo pacman -Rdd --noconfirm jack2 || true
 fi
 
-echo "1.2. Installing official packages, fonts & multimedia stack..."
+echo "1.2. Installing official packages, fonts, CLI tools & multimedia stack..."
 sudo pacman -S --noconfirm --needed \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
     hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring \
     flatpak polkit-kde-agent python-evdev python-pykakasi discord zed vlc cava \
     sunshine hyprsunset cliphist pamixer wl-clipboard playerctl grim slurp \
     hyprpicker brightnessctl python-pillow python-pip \
-    ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk
+    ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
+    jq socat fd ripgrep fzf zoxide direnv eza
 
 echo "1.3. Installing Caelestia & AUR dependencies..."
-# Install AUR dependencies via yay if missing
 if ! pacman -Qi quickshell-git &>/dev/null; then
     echo "Installing quickshell-git from AUR..."
     su - "$TARGET_USER" -c "yay -S --noconfirm quickshell-git" || true
@@ -66,6 +66,11 @@ fi
 if ! pacman -Qi spotify &>/dev/null; then
     echo "Installing Spotify from AUR..."
     su - "$TARGET_USER" -c "yay -S --noconfirm spotify" || true
+fi
+
+echo "1.4. Executing Caelestia CLI component initialization..."
+if command -v caelestia &>/dev/null; then
+    su - "$TARGET_USER" -c "caelestia install --noconfirm" || true
 fi
 
 echo "2. Copying user configurations to $TARGET_HOME/.config/..."
