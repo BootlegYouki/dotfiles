@@ -20,6 +20,15 @@ Scope {
         }
     }
 
+    Connections {
+        target: lock
+        function onLockedChanged(): void {
+            if (!lock.locked) {
+                Quickshell.execDetached(["sh", "-c", "$HOME/bin/on-unlock-autostart.sh"]);
+            }
+        }
+    }
+
     Pam {
         id: pam
 

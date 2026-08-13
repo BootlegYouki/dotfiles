@@ -37,6 +37,15 @@ Exec=uwsm app -- discord --start-minimized %U
 
 ---
 
+## 🔒 Deferred Autostart on Initial Lockscreen Unlock
+
+To prevent autostart apps from opening windows before the user enters their password on boot:
+1. `execs.lua` masks `xdg-desktop-autostart.target` on Hyprland startup (`systemctl --user mask xdg-desktop-autostart.target`).
+2. Caelestia Shell (`Lock.qml`) listens for the session unlock signal (`onLockedChanged` when `!lock.locked`).
+3. Upon initial unlock, [`~/bin/on-unlock-autostart.sh`](file:///home/youki/bin/on-unlock-autostart.sh) runs, unmasking and launching `xdg-desktop-autostart.target` cleanly AFTER password entry.
+
+---
+
 ## Related Notes
 - [[desktop-caelestia-hyprland]]
 - [[system-profile]]
