@@ -41,11 +41,11 @@ end
 - **Enable Getty tty1**: `sudo systemctl enable getty@tty1.service`
 
 ### 4. Caelestia Lockscreen on Boot (`~/.config/hypr/hyprland/execs.lua`)
-Upon Hyprland startup, Caelestia Shell immediately locks the session:
+Upon Hyprland startup, Caelestia Shell immediately locks the session via a high-speed IPC polling loop (polling every 10ms until Quickshell socket binds), preventing autostart apps (Discord, Spotify, Steam) from showing on screen before locking:
 ```lua
 hl.on("hyprland.start", function()
     hl.exec_cmd("caelestia shell -d")
-    hl.exec_cmd("caelestia shell lock lock")
+    hl.exec_cmd("until qs ipc -c caelestia call lock lock 2>/dev/null; do sleep 0.01; done")
 end)
 ```
 

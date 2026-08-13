@@ -29,7 +29,7 @@ hl.on("hyprland.start", function()
 
     -- Start shell and lock on boot
     hl.exec_cmd("caelestia shell -d")
-    hl.exec_cmd("sleep 1 && caelestia shell lock lock")
+    hl.exec_cmd("until qs ipc -c caelestia call lock lock 2>/dev/null; do sleep 0.01; done")
 end)
 
 -- Resizer listeners
