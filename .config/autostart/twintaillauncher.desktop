@@ -1,0 +1,12 @@
+[Desktop Entry]
+categories=Game;
+comment=Your anime games, one launcher
+exec=twintaillauncher
+icon=twintaillauncher
+name=TwintailLauncher
+terminal=false
+type=Application
+keywords=genshin;impact;honkai;star;rail;zenless;zone;zero;wuthering;waves;hsr;zzz;hi3;wuwa;gimi;srmi;zzmi;wwmi;himi;xxmi
+hidden=false
+x-gnome-autostart-enabled=true
+
