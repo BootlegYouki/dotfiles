@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/youki/.config/discord/app-1.0.153/Discord
+Hidden=true
+NoDisplay=false
+Name=Discord
+Icon=/home/youki/.config/discord/app-1.0.153/discord.png
+Comment=Text and voice chat for gamers.
+X-GNOME-Autostart-enabled=false

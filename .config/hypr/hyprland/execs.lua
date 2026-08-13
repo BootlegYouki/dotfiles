@@ -2,9 +2,6 @@ local vars = require("variables")
 local fn   = require("utils.functions")
 
 hl.on("hyprland.start", function()
-    -- Mask autostart target on boot so apps don't launch until session is unlocked
-    hl.exec_cmd("systemctl --user mask xdg-desktop-autostart.target")
-
     -- Keyring and auth
     hl.exec_cmd("gnome-keyring-daemon --start --components=secrets")
     hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
