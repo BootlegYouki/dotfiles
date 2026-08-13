@@ -134,7 +134,7 @@ def f_spam_loop():
     ui.write(ecodes.EV_KEY, ecodes.KEY_F, 0)
     ui.syn()
 
-def cleanup(signum=None, frame=None):
+def cleanup(signum=None, frame=None, exit_code=0):
     global macro_enabled
     macro_enabled = False
     print("\nStopping macro and restoring keyboards...")
@@ -147,11 +147,11 @@ def cleanup(signum=None, frame=None):
         ui.close()
     except Exception:
         pass
-    sys.exit(0)
+    sys.exit(exit_code)
 
 # Register signals for clean exit
-signal.signal(signal.SIGINT, cleanup)
-signal.signal(signal.SIGTERM, cleanup)
+signal.signal(signal.SIGINT, lambda s, f: cleanup(s, f, exit_code=0))
+signal.signal(signal.SIGTERM, lambda s, f: cleanup(s, f, exit_code=0))
 
 try:
     # Grab all physical keyboards so events go only to this script
@@ -167,7 +167,13 @@ try:
         r, w, x = select.select(devices_dict, [], [])
         for fd in r:
             dev = devices_dict[fd]
-            for event in dev.read():
+            try:
+                events = list(dev.read())
+            except (OSError, IOError) as e:
+                print(f"Device error on {dev.name}: {e}")
+                raise
+
+            for event in events:
                 if event.type == ecodes.EV_KEY:
                     # Track control keys
                     if event.code in (ecodes.KEY_LEFTCTRL, ecodes.KEY_RIGHTCTRL):
@@ -215,5 +221,7 @@ try:
 
 except Exception as e:
     print(f"Error in macro execution: {e}")
+    cleanup(exit_code=1)
 finally:
-    cleanup()
+    cleanup(exit_code=0)
+
