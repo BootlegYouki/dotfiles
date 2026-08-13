@@ -85,18 +85,7 @@ def get_installed_apps():
 
 def is_autostart_enabled(filename):
     auto_file = AUTOSTART_DIR / filename
-    if not auto_file.exists():
-        return False
-    try:
-        parser = configparser.ConfigParser(interpolation=None, strict=False)
-        parser.read(auto_file, encoding="utf-8")
-        if "Desktop Entry" in parser:
-            hidden = parser["Desktop Entry"].get("Hidden", "false").lower()
-            enabled = parser["Desktop Entry"].get("X-GNOME-Autostart-enabled", "true").lower()
-            return hidden != "true" and enabled != "false"
-    except Exception:
-        pass
-    return False
+    return auto_file.exists()
 
 def toggle_autostart(app_info):
     filename = app_info["filename"]
@@ -111,10 +100,9 @@ def toggle_autostart(app_info):
             auto_file.unlink()
         status_msg = f"Disabled on startup: {app_info['name']}"
     else:
-        # Enable by copying or writing desktop file to ~/.config/autostart/
+        # Enable by writing desktop file to ~/.config/autostart/
         src_file = app_info["desktop_file"]
         if src_file.exists() and src_file != auto_file:
-            # Read original and ensure no Hidden=true
             parser = configparser.ConfigParser(interpolation=None, strict=False)
             parser.read(src_file, encoding="utf-8")
             if "Desktop Entry" in parser:
@@ -126,7 +114,7 @@ def toggle_autostart(app_info):
                 auto_file.write_text(src_file.read_text(encoding="utf-8"), encoding="utf-8")
         else:
             # Create a simple autostart desktop file
-            content = f"[Desktop Entry]\nType=Application\nName={app_info['name']}\nExec={app_info['exec']}\nHidden=false\n"
+            content = f"[Desktop Entry]\nType=Application\nName={app_info['name']}\nExec={app_info['exec']}\nHidden=false\nX-GNOME-Autostart-enabled=true\n"
             auto_file.write_text(content, encoding="utf-8")
         status_msg = f"Enabled on startup: {app_info['name']}"
 

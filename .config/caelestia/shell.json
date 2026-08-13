@@ -66,6 +66,9 @@
             "xfce4-about"
         ]
     },
+    "lock": {
+        "enabled": true
+    },
     "paths": {
         "wallpaperDir": "~/Pictures/Wallpapers"
     },

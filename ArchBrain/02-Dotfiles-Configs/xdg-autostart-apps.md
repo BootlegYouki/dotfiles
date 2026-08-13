@@ -1,49 +1,14 @@
-# 🚀 Session Autostart Applications (Steam, Spotify, Discord)
+# 🚀 Session Autostart Applications (Disabled)
 
-Configuration for desktop applications launching automatically on Hyprland session login via XDG Autostart and UWSM systemd scope wrappers.
-
----
-
-## 📁 Autostart Location & Files
-
-All startup desktop entries are stored in `~/.config/autostart/`:
-
-- **Steam**: [`~/.config/autostart/steam.desktop`](file:///home/youki/.config/autostart/steam.desktop)
-- **Spotify**: [`~/.config/autostart/spotify.desktop`](file:///home/youki/.config/autostart/spotify.desktop)
-- **Discord**: [`~/.config/autostart/discord.desktop`](file:///home/youki/.config/autostart/discord.desktop)
+Autostart applications have been completely removed and disabled per user request.
 
 ---
 
-## ⚙️ Execution Commands & Launch Flags
+## 📁 Current Status
 
-Each application is configured to launch under UWSM (`uwsm app -- <cmd>`) to preserve systemd session scoping and clean process tracking:
-
-```ini
-# Steam (starts minimized in system tray)
-Exec=uwsm app -- steam -silent %U
-
-# Spotify (starts minimized)
-Exec=uwsm app -- spotify --minimized %U
-
-# Discord (starts minimized in background)
-Exec=uwsm app -- discord --start-minimized %U
-```
-
-> [!NOTE]
-> UWSM and `systemd-xdg-autostart-generator` convert these `.desktop` files into systemd user units:
-> - `app-steam@autostart.service`
-> - `app-spotify@autostart.service`
-> - `app-discord@autostart.service`
-
----
-
-## 🔒 Deferred Autostart on Initial Lockscreen Unlock
-
-To prevent systemd's `systemd-xdg-autostart-generator` from spawning autostart app processes during boot before password entry:
-1. `Hidden=true` and `X-GNOME-Autostart-enabled=false` are explicitly configured on `.desktop` files in `~/.config/autostart/`.
-2. This stops systemd from creating boot autostart services for these apps completely.
-3. Caelestia Shell ([`Lock.qml`](file:///home/youki/.config/quickshell/caelestia/modules/lock/Lock.qml)) monitors the initial unlock event (`onLockedChanged` when `!lock.locked`).
-4. Upon initial password entry, [`~/bin/on-unlock-autostart.sh`](file:///home/youki/bin/on-unlock-autostart.sh) dynamically scans `~/.config/autostart/*.desktop`, extracts `Exec=` commands, strips XDG specifiers, wraps them under UWSM (`uwsm app -- ...`), and launches them. No hardcoded app names or binary paths.
+- `~/.config/autostart/`: Cleared (no `.desktop` autostart files).
+- Autostart scripts (`~/.config/hypr/scripts/autostart.sh`, `~/bin/on-unlock-autostart.sh`): Removed.
+- `execs.lua`: Only runs core desktop services (gnome-keyring, polkit, cliphist, geoclue, mpris-proxy, nightlight, and lockscreen on boot). Zero applications are started automatically at boot or login.
 
 ---
 

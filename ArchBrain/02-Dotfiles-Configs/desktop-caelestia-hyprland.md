@@ -27,7 +27,7 @@ hl.monitor({
 ```
 - **Secondary Screen Bar Exclusion**: Configured `"excludedScreens": ["DP-1"]` under `bar` in [`shell.json`](file:///home/youki/.config/caelestia/shell.json#L17) so the Caelestia status bar renders cleanly on your main monitor (`HDMI-A-1`) only.
 - **Caelestia Logo Override**: Configured `"general": { "logo": "caelestia" }` in [`shell.json`](file:///home/youki/.config/caelestia/shell.json#L2-L4) to replace the distro (CachyOS) logo with the native Caelestia logo across the top bar, dashboard user card, and lockscreen fetch.
-- **Secondary Screen Lockscreen Exclusion**: Updated [`LockSurface.qml`](file:///home/youki/.config/quickshell/caelestia/modules/lock/LockSurface.qml#L17) so that interactive lock UI elements (clock, password input, avatar) only render on your primary monitor (`HDMI-A-1`), while secondary monitor (`DP-1`) renders a clean blurred lock overlay without duplicating the lockscreen UI.
+- **Secondary Screen Lockscreen Exclusion**: Fixed [`LockSurface.qml`](file:///home/youki/.config/quickshell/caelestia/modules/lock/LockSurface.qml#L19) to rely directly on `Config.bar.excludedScreens` (`["DP-1"]`). Removed the fragile `Quickshell.screens[0]` index check that previously caused both screens to evaluate as excluded during DPMS wake monitor re-enumeration.
 
 ### 1. Hyprland Windows-Style Keybindings (`~/.config/hypr/userprefs.conf`)
 ```ini
@@ -60,8 +60,8 @@ bind = SUPER, V, exec, caelestia clipboard
 # Windows + Shift + S -> Region Screenshot (Saves immediately to ~/Pictures/Screenshots/ + Clipboard)
 # Print / PrtScn -> Fullscreen Screenshot (Saves immediately to ~/Pictures/Screenshots/ + Clipboard)
 
-# Windows + L -> Lock Screen
-bind = SUPER, L, exec, hyprlock
+# Windows + L -> Lock Screen (Caelestia Shell IPC)
+# Handled in keybinds.lua via hl.dsp.exec_cmd("caelestia shell lock lock") (avoiding hl.dsp.global Lua parser syntax error)
 
 # Windows + Shift + N -> Night Light Toggle (4000K warm blue-light filter)
 bind = SUPER SHIFT, N, exec, pkill hyprsunset || hyprsunset -t 4000

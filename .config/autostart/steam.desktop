@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Steam
-Exec=uwsm app -- /home/youki/bin/autostart-steam.sh
-Icon=steam
-Terminal=false
-Categories=Game;
-Hidden=false
-X-GNOME-Autostart-enabled=true

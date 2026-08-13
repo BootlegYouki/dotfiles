@@ -7,7 +7,7 @@
 - **Layout & Alignment**:
   - Top star `▄` aligned 2 spaces right above `▄███▄`.
   - `logo.padding.top`: `1` (1 line of top margin spacing).
-  - 3 `break` modules for centered vertical specs alignment.
+  - 4 `break` modules for centered vertical specs alignment.
 
 ---
 
@@ -31,6 +31,7 @@
     }
   },
   "modules": [
+    "break",
     "break",
     "break",
     "break",

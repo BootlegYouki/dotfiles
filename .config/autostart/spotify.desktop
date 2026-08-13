@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Spotify
-Exec=uwsm app -- spotify --minimized
-Icon=spotify
-Terminal=false
-Categories=Audio;Music;Player;
-Hidden=false
-X-GNOME-Autostart-enabled=true

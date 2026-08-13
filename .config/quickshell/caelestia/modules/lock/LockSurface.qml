@@ -16,7 +16,8 @@ WlSessionLockSurface {
     required property Pam pam
 
     readonly property alias unlocking: unlockAnim.running
-    readonly property bool isExcluded: Strings.testRegexList(Config.bar.excludedScreens, root.screen?.name) || (Quickshell.screens.length > 0 && root.screen !== Quickshell.screens[0])
+    readonly property bool isExcluded: Strings.testRegexList(Config.bar.excludedScreens, root.screen?.name)
+    readonly property int screenHeight: root.screen?.height || 1080
 
     contentItem.Config.screen: screen.name
     contentItem.Tokens.screen: screen.name
@@ -85,9 +86,6 @@ WlSessionLockSurface {
             property: "locked"
             value: false
         }
-        ScriptAction {
-            script: Quickshell.execDetached(["sh", "-c", "/home/youki/bin/on-unlock-autostart.sh"])
-        }
     }
 
     ParallelAnimation {
@@ -137,27 +135,33 @@ WlSessionLockSurface {
                     to: 1
                 }
                 Anim {
-                    target: content
-                    property: "scale"
+                    target: lockContent
+                    property: "opacity"
                     to: 1
+                    type: Anim.FastSpatial
                 }
                 Anim {
                     target: lockBg
                     property: "radius"
-                    to: lockContent.Tokens.rounding.extraLarge * 1.5
+                    to: Tokens.rounding.extraLarge * 1.5
                 }
                 Anim {
                     target: lockContent
                     property: "implicitWidth"
-                    to: (root.screen?.height ?? 0) * lockContent.Tokens.sizes.lock.heightMult * lockContent.Tokens.sizes.lock.ratio
+                    to: root.screenHeight * Tokens.sizes.lock.heightMult * Tokens.sizes.lock.ratio
                 }
                 Anim {
                     target: lockContent
                     property: "implicitHeight"
-                    to: (root.screen?.height ?? 0) * lockContent.Tokens.sizes.lock.heightMult
+                    to: root.screenHeight * Tokens.sizes.lock.heightMult
                 }
             }
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        color: Colours.palette.m3surface
     }
 
     ScreencopyView {
@@ -187,9 +191,8 @@ WlSessionLockSurface {
         implicitWidth: size
         implicitHeight: size
 
-        visible: Config.lock.enabled && !root.isExcluded
+        visible: !root.isExcluded
         rotation: 180
-        scale: 0
 
         StyledRect {
             id: lockBg
@@ -220,12 +223,11 @@ WlSessionLockSurface {
             id: content
 
             anchors.centerIn: parent
-            width: (root.screen?.height ?? 0) * Tokens.sizes.lock.heightMult * Tokens.sizes.lock.ratio - Tokens.padding.extraLargeIncreased
-            height: (root.screen?.height ?? 0) * Tokens.sizes.lock.heightMult - Tokens.padding.extraLargeIncreased
+            width: root.screenHeight * Tokens.sizes.lock.heightMult * Tokens.sizes.lock.ratio - Tokens.padding.extraLargeIncreased
+            height: root.screenHeight * Tokens.sizes.lock.heightMult - Tokens.padding.extraLargeIncreased
 
             lock: root
-            opacity: 0
-            scale: 0
+            opacity: 1
         }
     }
 }
