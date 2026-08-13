@@ -85,6 +85,9 @@ WlSessionLockSurface {
             property: "locked"
             value: false
         }
+        ScriptAction {
+            script: Quickshell.execDetached(["sh", "-c", "/home/youki/bin/on-unlock-autostart.sh"])
+        }
     }
 
     ParallelAnimation {
