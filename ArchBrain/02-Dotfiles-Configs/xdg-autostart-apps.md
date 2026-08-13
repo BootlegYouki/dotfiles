@@ -39,11 +39,11 @@ Exec=uwsm app -- discord --start-minimized %U
 
 ## 🔒 Deferred Autostart on Initial Lockscreen Unlock
 
-To prevent systemd's `systemd-xdg-autostart-generator` from spawning `app-steam@autostart.service`, `app-discord@autostart.service`, and `app-spotify@autostart.service` during boot:
-1. `Hidden=true` and `X-GNOME-Autostart-enabled=false` are explicitly configured on all `.desktop` files in `~/.config/autostart/`.
+To prevent systemd's `systemd-xdg-autostart-generator` from spawning autostart app processes during boot before password entry:
+1. `Hidden=true` and `X-GNOME-Autostart-enabled=false` are explicitly configured on `.desktop` files in `~/.config/autostart/`.
 2. This stops systemd from creating boot autostart services for these apps completely.
 3. Caelestia Shell ([`Lock.qml`](file:///home/youki/.config/quickshell/caelestia/modules/lock/Lock.qml)) monitors the initial unlock event (`onLockedChanged` when `!lock.locked`).
-4. Upon entering your password and unlocking, [`~/bin/on-unlock-autostart.sh`](file:///home/youki/bin/on-unlock-autostart.sh) is triggered to launch Steam, Discord, and Spotify cleanly under UWSM (`uwsm app -- ...`).
+4. Upon initial password entry, [`~/bin/on-unlock-autostart.sh`](file:///home/youki/bin/on-unlock-autostart.sh) dynamically scans `~/.config/autostart/*.desktop`, extracts `Exec=` commands, strips XDG specifiers, wraps them under UWSM (`uwsm app -- ...`), and launches them. No hardcoded app names or binary paths.
 
 ---
 
