@@ -282,30 +282,20 @@ Item {
                             color: (hoursInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
 
-                            // Running view
-                            StyledText {
-                                anchors.centerIn: parent
-                                visible: root.timerRunning
-                                text: root.getHours(root.timerRemaining)
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
-                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
-                            }
-
-                            // Stopped view: editable
                             TextInput {
                                 id: hoursInput
                                 anchors.fill: parent
                                 horizontalAlignment: TextInput.AlignHCenter
                                 verticalAlignment: TextInput.AlignVCenter
-                                visible: !root.timerRunning
-                                text: root.inputHours
+                                renderType: Text.NativeRendering
+                                readOnly: root.timerRunning
+                                cursorVisible: activeFocus && !root.timerRunning
+                                text: root.timerRunning ? root.getHours(root.timerRemaining) : root.inputHours
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
-                                focus: true
-                                cursorVisible: activeFocus
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
@@ -369,29 +359,20 @@ Item {
                             color: (minutesInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
 
-                            // Running view
-                            StyledText {
-                                anchors.centerIn: parent
-                                visible: root.timerRunning
-                                text: root.getMinutes(root.timerRemaining)
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
-                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
-                            }
-
-                            // Stopped view: editable
                             TextInput {
                                 id: minutesInput
                                 anchors.fill: parent
                                 horizontalAlignment: TextInput.AlignHCenter
                                 verticalAlignment: TextInput.AlignVCenter
-                                visible: !root.timerRunning
-                                text: root.inputMinutes
+                                renderType: Text.NativeRendering
+                                readOnly: root.timerRunning
+                                cursorVisible: activeFocus && !root.timerRunning
+                                text: root.timerRunning ? root.getMinutes(root.timerRemaining) : root.inputMinutes
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
-                                cursorVisible: activeFocus
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
@@ -455,29 +436,20 @@ Item {
                             color: (secondsInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
 
-                            // Running view
-                            StyledText {
-                                anchors.centerIn: parent
-                                visible: root.timerRunning
-                                text: root.getSeconds(root.timerRemaining)
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
-                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
-                            }
-
-                            // Stopped view: editable
                             TextInput {
                                 id: secondsInput
                                 anchors.fill: parent
                                 horizontalAlignment: TextInput.AlignHCenter
                                 verticalAlignment: TextInput.AlignVCenter
-                                visible: !root.timerRunning
-                                text: root.inputSeconds
+                                renderType: Text.NativeRendering
+                                readOnly: root.timerRunning
+                                cursorVisible: activeFocus && !root.timerRunning
+                                text: root.timerRunning ? root.getSeconds(root.timerRemaining) : root.inputSeconds
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
-                                cursorVisible: activeFocus
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
