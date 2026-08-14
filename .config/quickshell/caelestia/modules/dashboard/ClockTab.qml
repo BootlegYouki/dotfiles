@@ -262,7 +262,7 @@ Item {
             // === 1. Countdown Timer Card ===
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 150
+                implicitHeight: 155
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
@@ -272,18 +272,18 @@ Item {
 
                     // 1 Single Unified Container for Countdown Time: [ HH : MM : SS ]
                     StyledRect {
-                        implicitWidth: 230
-                        implicitHeight: 64
+                        implicitWidth: 270
+                        implicitHeight: 70
                         color: Colours.tPalette.m3surfaceContainerHigh
                         radius: Tokens.rounding.medium
 
                         RowLayout {
                             anchors.centerIn: parent
-                            spacing: 6
+                            spacing: 8
 
                             TextInput {
                                 id: hoursInput
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
@@ -316,20 +316,19 @@ Item {
 
                                 onAccepted: {
                                     minutesInput.forceActiveFocus();
-                                    minutesInput.selectAll();
                                 }
                             }
 
                             StyledText {
                                 text: ":"
-                                font.pixelSize: 26
+                                font.pixelSize: 34
                                 font.weight: Font.Medium
                                 color: Colours.palette.m3onSurfaceVariant
                             }
 
                             TextInput {
                                 id: minutesInput
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
@@ -362,20 +361,19 @@ Item {
 
                                 onAccepted: {
                                     secondsInput.forceActiveFocus();
-                                    secondsInput.selectAll();
                                 }
                             }
 
                             StyledText {
                                 text: ":"
-                                font.pixelSize: 26
+                                font.pixelSize: 34
                                 font.weight: Font.Medium
                                 color: Colours.palette.m3onSurfaceVariant
                             }
 
                             TextInput {
                                 id: secondsInput
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
@@ -472,7 +470,7 @@ Item {
             // === 2. Stopwatch Card ===
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 150
+                implicitHeight: 155
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
@@ -482,44 +480,44 @@ Item {
 
                     // 1 Single Unified Container for Stopwatch Time: [ MM : SS . MS ]
                     StyledRect {
-                        implicitWidth: 230
-                        implicitHeight: 64
+                        implicitWidth: 270
+                        implicitHeight: 70
                         color: Colours.tPalette.m3surfaceContainerHigh
                         radius: Tokens.rounding.medium
 
                         RowLayout {
                             anchors.centerIn: parent
-                            spacing: 6
+                            spacing: 8
 
                             StyledText {
                                 text: root.getStopwatchMinutes(root.stopwatchMs)
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
 
                             StyledText {
                                 text: ":"
-                                font.pixelSize: 26
+                                font.pixelSize: 34
                                 font.weight: Font.Medium
                                 color: Colours.palette.m3onSurfaceVariant
                             }
 
                             StyledText {
                                 text: root.getStopwatchSeconds(root.stopwatchMs)
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
 
                             StyledText {
                                 text: "."
-                                font.pixelSize: 26
+                                font.pixelSize: 34
                                 font.weight: Font.Bold
                                 color: Colours.palette.m3primary
                             }
 
                             StyledText {
                                 text: root.getStopwatchMs(root.stopwatchMs)
-                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: root.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
                             }
                         }
