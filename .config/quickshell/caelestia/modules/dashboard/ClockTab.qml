@@ -70,30 +70,22 @@ Item {
             color: Colours.tPalette.m3surfaceContainer
             radius: Tokens.rounding.large
 
-            RowLayout {
+            ColumnLayout {
                 anchors.centerIn: parent
-                spacing: Tokens.spacing.extraLarge
-
-                MaterialIcon {
-                    text: "schedule"
-                    fontStyle: Tokens.font.icon.builders.extraLarge.scale(3.0).build()
-                    color: Colours.palette.m3primary
+                spacing: Tokens.spacing.small
+                
+                StyledText {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: Qt.formatTime(root.currentTime, "hh:mm:ss")
+                    font: Tokens.font.display.builders.large.scale(2.5).build()
+                    color: Colours.palette.m3onSurface
                 }
-
-                ColumnLayout {
-                    spacing: 0
-                    
-                    StyledText {
-                        text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                        font: Tokens.font.display.builders.large.scale(1.5).build()
-                        color: Colours.palette.m3onSurface
-                    }
-                    
-                    StyledText {
-                        text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
-                        font: Tokens.font.headline.builders.small.build()
-                        color: Colours.palette.m3onSurfaceVariant
-                    }
+                
+                StyledText {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
+                    font: Tokens.font.headline.builders.small.scale(1.5).build()
+                    color: Colours.palette.m3onSurfaceVariant
                 }
             }
         }
