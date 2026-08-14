@@ -14,7 +14,7 @@ Item {
     // 1. Current Time
     property var currentTime: new Date()
     Timer {
-        interval: 1000
+        interval: 30 // Fast update for milliseconds
         running: true
         repeat: true
         onTriggered: root.currentTime = new Date()
@@ -80,15 +80,17 @@ Item {
                 
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
-                    text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                    font: Tokens.font.display.builders.large.scale(2.5).build()
+                    text: Qt.formatTime(root.currentTime, "hh:mm:ss.zzz")
+                    font: Tokens.font.display.builders.large.build()
+                    font.pixelSize: 96
                     color: Colours.palette.m3onSurface
                 }
                 
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
                     text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
-                    font: Tokens.font.headline.builders.small.scale(1.5).build()
+                    font: Tokens.font.headline.builders.small.build()
+                    font.pixelSize: 32
                     color: Colours.palette.m3onSurfaceVariant
                 }
             }
