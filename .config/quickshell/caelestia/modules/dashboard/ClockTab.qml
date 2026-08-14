@@ -601,17 +601,10 @@ Item {
                         }
                     }
 
-                    // Status Text Row
+                    // Spacer to match preset height of timer card
                     Item {
                         Layout.fillWidth: true
                         implicitHeight: 26
-
-                        StyledText {
-                            anchors.centerIn: parent
-                            text: root.stopwatchRunning ? qsTr("Tracking active...") : (root.stopwatchMs > 0 ? qsTr("Paused") : qsTr("Ready"))
-                            font: Tokens.font.label.small
-                            color: root.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
-                        }
                     }
 
                     // Action Buttons
