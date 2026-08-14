@@ -347,8 +347,8 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
+                    z: -1
                     acceptedButtons: Qt.NoButton
-                    cursorShape: !Timers.timerRunning ? Qt.IBeamCursor : undefined
                     onWheel: event => {
                         if (!Timers.timerRunning) {
                             let s = parseInt(Timers.inputSeconds) || 0;
