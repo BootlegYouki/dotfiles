@@ -7,7 +7,6 @@ import Quickshell
 import Quickshell.Wayland
 import Caelestia.Config
 import qs.components
-import qs.components.containers
 import qs.services
 
 Variants {
@@ -29,14 +28,17 @@ Variants {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             WlrLayershell.namespace: "caelestia-macro-indicator"
 
+            contentItem.Config.screen: screen.name
+            contentItem.Tokens.screen: screen.name
+
             anchors {
                 top: true
                 right: true
             }
 
             margins {
-                top: 16
-                right: 16
+                top: 20
+                right: 20
             }
 
             implicitWidth: pill.implicitWidth + 24
@@ -55,11 +57,11 @@ Variants {
 
                     anchors.top: parent.top
                     anchors.right: parent.right
-                    anchors.margins: 8
+                    anchors.margins: 6
 
                     opacity: isActive ? 1.0 : 0.0
                     transform: Translate {
-                        x: pill.isActive ? 0 : 50
+                        x: pill.isActive ? 0 : 40
                         Behavior on x {
                             NumberAnimation {
                                 duration: 250
@@ -75,19 +77,19 @@ Variants {
                         }
                     }
 
-                    implicitWidth: contentRow.implicitWidth + Tokens.padding.medium * 2
-                    implicitHeight: contentRow.implicitHeight + Tokens.padding.small * 2
+                    implicitWidth: contentRow.implicitWidth + Tokens.padding.large * 2
+                    implicitHeight: contentRow.implicitHeight + Tokens.padding.medium * 2
 
                     radius: Tokens.rounding.large
-                    color: Colours.layer(Colours.palette.m3surfaceContainerHigh, 2)
-                    border.color: Qt.alpha(Colours.palette.m3primary, 0.4)
+                    color: Colours.tPalette.m3surfaceContainer
+                    border.color: Qt.alpha(Colours.palette.m3outlineVariant, 0.4)
                     border.width: 1
 
                     layer.enabled: true
                     layer.effect: MultiEffect {
                         shadowEnabled: true
-                        shadowBlur: 15
-                        shadowColor: Qt.alpha(Colours.palette.m3shadow, 0.6)
+                        shadowBlur: 16
+                        shadowColor: Qt.alpha(Colours.palette.m3shadow, 0.45)
                         shadowVerticalOffset: 4
                     }
 
@@ -97,21 +99,21 @@ Variants {
                         anchors.centerIn: parent
                         spacing: Tokens.spacing.medium
 
-                        // Icon badge with pulsing ring
+                        // Icon badge with pulsing ring matching Caelestia primary color
                         Item {
-                            implicitWidth: 32
-                            implicitHeight: 32
+                            implicitWidth: 34
+                            implicitHeight: 34
 
                             Rectangle {
                                 id: iconBg
                                 anchors.fill: parent
-                                radius: width / 2
+                                radius: Tokens.rounding.medium
                                 color: Qt.alpha(Colours.palette.m3primary, 0.15)
                             }
 
                             Rectangle {
                                 anchors.fill: parent
-                                radius: width / 2
+                                radius: Tokens.rounding.medium
                                 color: "transparent"
                                 border.color: Colours.palette.m3primary
                                 border.width: 1.5
@@ -119,34 +121,35 @@ Variants {
                                 SequentialAnimation on opacity {
                                     running: pill.isActive
                                     loops: Animation.Infinite
-                                    NumberAnimation { from: 0.3; to: 1.0; duration: 900; easing.type: Easing.InOutSine }
-                                    NumberAnimation { from: 1.0; to: 0.3; duration: 900; easing.type: Easing.InOutSine }
+                                    NumberAnimation { from: 0.25; to: 0.9; duration: 900; easing.type: Easing.InOutSine }
+                                    NumberAnimation { from: 0.9; to: 0.25; duration: 900; easing.type: Easing.InOutSine }
                                 }
 
                                 SequentialAnimation on scale {
                                     running: pill.isActive
                                     loops: Animation.Infinite
-                                    NumberAnimation { from: 0.95; to: 1.08; duration: 900; easing.type: Easing.InOutSine }
-                                    NumberAnimation { from: 1.08; to: 0.95; duration: 900; easing.type: Easing.InOutSine }
+                                    NumberAnimation { from: 0.96; to: 1.06; duration: 900; easing.type: Easing.InOutSine }
+                                    NumberAnimation { from: 1.06; to: 0.96; duration: 900; easing.type: Easing.InOutSine }
                                 }
                             }
 
                             MaterialIcon {
                                 anchors.centerIn: parent
+                                animate: true
                                 text: "sports_esports"
                                 color: Colours.palette.m3primary
                                 fontStyle: Tokens.font.icon.builders.medium.weight(Font.Bold).build()
                             }
                         }
 
-                        // Text Column
+                        // Text Column matching dashboard typography
                         ColumnLayout {
                             spacing: 1
 
                             StyledText {
                                 text: qsTr("Auto-Loot Active")
                                 font: Tokens.font.title.small
-                                color: Colours.palette.m3onSurface
+                                color: Colours.palette.m3primary
                             }
 
                             StyledText {
@@ -156,19 +159,19 @@ Variants {
                             }
                         }
 
-                        // Active ON badge
+                        // Active ON badge using M3 primary container tokens
                         StyledRect {
-                            implicitWidth: onLabel.implicitWidth + 12
+                            implicitWidth: onLabel.implicitWidth + 14
                             implicitHeight: onLabel.implicitHeight + 6
                             radius: Tokens.rounding.small
-                            color: Colours.palette.m3primary
+                            color: Colours.palette.m3primaryContainer
 
                             StyledText {
                                 id: onLabel
                                 anchors.centerIn: parent
                                 text: "ON"
                                 font: Tokens.font.label.small
-                                color: Colours.palette.m3onPrimary
+                                color: Colours.palette.m3onPrimaryContainer
                             }
                         }
                     }

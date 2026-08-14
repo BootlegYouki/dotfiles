@@ -111,17 +111,20 @@ def set_macro_indicator(enabled):
             pass
 
     # 2. Instantaneous IPC call to Quickshell Caelestia
+    env = os.environ.copy()
+    env["HOME"] = f"/home/{target_user}"
+    env["USER"] = target_user
+    env["LANG"] = "en_US.UTF-8"
+    env["XDG_RUNTIME_DIR"] = f"/run/user/{target_uid}"
+    env["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path=/run/user/{target_uid}/bus"
     cmd = [
-        "sudo", "-u", target_user,
-        f"XDG_RUNTIME_DIR=/run/user/{target_uid}",
-        f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{target_uid}/bus",
-        "qs", "ipc",
+        "/usr/bin/qs", "ipc",
         "-p", f"/home/{target_user}/.config/quickshell/caelestia/shell.qml",
         "--any-display",
         "call", "macro", "set", "true" if enabled else "false"
     ]
     try:
-        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.Popen(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception as e:
         print(f"Failed to update macro indicator: {e}")
 
