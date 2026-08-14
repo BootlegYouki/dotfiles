@@ -39,9 +39,9 @@ Variants {
                 right: 16
             }
 
-            implicitWidth: pill.implicitWidth + 30
-            implicitHeight: pill.implicitHeight + 30
-            visible: pill.opacity > 0.01
+            implicitWidth: pill.implicitWidth + 24
+            implicitHeight: pill.implicitHeight + 24
+            visible: MacroState.active || pill.opacity > 0.01
 
             Item {
                 id: pillContainer
@@ -55,20 +55,23 @@ Variants {
 
                     anchors.top: parent.top
                     anchors.right: parent.right
-                    anchors.topMargin: 10
-                    anchors.rightMargin: isActive ? 10 : -300
+                    anchors.margins: 8
 
                     opacity: isActive ? 1.0 : 0.0
-
-                    Behavior on opacity {
-                        Anim {
-                            type: Anim.DefaultEffects
+                    transform: Translate {
+                        x: pill.isActive ? 0 : 50
+                        Behavior on x {
+                            NumberAnimation {
+                                duration: 250
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
 
-                    Behavior on anchors.rightMargin {
-                        Anim {
-                            type: Anim.DefaultSpatial
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 200
+                            easing.type: Easing.OutCubic
                         }
                     }
 
