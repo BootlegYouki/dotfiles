@@ -9,6 +9,7 @@ import "modules/drawers"
 import "modules/background"
 import "modules/areapicker"
 import "modules/lock"
+import "modules/macro"
 import QtQuick
 import Quickshell
 import qs.services
@@ -33,6 +34,8 @@ ShellRoot {
     Lock {
         id: lock
     }
+
+    MacroIndicator {}
 
     ConfigToasts {}
     Shortcuts {}

@@ -14,6 +14,7 @@ Scope {
         Brightness;
         Romaji;
         Timers;
+        MacroState;
         Weather.reload();
 
         if (GlobalConfig.utilities.vpn.enabled)

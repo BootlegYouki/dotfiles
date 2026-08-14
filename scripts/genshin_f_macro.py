@@ -100,25 +100,26 @@ except Exception:
     target_user = "youki"
     target_uid = 1000
 
-def send_notification(enabled):
-    state = "Enabled" if enabled else "Disabled"
-    icon_path = os.path.expanduser(f"~{target_user}/.local/share/icons/loot_macro_keyboard.svg")
-    if not os.path.exists(icon_path):
-        icon_path = "/usr/share/icons/Papirus/22x22/devices/input-keyboard.svg"
+def set_macro_indicator(enabled):
+    # 1. Update persistent state file in /run/user/<uid>/ and /tmp/
+    for state_path in (f"/run/user/{target_uid}/genshin_macro.state", "/tmp/genshin_macro.state"):
+        try:
+            with open(state_path, "w") as f:
+                f.write("1" if enabled else "0")
+            os.chmod(state_path, 0o666)
+        except Exception:
+            pass
+
+    # 2. Instantaneous IPC call to Quickshell Caelestia
     cmd = [
         "sudo", "-u", target_user,
         f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{target_uid}/bus",
-        "notify-send",
-        "-a", "Loot Macro",
-        "-i", icon_path,
-        "Loot Macro",
-        state,
-        "-h", "string:x-canonical-private-synchronous:loot-macro"
+        "qs", "ipc", "-c", "caelestia", "call", "macro", "set", "true" if enabled else "false"
     ]
     try:
-        subprocess.Popen(cmd)
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception as e:
-        print(f"Failed to send notification: {e}")
+        print(f"Failed to update macro indicator: {e}")
 
 # Rapid F press loop (longer delays to ensure Proton/Wine registers input)
 def f_spam_loop():
@@ -137,6 +138,7 @@ def f_spam_loop():
 def cleanup(signum=None, frame=None, exit_code=0):
     global macro_enabled
     macro_enabled = False
+    set_macro_indicator(False)
     print("\nStopping macro and restoring keyboards...")
     for kb in keyboards:
         try:
@@ -157,6 +159,7 @@ try:
     # Grab all physical keyboards so events go only to this script
     for kb in keyboards:
         kb.grab()
+    set_macro_indicator(False)
     print("Keyboards grabbed. Press Ctrl+F to toggle rapid F-spam. Press Ctrl+C to stop.")
 
     # Mapping of file descriptors to keyboard objects
@@ -189,7 +192,7 @@ try:
                         if event.value == 1:  # Down
                             if ctrl_pressed:
                                 macro_enabled = not macro_enabled
-                                send_notification(macro_enabled)
+                                set_macro_indicator(macro_enabled)
                                 if macro_enabled:
                                     spam_thread = threading.Thread(target=f_spam_loop)
                                     spam_thread.daemon = True
