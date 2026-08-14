@@ -257,12 +257,12 @@ Item {
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                             }
 
-                            MouseArea {
+                            CustomMouseArea {
                                 anchors.fill: parent
                                 cursorShape: !root.timerRunning ? Qt.PointingHandCursor : undefined
-                                onWheel: wheel => {
+                                function onWheel(event: WheelEvent): void {
                                     if (!root.timerRunning) {
-                                        if (wheel.angleDelta.y > 0) {
+                                        if (event.angleDelta.y > 0) {
                                             root.timerDefault += 3600;
                                         } else if (root.timerDefault >= 3600) {
                                             root.timerDefault -= 3600;
@@ -303,12 +303,12 @@ Item {
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                             }
 
-                            MouseArea {
+                            CustomMouseArea {
                                 anchors.fill: parent
                                 cursorShape: !root.timerRunning ? Qt.PointingHandCursor : undefined
-                                onWheel: wheel => {
+                                function onWheel(event: WheelEvent): void {
                                     if (!root.timerRunning) {
-                                        if (wheel.angleDelta.y > 0) {
+                                        if (event.angleDelta.y > 0) {
                                             root.timerDefault += 60;
                                         } else if (root.timerDefault >= 60) {
                                             root.timerDefault -= 60;
@@ -349,12 +349,12 @@ Item {
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                             }
 
-                            MouseArea {
+                            CustomMouseArea {
                                 anchors.fill: parent
                                 cursorShape: !root.timerRunning ? Qt.PointingHandCursor : undefined
-                                onWheel: wheel => {
+                                function onWheel(event: WheelEvent): void {
                                     if (!root.timerRunning) {
-                                        if (wheel.angleDelta.y > 0) {
+                                        if (event.angleDelta.y > 0) {
                                             root.timerDefault += 10;
                                         } else if (root.timerDefault >= 10) {
                                             root.timerDefault -= 10;
