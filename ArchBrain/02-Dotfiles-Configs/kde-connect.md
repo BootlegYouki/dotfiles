@@ -37,8 +37,8 @@ sudo ufw reload
 
 ### Required Packages
 ```bash
-yay -S hypr-kdeconnect-fix-git      # provides hypr-kdeconnect-portal
-yay -S xdg-desktop-portal-hyprland  # Hyprland portal backend (was missing!)
+paru -S hypr-kdeconnect-fix-git      # provides hypr-kdeconnect-portal
+paru -S xdg-desktop-portal-hyprland  # Hyprland portal backend (was missing!)
 ```
 
 ### Required Services

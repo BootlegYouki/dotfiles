@@ -16,7 +16,7 @@ System information and specific environment setup for this Arch Linux installati
 ## 🚀 Distribution: CachyOS
 - **Base**: Arch Linux (performance-focused derivative)
 - **Kernel**: `linux-cachyos` (utilizes BORE / EEVDF schedulers and x86-64-v3/v4 micro-architecture packages)
-- **Package Managers**: `pacman`, `paru` / `yay`
+- **Package Managers**: `pacman`, `paru`
 - **CachyOS Repositories**: High-performance CPU architecture optimized repositories (`x86-64-v3`, `x86-64-v4`).
 
 ### Useful CachyOS Commands
