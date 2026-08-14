@@ -12,10 +12,10 @@ Item {
 
     implicitWidth: {
         if (!isCompact) return 840;
-        if (Timers.timerRunning && Timers.stopwatchRunning) return 480;
-        return 230;
+        if (Timers.timerRunning && Timers.stopwatchRunning) return 540;
+        return 260;
     }
-    implicitHeight: isCompact ? 60 : mainLayout.implicitHeight
+    implicitHeight: isCompact ? 76 : mainLayout.implicitHeight
 
     // Local Current Time (without milliseconds)
     property var currentTime: new Date()
@@ -178,10 +178,10 @@ Item {
             // === 1. Countdown Timer Card ===
             StyledRect {
                 id: timerCard
-                implicitWidth: root.isCompact ? 230 : 0
+                implicitWidth: root.isCompact ? 260 : 0
                 Layout.fillWidth: !root.isCompact
-                implicitHeight: root.isCompact ? 60 : 150
-                color: root.isCompact ? "transparent" : Colours.tPalette.m3surfaceContainer
+                implicitHeight: root.isCompact ? 76 : 150
+                color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
                 visible: !root.isCompact || Timers.timerRunning
 
@@ -189,7 +189,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: Tokens.spacing.medium
 
-                    // Time Digits Directly on Card (No Inner Container Box): HH : MM : SS
+                    // Time Digits: [ HH : MM : SS ]
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 8
@@ -367,10 +367,10 @@ Item {
             // === 2. Stopwatch Card ===
             StyledRect {
                 id: stopwatchCard
-                implicitWidth: root.isCompact ? 230 : 0
+                implicitWidth: root.isCompact ? 260 : 0
                 Layout.fillWidth: !root.isCompact
-                implicitHeight: root.isCompact ? 60 : 150
-                color: root.isCompact ? "transparent" : Colours.tPalette.m3surfaceContainer
+                implicitHeight: root.isCompact ? 76 : 150
+                color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
                 visible: !root.isCompact || Timers.stopwatchRunning
 
@@ -378,7 +378,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: Tokens.spacing.medium
 
-                    // Time Digits Directly on Card (No Inner Container Box): MM : SS . MS
+                    // Time Digits: [ MM : SS . MS ]
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 8
