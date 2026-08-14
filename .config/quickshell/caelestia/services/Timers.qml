@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Caelestia.Config
+import qs.utils
 
 Singleton {
     id: root
@@ -11,6 +12,8 @@ Singleton {
     property int timerRemaining: 300 // 5 minutes
     property int timerDefault: 300
     property bool timerRunning: false
+    property bool isOverdue: false
+    property int overdueSeconds: 0
     property string inputHours: "00"
     property string inputMinutes: "05"
     property string inputSeconds: "00"
@@ -20,19 +23,29 @@ Singleton {
     property bool stopwatchRunning: false
 
     // Active state indicator
-    readonly property bool hasActive: timerRunning || stopwatchRunning
+    readonly property bool hasActive: timerRunning || stopwatchRunning || isOverdue
 
     Timer {
         id: countdownTimer
         interval: 1000
-        running: root.timerRunning
+        running: root.timerRunning || root.isOverdue
         repeat: true
         onTriggered: {
-            if (root.timerRemaining > 0) {
-                root.timerRemaining--;
+            if (!root.isOverdue) {
+                if (root.timerRemaining > 1) {
+                    root.timerRemaining--;
+                    root.syncInputsFromRemaining();
+                } else if (root.timerRemaining === 1) {
+                    root.timerRemaining = 0;
+                    root.syncInputsFromRemaining();
+                    root.isOverdue = true;
+                    root.overdueSeconds = 0;
+
+                    // Play haptic vibration sound
+                    Quickshell.execDetached(["pw-play", `${Paths.home}/.config/quickshell/caelestia/assets/vibrate.wav`]);
+                }
             } else {
-                root.timerRunning = false;
-                root.syncInputsFromRemaining();
+                root.overdueSeconds++;
             }
         }
     }
@@ -92,6 +105,10 @@ Singleton {
     }
 
     function toggleTimer() {
+        if (isOverdue) {
+            resetTimer();
+            return;
+        }
         if (!timerRunning) {
             updateTimerFromInputs();
             if (timerRemaining === 0) {
@@ -106,9 +123,46 @@ Singleton {
     }
 
     function resetTimer() {
+        isOverdue = false;
+        overdueSeconds = 0;
         timerRunning = false;
         timerRemaining = timerDefault;
         syncInputsFromRemaining();
+    }
+
+    function restartTimer() {
+        isOverdue = false;
+        overdueSeconds = 0;
+        timerRemaining = timerDefault > 0 ? timerDefault : 300;
+        syncInputsFromRemaining();
+        timerRunning = true;
+    }
+
+    function addFiveMinutes() {
+        if (isOverdue) {
+            isOverdue = false;
+            overdueSeconds = 0;
+            timerRemaining = 300;
+            timerDefault = 300;
+            syncInputsFromRemaining();
+            timerRunning = true;
+        } else {
+            timerRemaining += 300;
+            timerDefault = Math.max(timerDefault, timerRemaining);
+            syncInputsFromRemaining();
+            if (!timerRunning) {
+                timerRunning = true;
+            }
+        }
+    }
+
+    function setAndStartTimer(seconds) {
+        isOverdue = false;
+        overdueSeconds = 0;
+        timerDefault = seconds;
+        timerRemaining = seconds;
+        syncInputsFromRemaining();
+        timerRunning = true;
     }
 
     function toggleStopwatch() {
