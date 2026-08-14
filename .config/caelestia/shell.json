@@ -106,7 +106,8 @@
             }
         ],
         "toasts": {
-            "capsLockChanged": false
+            "capsLockChanged": false,
+            "kbLayoutChanged": false
         }
     }
 }
