@@ -81,14 +81,16 @@ Item {
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
                     text: Qt.formatTime(root.currentTime, "hh:mm:ss.zzz")
-                    font: Tokens.font.display.builders.large.size(120).build()
+                    font.pixelSize: 84
+                    font.weight: Font.Bold
                     color: Colours.palette.m3onSurface
                 }
                 
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
                     text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
-                    font: Tokens.font.headline.builders.small.size(36).build()
+                    font.pixelSize: 32
+                    font.weight: Font.Medium
                     color: Colours.palette.m3onSurfaceVariant
                 }
             }
