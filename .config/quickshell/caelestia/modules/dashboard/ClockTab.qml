@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Caelestia.Config
 import qs.components
 import qs.components.controls
+import qs.services
 
 Item {
     id: root
