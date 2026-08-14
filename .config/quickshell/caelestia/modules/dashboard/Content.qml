@@ -61,10 +61,10 @@ Item {
     }
 
     readonly property real nonAnimWidth: isCompactTimer
-        ? (compactTimerLoader.item?.implicitWidth ?? 280) + Tokens.padding.large * 2
+        ? (compactTimerLoader.item?.implicitWidth ?? 230) + Tokens.padding.medium * 2
         : view.implicitWidth + viewWrapper.anchors.margins * 2
     readonly property real nonAnimHeight: isCompactTimer
-        ? (compactTimerLoader.item?.implicitHeight ?? 155) + Tokens.padding.large * 2
+        ? (compactTimerLoader.item?.implicitHeight ?? 60) + Tokens.padding.medium * 2
         : tabs.implicitHeight + tabs.anchors.topMargin + view.implicitHeight + viewWrapper.anchors.margins * 2
 
     implicitWidth: nonAnimWidth

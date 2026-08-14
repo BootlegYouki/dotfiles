@@ -12,10 +12,10 @@ Item {
 
     implicitWidth: {
         if (!isCompact) return 840;
-        if (Timers.timerRunning && Timers.stopwatchRunning) return 580;
-        return 280;
+        if (Timers.timerRunning && Timers.stopwatchRunning) return 480;
+        return 230;
     }
-    implicitHeight: isCompact ? 155 : mainLayout.implicitHeight
+    implicitHeight: isCompact ? 60 : mainLayout.implicitHeight
 
     // Local Current Time (without milliseconds)
     property var currentTime: new Date()
@@ -178,178 +178,154 @@ Item {
             // === 1. Countdown Timer Card ===
             StyledRect {
                 id: timerCard
-                implicitWidth: root.isCompact ? 280 : 0
+                implicitWidth: root.isCompact ? 230 : 0
                 Layout.fillWidth: !root.isCompact
-                implicitHeight: 155
-                color: Colours.tPalette.m3surfaceContainer
+                implicitHeight: root.isCompact ? 60 : 150
+                color: root.isCompact ? "transparent" : Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
                 visible: !root.isCompact || Timers.timerRunning
 
                 ColumnLayout {
                     anchors.centerIn: parent
-                    spacing: Tokens.spacing.small
+                    spacing: Tokens.spacing.medium
 
-                    // 1 Single Unified Container for Countdown Time: [ HH : MM : SS ]
-                    StyledRect {
-                        implicitWidth: 270
-                        implicitHeight: 70
-                        color: Colours.tPalette.m3surfaceContainerHigh
-                        radius: Tokens.rounding.medium
+                    // Time Digits Directly on Card (No Inner Container Box): HH : MM : SS
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 8
 
-                        RowLayout {
-                            anchors.centerIn: parent
-                            spacing: 8
+                        TextInput {
+                            id: hoursInput
+                            font: Tokens.font.clock.size(36).weight(Font.Medium).build()
+                            color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                            selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
+                            selectedTextColor: color
+                            selectByMouse: true
+                            renderType: Text.NativeRendering
+                            readOnly: Timers.timerRunning
+                            cursorVisible: activeFocus && !Timers.timerRunning
+                            maximumLength: 2
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
+                            text: Timers.timerRunning ? Timers.getHours(Timers.timerRemaining) : Timers.inputHours
 
-                            TextInput {
-                                id: hoursInput
-                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
-                                selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
-                                selectedTextColor: color
-                                selectByMouse: true
-                                renderType: Text.NativeRendering
-                                readOnly: Timers.timerRunning
-                                cursorVisible: activeFocus && !Timers.timerRunning
-                                maximumLength: 2
-                                inputMethodHints: Qt.ImhDigitsOnly
-                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
-                                text: Timers.timerRunning ? Timers.getHours(Timers.timerRemaining) : Timers.inputHours
-
-                                onTextEdited: {
-                                    Timers.inputHours = text;
-                                    Timers.updateTimerFromInputs();
-                                    if (text.length >= 2) {
-                                        minutesInput.forceActiveFocus();
-                                        minutesInput.selectAll();
-                                    }
-                                }
-
-                                onActiveFocusChanged: {
-                                    if (activeFocus) {
-                                        selectAll();
-                                    } else {
-                                        Timers.inputHours = (parseInt(text) || 0).toString().padStart(2, '0');
-                                        Timers.updateTimerFromInputs();
-                                    }
-                                }
-
-                                onAccepted: {
+                            onTextEdited: {
+                                Timers.inputHours = text;
+                                Timers.updateTimerFromInputs();
+                                if (text.length >= 2) {
                                     minutesInput.forceActiveFocus();
+                                    minutesInput.selectAll();
                                 }
                             }
 
-                            StyledText {
-                                text: ":"
-                                font.pixelSize: 34
-                                font.weight: Font.Medium
-                                color: Colours.palette.m3onSurfaceVariant
-                            }
-
-                            TextInput {
-                                id: minutesInput
-                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
-                                selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
-                                selectedTextColor: color
-                                selectByMouse: true
-                                renderType: Text.NativeRendering
-                                readOnly: Timers.timerRunning
-                                cursorVisible: activeFocus && !Timers.timerRunning
-                                maximumLength: 2
-                                inputMethodHints: Qt.ImhDigitsOnly
-                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
-                                text: Timers.timerRunning ? Timers.getMinutes(Timers.timerRemaining) : Timers.inputMinutes
-
-                                onTextEdited: {
-                                    Timers.inputMinutes = text;
+                            onActiveFocusChanged: {
+                                if (activeFocus) {
+                                    selectAll();
+                                } else {
+                                    Timers.inputHours = (parseInt(text) || 0).toString().padStart(2, '0');
                                     Timers.updateTimerFromInputs();
-                                    if (text.length >= 2) {
-                                        secondsInput.forceActiveFocus();
-                                        secondsInput.selectAll();
-                                    }
                                 }
+                            }
 
-                                onActiveFocusChanged: {
-                                    if (activeFocus) {
-                                        selectAll();
-                                    } else {
-                                        Timers.inputMinutes = (parseInt(text) || 0).toString().padStart(2, '0');
-                                        Timers.updateTimerFromInputs();
-                                    }
-                                }
+                            onAccepted: {
+                                minutesInput.forceActiveFocus();
+                            }
+                        }
 
-                                onAccepted: {
+                        StyledText {
+                            text: ":"
+                            font.pixelSize: 34
+                            font.weight: Font.Medium
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
+
+                        TextInput {
+                            id: minutesInput
+                            font: Tokens.font.clock.size(36).weight(Font.Medium).build()
+                            color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                            selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
+                            selectedTextColor: color
+                            selectByMouse: true
+                            renderType: Text.NativeRendering
+                            readOnly: Timers.timerRunning
+                            cursorVisible: activeFocus && !Timers.timerRunning
+                            maximumLength: 2
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
+                            text: Timers.timerRunning ? Timers.getMinutes(Timers.timerRemaining) : Timers.inputMinutes
+
+                            onTextEdited: {
+                                Timers.inputMinutes = text;
+                                Timers.updateTimerFromInputs();
+                                if (text.length >= 2) {
                                     secondsInput.forceActiveFocus();
+                                    secondsInput.selectAll();
                                 }
                             }
 
-                            StyledText {
-                                text: ":"
-                                font.pixelSize: 34
-                                font.weight: Font.Medium
-                                color: Colours.palette.m3onSurfaceVariant
-                            }
-
-                            TextInput {
-                                id: secondsInput
-                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
-                                selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
-                                selectedTextColor: color
-                                selectByMouse: true
-                                renderType: Text.NativeRendering
-                                readOnly: Timers.timerRunning
-                                cursorVisible: activeFocus && !Timers.timerRunning
-                                maximumLength: 2
-                                inputMethodHints: Qt.ImhDigitsOnly
-                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
-                                text: Timers.timerRunning ? Timers.getSeconds(Timers.timerRemaining) : Timers.inputSeconds
-
-                                onTextEdited: {
-                                    Timers.inputSeconds = text;
+                            onActiveFocusChanged: {
+                                if (activeFocus) {
+                                    selectAll();
+                                } else {
+                                    Timers.inputMinutes = (parseInt(text) || 0).toString().padStart(2, '0');
                                     Timers.updateTimerFromInputs();
                                 }
+                            }
 
-                                onActiveFocusChanged: {
-                                    if (activeFocus) {
-                                        selectAll();
-                                    } else {
-                                        Timers.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
-                                        Timers.updateTimerFromInputs();
-                                    }
-                                }
+                            onAccepted: {
+                                secondsInput.forceActiveFocus();
+                            }
+                        }
 
-                                onAccepted: {
-                                    focus = false;
+                        StyledText {
+                            text: ":"
+                            font.pixelSize: 34
+                            font.weight: Font.Medium
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
+
+                        TextInput {
+                            id: secondsInput
+                            font: Tokens.font.clock.size(36).weight(Font.Medium).build()
+                            color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                            selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
+                            selectedTextColor: color
+                            selectByMouse: true
+                            renderType: Text.NativeRendering
+                            readOnly: Timers.timerRunning
+                            cursorVisible: activeFocus && !Timers.timerRunning
+                            maximumLength: 2
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
+                            text: Timers.timerRunning ? Timers.getSeconds(Timers.timerRemaining) : Timers.inputSeconds
+
+                            onTextEdited: {
+                                Timers.inputSeconds = text;
+                                Timers.updateTimerFromInputs();
+                            }
+
+                            onActiveFocusChanged: {
+                                if (activeFocus) {
+                                    selectAll();
+                                } else {
                                     Timers.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
                                     Timers.updateTimerFromInputs();
                                 }
                             }
-                        }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.NoButton
-                            cursorShape: !Timers.timerRunning ? Qt.IBeamCursor : undefined
-                            onWheel: event => {
-                                if (!Timers.timerRunning) {
-                                    let s = parseInt(Timers.inputSeconds) || 0;
-                                    if (event.angleDelta.y > 0) {
-                                        s = (s + 5) % 60;
-                                    } else if (s >= 5) {
-                                        s = s - 5;
-                                    }
-                                    Timers.inputSeconds = s < 10 ? "0" + s : s.toString();
-                                    Timers.updateTimerFromInputs();
-                                }
+                            onAccepted: {
+                                focus = false;
+                                Timers.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
+                                Timers.updateTimerFromInputs();
                             }
                         }
                     }
 
-                    // Action Buttons (Play/Pause & Reset)
+                    // Action Buttons (Play/Pause & Reset) - ONLY visible in full dashboard
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.medium
+                        visible: !root.isCompact
 
                         IconButton {
                             icon: Timers.timerRunning ? "pause" : "play_arrow"
@@ -368,71 +344,83 @@ Item {
                         }
                     }
                 }
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.NoButton
+                    cursorShape: !Timers.timerRunning ? Qt.IBeamCursor : undefined
+                    onWheel: event => {
+                        if (!Timers.timerRunning) {
+                            let s = parseInt(Timers.inputSeconds) || 0;
+                            if (event.angleDelta.y > 0) {
+                                s = (s + 5) % 60;
+                            } else if (s >= 5) {
+                                s = s - 5;
+                            }
+                            Timers.inputSeconds = s < 10 ? "0" + s : s.toString();
+                            Timers.updateTimerFromInputs();
+                        }
+                    }
+                }
             }
 
             // === 2. Stopwatch Card ===
             StyledRect {
                 id: stopwatchCard
-                implicitWidth: root.isCompact ? 280 : 0
+                implicitWidth: root.isCompact ? 230 : 0
                 Layout.fillWidth: !root.isCompact
-                implicitHeight: 155
-                color: Colours.tPalette.m3surfaceContainer
+                implicitHeight: root.isCompact ? 60 : 150
+                color: root.isCompact ? "transparent" : Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
                 visible: !root.isCompact || Timers.stopwatchRunning
 
                 ColumnLayout {
                     anchors.centerIn: parent
-                    spacing: Tokens.spacing.small
+                    spacing: Tokens.spacing.medium
 
-                    // 1 Single Unified Container for Stopwatch Time: [ MM : SS . MS ]
-                    StyledRect {
-                        implicitWidth: 270
-                        implicitHeight: 70
-                        color: Colours.tPalette.m3surfaceContainerHigh
-                        radius: Tokens.rounding.medium
+                    // Time Digits Directly on Card (No Inner Container Box): MM : SS . MS
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 8
 
-                        RowLayout {
-                            anchors.centerIn: parent
-                            spacing: 8
+                        StyledText {
+                            text: Timers.getStopwatchMinutes(Timers.stopwatchMs)
+                            font: Tokens.font.clock.size(36).weight(Font.Medium).build()
+                            color: Colours.palette.m3onSurface
+                        }
 
-                            StyledText {
-                                text: Timers.getStopwatchMinutes(Timers.stopwatchMs)
-                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: Colours.palette.m3onSurface
-                            }
+                        StyledText {
+                            text: ":"
+                            font.pixelSize: 34
+                            font.weight: Font.Medium
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
 
-                            StyledText {
-                                text: ":"
-                                font.pixelSize: 34
-                                font.weight: Font.Medium
-                                color: Colours.palette.m3onSurfaceVariant
-                            }
+                        StyledText {
+                            text: Timers.getStopwatchSeconds(Timers.stopwatchMs)
+                            font: Tokens.font.clock.size(36).weight(Font.Medium).build()
+                            color: Colours.palette.m3onSurface
+                        }
 
-                            StyledText {
-                                text: Timers.getStopwatchSeconds(Timers.stopwatchMs)
-                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: Colours.palette.m3onSurface
-                            }
+                        StyledText {
+                            text: "."
+                            font.pixelSize: 34
+                            font.weight: Font.Bold
+                            color: Colours.palette.m3primary
+                        }
 
-                            StyledText {
-                                text: "."
-                                font.pixelSize: 34
-                                font.weight: Font.Bold
-                                color: Colours.palette.m3primary
-                            }
-
-                            StyledText {
-                                text: Timers.getStopwatchMs(Timers.stopwatchMs)
-                                font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: Timers.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
-                            }
+                        StyledText {
+                            text: Timers.getStopwatchMs(Timers.stopwatchMs)
+                            font: Tokens.font.clock.size(36).weight(Font.Medium).build()
+                            color: Timers.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
                         }
                     }
 
-                    // Action Buttons (Play/Pause & Reset)
+                    // Action Buttons (Play/Pause & Reset) - ONLY visible in full dashboard
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.medium
+                        visible: !root.isCompact
 
                         IconButton {
                             icon: Timers.stopwatchRunning ? "pause" : "play_arrow"
