@@ -13,8 +13,8 @@ Item {
 
     implicitWidth: {
         if (!isCompact) return 840;
-        if (Timers.timerRunning && Timers.stopwatchRunning) return 600;
-        return 290;
+        if (Timers.timerRunning && Timers.stopwatchRunning) return 580;
+        return 280;
     }
     implicitHeight: isCompact ? 155 : mainLayout.implicitHeight
 
@@ -185,12 +185,14 @@ Item {
         // --- Bottom Row: Countdown Timer & Stopwatch Cards ---
         RowLayout {
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
             spacing: Tokens.spacing.medium
 
             // === 1. Countdown Timer Card ===
             StyledRect {
                 id: timerCard
-                Layout.fillWidth: true
+                implicitWidth: root.isCompact ? 280 : 0
+                Layout.fillWidth: !root.isCompact
                 implicitHeight: 155
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
@@ -384,7 +386,8 @@ Item {
             // === 2. Stopwatch Card ===
             StyledRect {
                 id: stopwatchCard
-                Layout.fillWidth: true
+                implicitWidth: root.isCompact ? 280 : 0
+                Layout.fillWidth: !root.isCompact
                 implicitHeight: 155
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large

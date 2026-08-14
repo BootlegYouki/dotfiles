@@ -17,10 +17,6 @@ Item {
     required property FileDialog facePicker
 
     readonly property bool isCompactTimer: !screenState.dashboard && Timers.hasActive
-    readonly property int clockTabIndex: {
-        const idx = root.dashboardTabs.findIndex(t => t.component === clockComponent);
-        return idx >= 0 ? idx : 0;
-    }
 
     readonly property var dashboardTabs: {
         const allTabs = [
@@ -58,163 +54,171 @@ Item {
         return allTabs.filter(tab => tab.enabled);
     }
 
-    readonly property real nonAnimWidth: view.implicitWidth + viewWrapper.anchors.margins * 2
-    readonly property real nonAnimHeight: root.isCompactTimer
-        ? view.implicitHeight + viewWrapper.anchors.margins * 2
+    readonly property real nonAnimWidth: isCompactTimer
+        ? (compactTimerLoader.item?.implicitWidth ?? 280) + Tokens.padding.large * 2
+        : view.implicitWidth + viewWrapper.anchors.margins * 2
+    readonly property real nonAnimHeight: isCompactTimer
+        ? (compactTimerLoader.item?.implicitHeight ?? 155) + Tokens.padding.large * 2
         : tabs.implicitHeight + tabs.anchors.topMargin + view.implicitHeight + viewWrapper.anchors.margins * 2
 
     implicitWidth: nonAnimWidth
     implicitHeight: nonAnimHeight
 
-    Tabs {
-        id: tabs
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.topMargin: root.isCompactTimer ? 0 : CUtils.clamp(anchors.margins - Config.border.thickness, 0, anchors.margins)
-        anchors.margins: Tokens.padding.large
-
+    // 1. Normal Dashboard View (Tabs + Flickable)
+    Item {
+        id: normalView
+        anchors.fill: parent
         visible: !root.isCompactTimer
-        height: root.isCompactTimer ? 0 : implicitHeight
-        opacity: root.isCompactTimer ? 0 : 1
 
-        nonAnimWidth: root.nonAnimWidth - anchors.margins * 2
-        screenState: root.screenState
-        tabs: root.dashboardTabs
+        Tabs {
+            id: tabs
 
-        Behavior on opacity {
-            Anim {}
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.topMargin: CUtils.clamp(anchors.margins - Config.border.thickness, 0, anchors.margins)
+            anchors.margins: Tokens.padding.large
+
+            nonAnimWidth: root.nonAnimWidth - anchors.margins * 2
+            screenState: root.screenState
+            tabs: root.dashboardTabs
+        }
+
+        ClippingRectangle {
+            id: viewWrapper
+
+            anchors.top: tabs.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: Tokens.padding.large
+
+            radius: Tokens.rounding.large
+            color: "transparent"
+
+            Flickable {
+                id: view
+
+                readonly property int currentIndex: root.screenState.dashboardTab
+                readonly property Item currentItem: {
+                    repeater.count;
+                    return repeater.itemAt(currentIndex);
+                }
+
+                anchors.fill: parent
+                flickableDirection: Flickable.HorizontalFlick
+
+                implicitWidth: currentItem?.implicitWidth ?? 0
+                implicitHeight: currentItem?.implicitHeight ?? 0
+
+                contentX: currentItem?.x ?? 0
+                contentWidth: row.implicitWidth
+                contentHeight: row.implicitHeight
+
+                onContentXChanged: {
+                    if (!moving || !currentItem)
+                        return;
+
+                    const x = contentX - currentItem.x;
+                    if (x > currentItem.implicitWidth / 2)
+                        root.screenState.dashboardTab = Math.min(root.screenState.dashboardTab + 1, tabs.count - 1);
+                    else if (x < -currentItem.implicitWidth / 2)
+                        root.screenState.dashboardTab = Math.max(root.screenState.dashboardTab - 1, 0);
+                }
+
+                onDragEnded: {
+                    if (!currentItem)
+                        return;
+
+                    const x = contentX - currentItem.x;
+                    if (x > currentItem.implicitWidth / 10)
+                        root.screenState.dashboardTab = Math.min(root.screenState.dashboardTab + 1, tabs.count - 1);
+                    else if (x < -currentItem.implicitWidth / 10)
+                        root.screenState.dashboardTab = Math.max(root.screenState.dashboardTab - 1, 0);
+                    else
+                        contentX = Qt.binding(() => currentItem?.x ?? 0);
+                }
+
+                RowLayout {
+                    id: row
+
+                    Repeater {
+                        id: repeater
+
+                        model: ScriptModel {
+                            values: root.dashboardTabs
+                        }
+
+                        delegate: Loader {
+                            id: paneLoader
+
+                            required property int index
+                            required property var modelData
+
+                            Layout.alignment: Qt.AlignTop
+                            sourceComponent: modelData.component
+
+                            Component.onCompleted: active = Qt.binding(() => {
+                                if (index === view.currentIndex)
+                                    return true;
+                                const vx = Math.floor(view.visibleArea.xPosition * view.contentWidth);
+                                const vex = Math.floor(vx + view.visibleArea.widthRatio * view.contentWidth);
+                                return (vx >= x && vx <= x + implicitWidth) || (vex >= x && vex <= x + implicitWidth);
+                            })
+                        }
+                    }
+                }
+
+                Behavior on contentX {
+                    Anim {}
+                }
+            }
         }
     }
 
-    ClippingRectangle {
-        id: viewWrapper
+    // 2. Compact Timer View (Direct, isolated display with zero flickable horizontal shifting)
+    Loader {
+        id: compactTimerLoader
+        anchors.centerIn: parent
+        active: root.isCompactTimer
+        visible: root.isCompactTimer
+        sourceComponent: clockComponent
+    }
 
-        anchors.top: root.isCompactTimer ? parent.top : tabs.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: Tokens.padding.large
+    Component {
+        id: dashComponent
 
-        radius: Tokens.rounding.large
-        color: "transparent"
+        Dash {
+            screenState: root.screenState
+            facePicker: root.facePicker
+        }
+    }
 
-        Flickable {
-            id: view
+    Component {
+        id: mediaComponent
 
-            readonly property int currentIndex: root.isCompactTimer ? root.clockTabIndex : root.screenState.dashboardTab
-            readonly property Item currentItem: {
-                repeater.count; // Trigger update on count change
-                return repeater.itemAt(currentIndex);
-            }
+        Media {
+            screenState: root.screenState
+        }
+    }
 
-            anchors.fill: parent
+    Component {
+        id: performanceComponent
 
-            flickableDirection: Flickable.HorizontalFlick
+        Performance {}
+    }
 
-            implicitWidth: currentItem?.implicitWidth ?? 0
-            implicitHeight: currentItem?.implicitHeight ?? 0
+    Component {
+        id: weatherComponent
 
-            contentX: currentItem?.x ?? 0
-            contentWidth: row.implicitWidth
-            contentHeight: row.implicitHeight
+        WeatherTab {}
+    }
 
-            onContentXChanged: {
-                if (!moving || !currentItem || root.isCompactTimer)
-                    return;
+    Component {
+        id: clockComponent
 
-                const x = contentX - currentItem.x;
-                if (x > currentItem.implicitWidth / 2)
-                    root.screenState.dashboardTab = Math.min(root.screenState.dashboardTab + 1, tabs.count - 1);
-                else if (x < -currentItem.implicitWidth / 2)
-                    root.screenState.dashboardTab = Math.max(root.screenState.dashboardTab - 1, 0);
-            }
-
-            onDragEnded: {
-                if (!currentItem || root.isCompactTimer)
-                    return;
-
-                const x = contentX - currentItem.x;
-                if (x > currentItem.implicitWidth / 10)
-                    root.screenState.dashboardTab = Math.min(root.screenState.dashboardTab + 1, tabs.count - 1);
-                else if (x < -currentItem.implicitWidth / 10)
-                    root.screenState.dashboardTab = Math.max(root.screenState.dashboardTab - 1, 0);
-                else
-                    contentX = Qt.binding(() => currentItem?.x ?? 0);
-            }
-
-            RowLayout {
-                id: row
-
-                Repeater {
-                    id: repeater
-
-                    model: ScriptModel {
-                        values: root.dashboardTabs
-                    }
-
-                    delegate: Loader {
-                        id: paneLoader
-
-                        required property int index
-                        required property var modelData
-
-                        Layout.alignment: Qt.AlignTop
-
-                        sourceComponent: modelData.component
-
-                        Component.onCompleted: active = Qt.binding(() => {
-                            if (index === view.currentIndex)
-                                return true;
-                            const vx = Math.floor(view.visibleArea.xPosition * view.contentWidth);
-                            const vex = Math.floor(vx + view.visibleArea.widthRatio * view.contentWidth);
-                            return (vx >= x && vx <= x + implicitWidth) || (vex >= x && vex <= x + implicitWidth);
-                        })
-                    }
-                }
-            }
-
-            Component {
-                id: dashComponent
-
-                Dash {
-                    screenState: root.screenState
-                    facePicker: root.facePicker
-                }
-            }
-
-            Component {
-                id: mediaComponent
-
-                Media {
-                    screenState: root.screenState
-                }
-            }
-
-            Component {
-                id: performanceComponent
-
-                Performance {}
-            }
-
-            Component {
-                id: weatherComponent
-
-                WeatherTab {}
-            }
-
-            Component {
-                id: clockComponent
-
-                ClockTab {
-                    screenState: root.screenState
-                }
-            }
-
-            Behavior on contentX {
-                Anim {}
-            }
+        ClockTab {
+            screenState: root.screenState
         }
     }
 
