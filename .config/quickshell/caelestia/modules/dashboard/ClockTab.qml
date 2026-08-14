@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import Caelestia.Config
 import qs.components
 import qs.components.controls
-import M3Shapes
 
 Item {
     id: root
@@ -11,6 +10,7 @@ Item {
     implicitWidth: mainRow.implicitWidth
     implicitHeight: mainRow.implicitHeight
 
+    // Current time property
     property var currentTime: new Date()
 
     Timer {
@@ -65,8 +65,8 @@ Item {
 
             // Hero Local Clock
             StyledRect {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 180
+                implicitWidth: 460
+                implicitHeight: 160
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
@@ -87,7 +87,7 @@ Item {
 
                         StyledText {
                             text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                            font: Tokens.font.display.builders.large.scale(1.5).build()
+                            font: Tokens.font.display.builders.large.scale(1.2).build()
                             color: Colours.palette.m3onSurface
                         }
                         StyledText {
@@ -101,7 +101,7 @@ Item {
 
             // World Clocks Row
             RowLayout {
-                Layout.fillWidth: true
+                implicitWidth: 460
                 spacing: Tokens.spacing.large
 
                 Repeater {
@@ -112,7 +112,7 @@ Item {
                     ]
                     delegate: StyledRect {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 120
+                        implicitHeight: 120
                         color: Colours.tPalette.m3surfaceContainer
                         radius: Tokens.rounding.large
 
@@ -151,8 +151,8 @@ Item {
         // Right Column (Timer)
         StyledRect {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: 320
-            Layout.preferredHeight: 320 // Square layout like other widgets
+            implicitWidth: 320
+            implicitHeight: 320 // Square layout like other widgets
             color: Colours.tPalette.m3surfaceContainer
             radius: Tokens.rounding.large
 
