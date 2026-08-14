@@ -66,29 +66,54 @@ Item {
         return s < 10 ? "0" + s : s.toString();
     }
 
+    function isDstUs(d) {
+        const year = d.getUTCFullYear();
+        const march1 = new Date(Date.UTC(year, 2, 1));
+        const marchDstDay = 14 - ((march1.getUTCDay() + 6) % 7);
+        const marchDst = new Date(Date.UTC(year, 2, marchDstDay, 7));
+        const nov1 = new Date(Date.UTC(year, 10, 1));
+        const novDstDay = 7 - ((nov1.getUTCDay() + 6) % 7);
+        const novDst = new Date(Date.UTC(year, 10, novDstDay, 6));
+        return d >= marchDst && d < novDst;
+    }
+
+    function isDstEu(d) {
+        const year = d.getUTCFullYear();
+        const marchLast = new Date(Date.UTC(year, 2, 31));
+        const marchDstDay = 31 - marchLast.getUTCDay();
+        const marchDst = new Date(Date.UTC(year, 2, marchDstDay, 1));
+        const octLast = new Date(Date.UTC(year, 9, 31));
+        const octDstDay = 31 - octLast.getUTCDay();
+        const octDst = new Date(Date.UTC(year, 9, octDstDay, 1));
+        return d >= marchDst && d < octDst;
+    }
+
+    function getTzOffset(tz, d) {
+        if (tz === "America/New_York") return isDstUs(d) ? -4 : -5;
+        if (tz === "Europe/London") return isDstEu(d) ? 1 : 0;
+        if (tz === "Asia/Tokyo") return 9;
+        return 0;
+    }
+
     function getTzHour(tz) {
-        try {
-            const str = new Intl.DateTimeFormat('en-US', {
-                timeZone: tz,
-                hour: '2-digit',
-                hour12: false
-            }).format(root.currentTime);
-            return str.padStart(2, '0');
-        } catch (e) {
-            return "--";
+        const d = root.currentTime;
+        const offset = getTzOffset(tz, d);
+        let totalMinutes = d.getUTCHours() * 60 + d.getUTCMinutes() + offset * 60;
+        totalMinutes = (totalMinutes % 1440 + 1440) % 1440;
+        let h = Math.floor(totalMinutes / 60);
+        if (GlobalConfig.services.useTwelveHourClock) {
+            h = h % 12 || 12;
         }
+        return h < 10 ? "0" + h : h.toString();
     }
 
     function getTzMinute(tz) {
-        try {
-            const str = new Intl.DateTimeFormat('en-US', {
-                timeZone: tz,
-                minute: '2-digit'
-            }).format(root.currentTime);
-            return str.padStart(2, '0');
-        } catch (e) {
-            return "--";
-        }
+        const d = root.currentTime;
+        const offset = getTzOffset(tz, d);
+        let totalMinutes = d.getUTCHours() * 60 + d.getUTCMinutes() + offset * 60;
+        totalMinutes = (totalMinutes % 1440 + 1440) % 1440;
+        let m = totalMinutes % 60;
+        return m < 10 ? "0" + m : m.toString();
     }
 
     ColumnLayout {
