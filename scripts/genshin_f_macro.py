@@ -113,8 +113,12 @@ def set_macro_indicator(enabled):
     # 2. Instantaneous IPC call to Quickshell Caelestia
     cmd = [
         "sudo", "-u", target_user,
+        f"XDG_RUNTIME_DIR=/run/user/{target_uid}",
         f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{target_uid}/bus",
-        "qs", "ipc", "-c", "caelestia", "call", "macro", "set", "true" if enabled else "false"
+        "qs", "ipc",
+        "-p", f"/home/{target_user}/.config/quickshell/caelestia/shell.qml",
+        "--any-display",
+        "call", "macro", "set", "true" if enabled else "false"
     ]
     try:
         subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
