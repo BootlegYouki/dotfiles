@@ -254,32 +254,30 @@ Item {
             }
         }
 
-        // --- Bottom Row: Countdown Timer & Stopwatch Cards with Side-Mounted Icon Controls ---
+        // --- Bottom Row: Countdown Timer & Stopwatch Cards ---
         RowLayout {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
 
-            // === 1. Countdown Timer Card (HH : MM : SS + Side Buttons) ===
+            // === 1. Countdown Timer Card (HH : MM : SS + Bottom Icon Buttons) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 150
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: Tokens.padding.large
-                    spacing: Tokens.spacing.medium
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: Tokens.spacing.small
 
-                    // Center Digits
+                    // Direct Editable Digital Cards: HH : MM : SS
                     RowLayout {
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignCenter
+                        Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.small
 
                         // Hours Box
                         StyledRect {
-                            implicitWidth: 68
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: (hoursInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -322,7 +320,6 @@ Item {
 
                                 onAccepted: {
                                     minutesInput.forceActiveFocus();
-                                    minutesInput.selectAll();
                                 }
                             }
 
@@ -356,7 +353,7 @@ Item {
 
                         // Minutes Box
                         StyledRect {
-                            implicitWidth: 68
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: (minutesInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -399,7 +396,6 @@ Item {
 
                                 onAccepted: {
                                     secondsInput.forceActiveFocus();
-                                    secondsInput.selectAll();
                                 }
                             }
 
@@ -433,7 +429,7 @@ Item {
 
                         // Seconds Box
                         StyledRect {
-                            implicitWidth: 68
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: (secondsInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -497,10 +493,10 @@ Item {
                         }
                     }
 
-                    // Side-Mounted Vertical Icon Controls (Play/Pause & Reset)
-                    ColumnLayout {
-                        Layout.alignment: Qt.AlignVCenter
-                        spacing: Tokens.spacing.small
+                    // Bottom Row of Icon Buttons (Play/Pause & Reset)
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: Tokens.spacing.medium
 
                         IconButton {
                             icon: root.timerRunning ? "pause" : "play_arrow"
@@ -537,27 +533,25 @@ Item {
                 }
             }
 
-            // === 2. Stopwatch Card (MM : SS . MS + Side Buttons) ===
+            // === 2. Stopwatch Card (MM : SS . MS + Bottom Icon Buttons) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 150
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: Tokens.padding.large
-                    spacing: Tokens.spacing.medium
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: Tokens.spacing.small
 
-                    // Center Digits
+                    // Digital Cards Display: MM : SS . MS (No Hours, Continues 60, 61, 62...)
                     RowLayout {
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignCenter
+                        Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.small
 
                         // Minutes Box
                         StyledRect {
-                            implicitWidth: 68
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -581,7 +575,7 @@ Item {
 
                         // Seconds Box
                         StyledRect {
-                            implicitWidth: 68
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -605,7 +599,7 @@ Item {
 
                         // Milliseconds Box (Hundredths: 00 - 99)
                         StyledRect {
-                            implicitWidth: 68
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -619,10 +613,10 @@ Item {
                         }
                     }
 
-                    // Side-Mounted Vertical Icon Controls (Play/Pause & Reset)
-                    ColumnLayout {
-                        Layout.alignment: Qt.AlignVCenter
-                        spacing: Tokens.spacing.small
+                    // Bottom Row of Icon Buttons (Play/Pause & Reset)
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: Tokens.spacing.medium
 
                         IconButton {
                             icon: root.stopwatchRunning ? "pause" : "play_arrow"
