@@ -40,6 +40,12 @@ Item {
                 iconName: "cloud",
                 text: qsTr("Weather"),
                 enabled: Config.dashboard.showWeather
+            },
+            {
+                component: clockComponent,
+                iconName: "schedule",
+                text: qsTr("Clock"),
+                enabled: true
             }
         ];
         return allTabs.filter(tab => tab.enabled);
@@ -179,6 +185,12 @@ Item {
                 id: weatherComponent
 
                 WeatherTab {}
+            }
+
+            Component {
+                id: clockComponent
+
+                ClockTab {}
             }
 
             Behavior on contentX {
