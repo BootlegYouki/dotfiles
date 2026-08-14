@@ -18,7 +18,7 @@ Scripts currently installed in `~/.local/bin/` on this machine.
 - **`caelestia-romaji-daemon`**: Daemon running in the background for Romaji lyrics integration.
 
 ## Gaming & Macro
-- **`genshin_f_macro.py`**: Genshin Impact rapid F-spam macro daemon (`genshin-f-macro.service`). Toggled via `Ctrl + F`. Shows a persistent top-right status indicator widget via Caelestia Shell (`MacroIndicator.qml`) instead of desktop notifications.
+- **`genshin_f_macro.py`**: Genshin Impact rapid F-spam macro daemon (`genshin-f-macro.service`). Toggled via `Ctrl + F`. Directly integrated into Caelestia Shell's native notification popup container inside drawers (`modules/notifications/Content.qml`), ensuring it renders within Caelestia's SDF window frame borders, wallpaper blur, clipping, and exact notification card geometry.
 
 ## Related Notes
 - [[caelestia-hyprland]]

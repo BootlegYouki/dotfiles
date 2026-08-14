@@ -28,10 +28,11 @@ Item {
     implicitWidth: Tokens.sizes.notifs.width
     implicitHeight: {
         const count = list.count;
-        if (count === 0)
+        const macroHeight = (MacroState.active || macroItem.visible) ? (macroItem.nonAnimHeight + (count > 0 ? Tokens.spacing.medium : 0)) : 0;
+        if (count === 0 && macroHeight === 0)
             return 0;
 
-        let height = (count - 1) * Tokens.spacing.medium;
+        let height = macroHeight + (count > 0 ? (count - 1) * Tokens.spacing.medium : 0);
         for (let i = 0; i < count; i++)
             height += (list.itemAtIndex(i) as NotifWrapper)?.nonAnimHeight ?? 0;
 
@@ -65,72 +66,87 @@ Item {
         color: "transparent"
         radius: Tokens.rounding.large
 
-        StyledListView {
-            id: list
-
-            model: ScriptModel {
-                values: Notifs.popups.filter(n => !n.closed)
-            }
-
+        Item {
+            id: container
             anchors.fill: parent
 
-            orientation: Qt.Vertical
-            spacing: 0
-            cacheBuffer: (QsWindow.window as QsWindow)?.screen.height ?? 0
-
-            delegate: NotifWrapper {}
-
-            move: Transition {
-                Anim {
-                    property: "y"
-                }
-            }
-
-            displaced: Transition {
-                Anim {
-                    property: "y"
-                }
-            }
-
-            ExtraIndicator {
+            MacroItem {
+                id: macroItem
                 anchors.top: parent.top
-                extra: {
-                    const count = list.count;
-                    if (count === 0)
-                        return 0;
-
-                    const scrollY = list.contentY;
-
-                    let height = 0;
-                    for (let i = 0; i < count; i++) {
-                        height += ((list.itemAtIndex(i) as NotifWrapper)?.nonAnimHeight ?? 0) + Tokens.spacing.medium;
-
-                        if (height - Tokens.spacing.medium >= scrollY)
-                            return i;
-                    }
-
-                    return count;
-                }
+                implicitWidth: root.implicitWidth - root.padding - root.clampedPadding
             }
 
-            ExtraIndicator {
+            StyledListView {
+                id: list
+
+                model: ScriptModel {
+                    values: Notifs.popups.filter(n => !n.closed)
+                }
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: macroItem.visible ? macroItem.bottom : parent.top
+                anchors.topMargin: (macroItem.visible && list.count > 0) ? Tokens.spacing.medium : 0
                 anchors.bottom: parent.bottom
-                extra: {
-                    const count = list.count;
-                    if (count === 0)
-                        return 0;
 
-                    const scrollY = list.contentHeight - (list.contentY + list.height);
+                orientation: Qt.Vertical
+                spacing: 0
+                cacheBuffer: (QsWindow.window as QsWindow)?.screen.height ?? 0
 
-                    let height = 0;
-                    for (let i = count - 1; i >= 0; i--) {
-                        height += ((list.itemAtIndex(i) as NotifWrapper)?.nonAnimHeight ?? 0) + Tokens.spacing.medium;
+                delegate: NotifWrapper {}
 
-                        if (height - Tokens.spacing.medium >= scrollY)
-                            return count - i - 1;
+                move: Transition {
+                    Anim {
+                        property: "y"
                     }
+                }
 
-                    return 0;
+                displaced: Transition {
+                    Anim {
+                        property: "y"
+                    }
+                }
+
+                ExtraIndicator {
+                    anchors.top: parent.top
+                    extra: {
+                        const count = list.count;
+                        if (count === 0)
+                            return 0;
+
+                        const scrollY = list.contentY;
+
+                        let height = 0;
+                        for (let i = 0; i < count; i++) {
+                            height += ((list.itemAtIndex(i) as NotifWrapper)?.nonAnimHeight ?? 0) + Tokens.spacing.medium;
+
+                            if (height - Tokens.spacing.medium >= scrollY)
+                                return i;
+                        }
+
+                        return count;
+                    }
+                }
+
+                ExtraIndicator {
+                    anchors.bottom: parent.bottom
+                    extra: {
+                        const count = list.count;
+                        if (count === 0)
+                            return 0;
+
+                        const scrollY = list.contentHeight - (list.contentY + list.height);
+
+                        let height = 0;
+                        for (let i = count - 1; i >= 0; i--) {
+                            height += ((list.itemAtIndex(i) as NotifWrapper)?.nonAnimHeight ?? 0) + Tokens.spacing.medium;
+
+                            if (height - Tokens.spacing.medium >= scrollY)
+                                return count - i - 1;
+                        }
+
+                        return 0;
+                    }
                 }
             }
         }
@@ -138,6 +154,143 @@ Item {
 
     Behavior on implicitHeight {
         Anim {}
+    }
+
+    component MacroItem: Item {
+        id: mRoot
+
+        readonly property bool isActive: MacroState.active
+        readonly property int nonAnimHeight: notifCard.implicitHeight
+
+        visible: isActive || opacity > 0.001
+        implicitHeight: isActive ? nonAnimHeight : 0
+        opacity: isActive ? 1 : 0
+
+        Behavior on implicitHeight {
+            Anim {}
+        }
+
+        Behavior on opacity {
+            Anim {}
+        }
+
+        ClippingRectangle {
+            id: clipRect
+
+            anchors.fill: parent
+            color: "transparent"
+            radius: notifCard.radius
+            implicitWidth: notifCard.implicitWidth
+            implicitHeight: notifCard.implicitHeight
+
+            StyledRect {
+                id: notifCard
+
+                color: Colours.tPalette.m3surfaceContainer
+                radius: Tokens.rounding.large
+                implicitWidth: mRoot.implicitWidth
+                implicitHeight: innerContent.implicitHeight + innerContent.anchors.margins * 2
+
+                x: mRoot.isActive ? 0 : implicitWidth
+
+                Behavior on x {
+                    Anim {
+                        easing: Tokens.anim.emphasizedDecel
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: MacroState.toggle()
+
+                    Item {
+                        id: innerContent
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: Tokens.padding.medium
+
+                        implicitHeight: Math.max(appIconBadge.implicitHeight, summaryText.implicitHeight + bodyText.implicitHeight + Tokens.spacing.extraSmall)
+
+                        StyledRect {
+                            id: appIconBadge
+
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            radius: Tokens.rounding.full
+                            color: Colours.palette.m3secondaryContainer
+                            implicitWidth: TokenConfig.sizes.notifs.image
+                            implicitHeight: TokenConfig.sizes.notifs.image
+
+                            MaterialIcon {
+                                anchors.centerIn: parent
+                                anchors.verticalCenterOffset: 1
+                                text: "sports_esports"
+                                color: Colours.palette.m3onSecondaryContainer
+                                fontStyle: Tokens.font.icon.medium
+                            }
+                        }
+
+                        StyledText {
+                            id: summaryText
+
+                            anchors.top: parent.top
+                            anchors.left: appIconBadge.right
+                            anchors.leftMargin: Tokens.spacing.medium
+
+                            animate: !GameMode.enabled
+                            text: qsTr("Auto-Loot Active")
+                            color: Colours.palette.m3onSurface
+                            font: Tokens.font.title.small
+                        }
+
+                        StyledText {
+                            id: dotSep
+
+                            anchors.top: parent.top
+                            anchors.left: summaryText.right
+                            anchors.leftMargin: Tokens.spacing.small
+
+                            text: "•"
+                            color: Colours.palette.m3onSurfaceVariant
+                            font: Tokens.font.body.small
+                        }
+
+                        StyledText {
+                            id: timeLabel
+
+                            anchors.top: parent.top
+                            anchors.left: dotSep.right
+                            anchors.leftMargin: Tokens.spacing.small
+
+                            animate: !GameMode.enabled
+                            text: qsTr("now")
+                            color: Colours.palette.m3onSurfaceVariant
+                            font: Tokens.font.body.small
+                        }
+
+                        StyledText {
+                            id: bodyText
+
+                            anchors.left: summaryText.left
+                            anchors.right: parent.right
+                            anchors.rightMargin: Tokens.padding.extraSmall
+                            anchors.top: summaryText.bottom
+                            anchors.topMargin: Tokens.spacing.extraSmall
+
+                            animate: !GameMode.enabled
+                            text: qsTr("F-Spamming • Ctrl+F to stop")
+                            color: Colours.palette.m3onSurfaceVariant
+                            font: Tokens.font.body.small
+                            elide: Text.ElideRight
+                        }
+                    }
+                }
+            }
+        }
     }
 
     component NotifWrapper: Item {
@@ -185,7 +338,7 @@ Item {
                 target: notif
                 property: "x"
                 to: (notif.x >= 0 ? root.implicitWidth : -root.implicitWidth) * 2
-                duration: Tokens.anim.durations.normal
+                duration: GameMode.enabled ? 0 : Tokens.anim.durations.normal
                 easing: Tokens.anim.emphasized
             }
             PropertyAction {
@@ -214,7 +367,7 @@ Item {
     }
 
     component Anim: NumberAnimation {
-        duration: Tokens.anim.durations.expressiveDefaultSpatial
+        duration: GameMode.enabled ? 0 : Tokens.anim.durations.expressiveDefaultSpatial
         easing: Tokens.anim.expressiveDefaultSpatial
     }
 }

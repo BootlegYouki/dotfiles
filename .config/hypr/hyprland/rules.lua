@@ -219,4 +219,4 @@ hl.layer_rule({ match = { namespace = "launcher" }, animation = "popin 80%", blu
 
 -- Shell
 hl.layer_rule({ match = { namespace = "caelestia-(border-exclusion|area-picker)" }, no_anim = true })
-hl.layer_rule({ match = { namespace = "caelestia-(drawers|background|macro-indicator)" }, animation = "fade" })
+hl.layer_rule({ match = { namespace = "caelestia-(drawers|background)" }, animation = "fade" })

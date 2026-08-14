@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "02-Dotfiles-Configs/PROMPT-FOR-FUTURE-AGENT.md",
+                "file": "02-Dotfiles-Configs/restore-setup-script.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PROMPT-FOR-FUTURE-AGENT"
+              "title": "restore-setup-script"
             }
           }
         ]
@@ -55,7 +55,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "superwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -79,8 +79,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -189,8 +188,17 @@
       "bases:Create new base": false
     }
   },
-  "active": "39f01765436c0761",
+  "active": "99e7c5b5564f758a",
   "lastOpenFiles": [
+    "02-Dotfiles-Configs/caelestia-hyprland.md",
+    "02-Dotfiles-Configs/restore-setup-script.md",
+    "02-Dotfiles-Configs/shell-terminal-config.md",
+    "01-Cheatsheets/launching-apps.md",
+    "01-Cheatsheets/linux-basics-guide.md",
+    "01-Cheatsheets/custom-scripts.md",
+    "00-Meta/README.md",
+    "04-Package-Log/core-packages.md",
+    "04-Package-Log/system-services.md",
     "03-Troubleshooting/hyprland-screenshot-direct-save.md",
     "02-Dotfiles-Configs/caelestia-nightlight-widget.md",
     "01-Cheatsheets/gaming-steam-overwatch2.md",
@@ -198,7 +206,6 @@
     "02-Dotfiles-Configs/kde-connect.md",
     "02-Dotfiles-Configs/PROMPT-FOR-FUTURE-AGENT.md",
     "02-Dotfiles-Configs/01-GNOME-TO-UWSM-HYPRLAND.md",
-    "00-Meta/README.md",
     "00-Meta/system-customizations-master-blueprint.md",
     "Untitled.canvas",
     "01-Cheatsheets/linux-essential-commands.md",
@@ -210,14 +217,6 @@
     "01-Cheatsheets/hardware-and-kernel.md",
     "01-Cheatsheets/gaming-genshin-impact-cachyos.md",
     "01-Cheatsheets/btrfs-multi-device-drive-merge.md",
-    "02-Dotfiles-Configs/fish-and-starship.md",
-    "02-Dotfiles-Configs/fastfetch.md",
-    "02-Dotfiles-Configs/ghostty-and-terminals.md",
-    "02-Dotfiles-Configs/hyprland-workspace-hover-focus.md",
-    "02-Dotfiles-Configs/xdg-autostart-apps.md",
-    "02-Dotfiles-Configs/romaji-lyrics-daemon.md",
-    "01-Cheatsheets/audio-pipewire-sunshine.md",
-    "01-Cheatsheets/btrfs-live-partition-expansion.md",
     "Untitled 1.canvas",
     "04-Package-Log",
     "02-Dotfiles-Configs"
