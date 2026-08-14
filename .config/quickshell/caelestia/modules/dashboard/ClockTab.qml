@@ -240,16 +240,15 @@ Item {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
 
-            // === 1. Countdown Timer Card (HH : MM : SS - Direct Typeable Digits) ===
+            // === 1. Countdown Timer Card (HH : MM : SS) ===
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 200
+                implicitHeight: 150
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
                 ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: Tokens.padding.large
+                    anchors.centerIn: parent
                     spacing: Tokens.spacing.medium
 
                     // Direct Editable Digital Cards: HH : MM : SS
@@ -481,22 +480,6 @@ Item {
                         }
                     }
 
-                    // Active Progress Bar / Spacer
-                    Item {
-                        Layout.fillWidth: true
-                        implicitHeight: 26
-
-                        StyledProgressBar {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.margins: Tokens.padding.medium
-                            visible: root.timerRunning
-                            value: 1.0 - (root.timerRemaining / Math.max(1, root.timerDefault))
-                            fgColour: Colours.palette.m3primary
-                        }
-                    }
-
                     // Action Buttons
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
@@ -550,13 +533,12 @@ Item {
             // === 2. Stopwatch Card (MM : SS . MS) ===
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 200
+                implicitHeight: 150
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
                 ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: Tokens.padding.large
+                    anchors.centerIn: parent
                     spacing: Tokens.spacing.medium
 
                     // Digital Cards Display: MM : SS . MS (No Hours, Continues 60, 61, 62...)
@@ -626,12 +608,6 @@ Item {
                                 color: root.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
                             }
                         }
-                    }
-
-                    // Spacer to match progress bar space of timer card
-                    Item {
-                        Layout.fillWidth: true
-                        implicitHeight: 26
                     }
 
                     // Action Buttons
