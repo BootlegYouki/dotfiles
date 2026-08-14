@@ -17,10 +17,10 @@ Item {
     }
     implicitHeight: isCompact ? 155 : mainLayout.implicitHeight
 
-    // Local Current Time (with milliseconds)
+    // Local Current Time (without milliseconds)
     property var currentTime: new Date()
     Timer {
-        interval: 30
+        interval: 1000
         running: true
         repeat: true
         onTriggered: root.currentTime = new Date()
@@ -100,29 +100,17 @@ Item {
                     anchors.centerIn: parent
                     spacing: Tokens.spacing.extraSmall
 
-                    RowLayout {
+                    StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        spacing: 4
-
-                        StyledText {
-                            text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                            font: Tokens.font.clock.size(44).weight(Font.Medium).build()
-                            color: Colours.palette.m3onSurface
-                        }
-
-                        StyledText {
-                            Layout.alignment: Qt.AlignBaseline
-                            text: "." + Qt.formatTime(root.currentTime, "zzz")
-                            font: Tokens.font.clock.size(20).weight(Font.Normal).build()
-                            color: Colours.palette.m3primary
-                        }
+                        text: Qt.formatTime(root.currentTime, "hh:mm:ss")
+                        font: Tokens.font.clock.size(44).weight(Font.Medium).build()
+                        color: Colours.palette.m3onSurface
                     }
 
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
                         text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
-                        font.pixelSize: 16
-                        font.weight: Font.Normal
+                        font: Tokens.font.title.medium
                         color: Colours.palette.m3onSurfaceVariant
                     }
                 }
