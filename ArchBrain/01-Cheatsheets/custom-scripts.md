@@ -17,9 +17,8 @@ Scripts currently installed in `~/.local/bin/` on this machine.
 - **`caelestia-romaji`**: CLI tool/utility for Romaji lyrics.
 - **`caelestia-romaji-daemon`**: Daemon running in the background for Romaji lyrics integration.
 
-## Wrappers & Utilities
-- **`gnome-control-center`**: Wrapper around the GNOME control center.
-- **`vlc`**: Custom wrapper for VLC media player.
+## Gaming & Macro
+- **`genshin_f_macro.py`**: Genshin Impact rapid F-spam macro daemon (`genshin-f-macro.service`). Toggled via `Ctrl + F`. Shows a persistent top-right status indicator widget via Caelestia Shell (`MacroIndicator.qml`) instead of desktop notifications.
 
 ## Related Notes
 - [[caelestia-hyprland]]
