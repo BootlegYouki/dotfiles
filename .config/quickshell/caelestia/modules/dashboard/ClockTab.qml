@@ -38,7 +38,7 @@ Item {
         }
     }
 
-    // 3. Stopwatch (with milliseconds)
+    // 3. Stopwatch (Minutes:Seconds.Milliseconds)
     property int stopwatchMs: 0
     property bool stopwatchRunning: false
     Timer {
@@ -66,13 +66,8 @@ Item {
         return s < 10 ? "0" + s : s.toString();
     }
 
-    function getStopwatchHours(ms) {
-        const h = Math.floor(ms / 3600000);
-        return h < 10 ? "0" + h : h.toString();
-    }
-
     function getStopwatchMinutes(ms) {
-        const m = Math.floor((ms % 3600000) / 60000);
+        const m = Math.floor(ms / 60000);
         return m < 10 ? "0" + m : m.toString();
     }
 
@@ -245,7 +240,7 @@ Item {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
 
-            // === 1. Countdown Timer Card ===
+            // === 1. Countdown Timer Card (HH : MM : SS) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 200
@@ -496,7 +491,7 @@ Item {
                 }
             }
 
-            // === 2. Stopwatch Card ===
+            // === 2. Stopwatch Card (MM : SS . MS) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 200
@@ -508,38 +503,14 @@ Item {
                     anchors.margins: Tokens.padding.large
                     spacing: Tokens.spacing.medium
 
-                    // Digital Cards Display: HH : MM : SS . MS
+                    // Digital Cards Display: MM : SS . MS (No Hours, Continues 60, 61, 62...)
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
-                        spacing: 4
-
-                        // Hours Box
-                        StyledRect {
-                            implicitWidth: 56
-                            implicitHeight: 64
-                            color: Colours.tPalette.m3surfaceContainerHigh
-                            radius: Tokens.rounding.medium
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: root.getStopwatchHours(root.stopwatchMs)
-                                font: Tokens.font.clock.size(26).weight(Font.Medium).build()
-                                color: Colours.palette.m3onSurface
-                            }
-                        }
-
-                        // Colon Separator
-                        StyledText {
-                            Layout.alignment: Qt.AlignVCenter
-                            text: ":"
-                            font.pixelSize: 22
-                            font.weight: Font.Medium
-                            color: Colours.palette.m3onSurfaceVariant
-                        }
+                        spacing: Tokens.spacing.small
 
                         // Minutes Box
                         StyledRect {
-                            implicitWidth: 56
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -547,7 +518,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getStopwatchMinutes(root.stopwatchMs)
-                                font: Tokens.font.clock.size(26).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
                         }
@@ -556,14 +527,14 @@ Item {
                         StyledText {
                             Layout.alignment: Qt.AlignVCenter
                             text: ":"
-                            font.pixelSize: 22
+                            font.pixelSize: 26
                             font.weight: Font.Medium
                             color: Colours.palette.m3onSurfaceVariant
                         }
 
                         // Seconds Box
                         StyledRect {
-                            implicitWidth: 56
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -571,7 +542,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getStopwatchSeconds(root.stopwatchMs)
-                                font: Tokens.font.clock.size(26).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
                         }
@@ -580,14 +551,14 @@ Item {
                         StyledText {
                             Layout.alignment: Qt.AlignVCenter
                             text: "."
-                            font.pixelSize: 22
+                            font.pixelSize: 26
                             font.weight: Font.Bold
                             color: Colours.palette.m3primary
                         }
 
                         // Milliseconds Box (Hundredths: 00 - 99)
                         StyledRect {
-                            implicitWidth: 56
+                            implicitWidth: 72
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -595,7 +566,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getStopwatchMs(root.stopwatchMs)
-                                font: Tokens.font.clock.size(26).weight(Font.Medium).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
                             }
                         }
