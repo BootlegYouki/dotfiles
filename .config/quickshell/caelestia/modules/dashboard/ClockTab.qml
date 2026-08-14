@@ -145,14 +145,14 @@ Item {
 
                         StyledText {
                             text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                            font: Tokens.font.clock.size(46).weight(Font.Bold).build()
+                            font: Tokens.font.clock.size(44).weight(Font.Medium).build()
                             color: Colours.palette.m3onSurface
                         }
 
                         StyledText {
                             Layout.alignment: Qt.AlignBaseline
                             text: "." + Qt.formatTime(root.currentTime, "zzz")
-                            font: Tokens.font.clock.size(22).weight(Font.DemiBold).build()
+                            font: Tokens.font.clock.size(20).weight(Font.Normal).build()
                             color: Colours.palette.m3primary
                         }
                     }
@@ -161,7 +161,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
                         font.pixelSize: 16
-                        font.weight: Font.Medium
+                        font.weight: Font.Normal
                         color: Colours.palette.m3onSurfaceVariant
                     }
                 }
@@ -186,26 +186,26 @@ Item {
                         spacing: 0
 
                         StyledText {
-                            Layout.bottomMargin: -(font.pointSize * 0.4)
+                            Layout.bottomMargin: -(font.pointSize * 0.35)
                             Layout.alignment: Qt.AlignHCenter
                             text: root.getTzHour(modelData.tz)
                             color: Colours.palette.m3secondary
-                            font: Tokens.font.clock.size(28).weight(Font.DemiBold).build()
+                            font: Tokens.font.clock.size(26).weight(Font.Medium).build()
                         }
 
                         StyledText {
                             Layout.alignment: Qt.AlignHCenter
                             text: "•••"
                             color: Colours.palette.m3primary
-                            font: Tokens.font.clock.size(28 * 0.9).build()
+                            font: Tokens.font.clock.size(22).build()
                         }
 
                         StyledText {
-                            Layout.topMargin: -(font.pointSize * 0.4)
+                            Layout.topMargin: -(font.pointSize * 0.35)
                             Layout.alignment: Qt.AlignHCenter
                             text: root.getTzMinute(modelData.tz)
                             color: Colours.palette.m3secondary
-                            font: Tokens.font.clock.size(28).weight(Font.DemiBold).build()
+                            font: Tokens.font.clock.size(26).weight(Font.Medium).build()
                         }
 
                         StyledText {
@@ -255,7 +255,7 @@ Item {
                         }
                     }
 
-                    // Digital Cards Display: HH : MM : SS (No Text Labels)
+                    // Digital Cards Display: HH : MM : SS
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.small
@@ -270,7 +270,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getHours(root.timerRemaining)
-                                font: Tokens.font.clock.size(30).weight(Font.Bold).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                             }
 
@@ -300,8 +300,8 @@ Item {
                         StyledText {
                             Layout.alignment: Qt.AlignVCenter
                             text: ":"
-                            font.pixelSize: 30
-                            font.weight: Font.Bold
+                            font.pixelSize: 26
+                            font.weight: Font.Medium
                             color: Colours.palette.m3onSurfaceVariant
                         }
 
@@ -315,7 +315,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getMinutes(root.timerRemaining)
-                                font: Tokens.font.clock.size(30).weight(Font.Bold).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                             }
 
@@ -345,8 +345,8 @@ Item {
                         StyledText {
                             Layout.alignment: Qt.AlignVCenter
                             text: ":"
-                            font.pixelSize: 30
-                            font.weight: Font.Bold
+                            font.pixelSize: 26
+                            font.weight: Font.Medium
                             color: Colours.palette.m3onSurfaceVariant
                         }
 
@@ -360,7 +360,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getSeconds(root.timerRemaining)
-                                font: Tokens.font.clock.size(30).weight(Font.Bold).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                             }
 
@@ -539,7 +539,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getHours(root.stopwatchSeconds)
-                                font: Tokens.font.clock.size(30).weight(Font.Bold).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
                         }
@@ -548,8 +548,8 @@ Item {
                         StyledText {
                             Layout.alignment: Qt.AlignVCenter
                             text: ":"
-                            font.pixelSize: 30
-                            font.weight: Font.Bold
+                            font.pixelSize: 26
+                            font.weight: Font.Medium
                             color: Colours.palette.m3onSurfaceVariant
                         }
 
@@ -563,7 +563,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getMinutes(root.stopwatchSeconds)
-                                font: Tokens.font.clock.size(30).weight(Font.Bold).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
                         }
@@ -572,8 +572,8 @@ Item {
                         StyledText {
                             Layout.alignment: Qt.AlignVCenter
                             text: ":"
-                            font.pixelSize: 30
-                            font.weight: Font.Bold
+                            font.pixelSize: 26
+                            font.weight: Font.Medium
                             color: Colours.palette.m3onSurfaceVariant
                         }
 
@@ -587,7 +587,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: root.getSeconds(root.stopwatchSeconds)
-                                font: Tokens.font.clock.size(30).weight(Font.Bold).build()
+                                font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
                         }
