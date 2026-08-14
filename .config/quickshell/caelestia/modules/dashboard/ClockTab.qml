@@ -66,6 +66,31 @@ Item {
         return s < 10 ? "0" + s : s.toString();
     }
 
+    function getTzHour(tz) {
+        try {
+            const str = new Intl.DateTimeFormat('en-US', {
+                timeZone: tz,
+                hour: '2-digit',
+                hour12: false
+            }).format(root.currentTime);
+            return str.padStart(2, '0');
+        } catch (e) {
+            return "--";
+        }
+    }
+
+    function getTzMinute(tz) {
+        try {
+            const str = new Intl.DateTimeFormat('en-US', {
+                timeZone: tz,
+                minute: '2-digit'
+            }).format(root.currentTime);
+            return str.padStart(2, '0');
+        } catch (e) {
+            return "--";
+        }
+    }
+
     ColumnLayout {
         id: mainLayout
         anchors.left: parent.left
@@ -73,43 +98,106 @@ Item {
         anchors.top: parent.top
         spacing: Tokens.spacing.medium
 
-        // --- Top Hero Card: Local Date & Time ---
-        StyledRect {
+        // --- Top Row: Hero Clock Card + 3 Timezone Cards ---
+        RowLayout {
             Layout.fillWidth: true
-            implicitHeight: 140
-            color: Colours.tPalette.m3surfaceContainer
-            radius: Tokens.rounding.large
+            spacing: Tokens.spacing.medium
 
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: Tokens.spacing.extraSmall
+            // 1. Local Time Hero Card
+            StyledRect {
+                Layout.fillWidth: true
+                implicitHeight: 150
+                color: Colours.tPalette.m3surfaceContainer
+                radius: Tokens.rounding.large
 
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    spacing: 4
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: Tokens.spacing.extraSmall
 
-                    StyledText {
-                        text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                        font.pixelSize: 56
-                        font.weight: Font.Bold
-                        color: Colours.palette.m3onSurface
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 4
+
+                        StyledText {
+                            text: Qt.formatTime(root.currentTime, "hh:mm:ss")
+                            font.pixelSize: 48
+                            font.weight: Font.Bold
+                            color: Colours.palette.m3onSurface
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignBaseline
+                            text: "." + Qt.formatTime(root.currentTime, "zzz")
+                            font.pixelSize: 24
+                            font.weight: Font.DemiBold
+                            color: Colours.palette.m3primary
+                        }
                     }
 
                     StyledText {
-                        Layout.alignment: Qt.AlignBaseline
-                        text: "." + Qt.formatTime(root.currentTime, "zzz")
-                        font.pixelSize: 26
-                        font.weight: Font.DemiBold
-                        color: Colours.palette.m3primary
+                        Layout.alignment: Qt.AlignHCenter
+                        text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        color: Colours.palette.m3onSurfaceVariant
                     }
                 }
+            }
 
-                StyledText {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
-                    font.pixelSize: 18
-                    font.weight: Font.Medium
-                    color: Colours.palette.m3onSurfaceVariant
+            // 2. Timezone Cards (New York, London, Tokyo)
+            Repeater {
+                model: [
+                    { name: "New York", tz: "America/New_York" },
+                    { name: "London", tz: "Europe/London" },
+                    { name: "Tokyo", tz: "Asia/Tokyo" }
+                ]
+
+                delegate: StyledRect {
+                    implicitWidth: 104
+                    implicitHeight: 150
+                    color: Colours.tPalette.m3surfaceContainer
+                    radius: Tokens.rounding.large
+
+                    ColumnLayout {
+                        anchors.centerIn: parent
+                        spacing: 0
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.bottomMargin: -6
+                            text: root.getTzHour(modelData.tz)
+                            color: Colours.palette.m3secondary
+                            font.family: Tokens.font.clock.family
+                            font.pixelSize: 26
+                            font.weight: Font.DemiBold
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "•••"
+                            color: Colours.palette.m3primary
+                            font.family: Tokens.font.clock.family
+                            font.pixelSize: 22
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.topMargin: -6
+                            text: root.getTzMinute(modelData.tz)
+                            color: Colours.palette.m3secondary
+                            font.family: Tokens.font.clock.family
+                            font.pixelSize: 26
+                            font.weight: Font.DemiBold
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.topMargin: Tokens.spacing.small
+                            text: modelData.name
+                            font: Tokens.font.label.small
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
+                    }
                 }
             }
         }
