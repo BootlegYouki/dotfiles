@@ -228,7 +228,7 @@ Item {
             // === 1. Countdown Timer Card ===
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 230
+                implicitHeight: 200
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
@@ -236,24 +236,6 @@ Item {
                     anchors.fill: parent
                     anchors.margins: Tokens.padding.large
                     spacing: Tokens.spacing.medium
-
-                    // Header
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: Tokens.spacing.small
-
-                        MaterialIcon {
-                            text: "timer"
-                            fontStyle: Tokens.font.icon.small
-                            color: root.timerRunning ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
-                        }
-
-                        StyledText {
-                            text: qsTr("Countdown Timer")
-                            font: Tokens.font.title.medium
-                            color: Colours.palette.m3onSurface
-                        }
-                    }
 
                     // Digital Cards Display: HH : MM : SS
                     RowLayout {
@@ -497,7 +479,7 @@ Item {
             // === 2. Stopwatch Card ===
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 230
+                implicitHeight: 200
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
@@ -505,24 +487,6 @@ Item {
                     anchors.fill: parent
                     anchors.margins: Tokens.padding.large
                     spacing: Tokens.spacing.medium
-
-                    // Header
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: Tokens.spacing.small
-
-                        MaterialIcon {
-                            text: "pace"
-                            fontStyle: Tokens.font.icon.small
-                            color: root.stopwatchRunning ? Colours.palette.m3tertiary : Colours.palette.m3onSurfaceVariant
-                        }
-
-                        StyledText {
-                            text: qsTr("Stopwatch")
-                            font: Tokens.font.title.medium
-                            color: Colours.palette.m3onSurface
-                        }
-                    }
 
                     // Digital Cards Display: HH : MM : SS (No Text Labels)
                     RowLayout {
