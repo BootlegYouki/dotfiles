@@ -270,7 +270,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: Tokens.spacing.medium
 
-                    // Digital Cards Display: HH : MM : SS
+                    // Direct Editable Digital Cards: HH : MM : SS
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.small
@@ -294,7 +294,9 @@ Item {
                             // Stopped view: editable
                             TextInput {
                                 id: hoursInput
-                                anchors.centerIn: parent
+                                anchors.fill: parent
+                                horizontalAlignment: TextInput.AlignHCenter
+                                verticalAlignment: TextInput.AlignVCenter
                                 visible: !root.timerRunning
                                 text: root.inputHours
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
@@ -302,6 +304,8 @@ Item {
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
+                                focus: true
+                                cursorVisible: activeFocus
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
@@ -326,26 +330,25 @@ Item {
 
                                 onAccepted: {
                                     minutesInput.forceActiveFocus();
+                                    minutesInput.selectAll();
                                 }
                             }
 
-                            CustomMouseArea {
+                            MouseArea {
                                 anchors.fill: parent
-                                visible: !root.timerRunning && !hoursInput.activeFocus
-                                cursorShape: Qt.IBeamCursor
-                                function onWheel(event: WheelEvent): void {
-                                    let h = parseInt(root.inputHours) || 0;
-                                    if (event.angleDelta.y > 0) {
-                                        h = (h + 1) % 100;
-                                    } else if (h > 0) {
-                                        h = h - 1;
+                                acceptedButtons: Qt.NoButton
+                                cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
+                                onWheel: event => {
+                                    if (!root.timerRunning) {
+                                        let h = parseInt(root.inputHours) || 0;
+                                        if (event.angleDelta.y > 0) {
+                                            h = (h + 1) % 100;
+                                        } else if (h > 0) {
+                                            h = h - 1;
+                                        }
+                                        root.inputHours = h < 10 ? "0" + h : h.toString();
+                                        root.updateTimerFromInputs();
                                     }
-                                    root.inputHours = h < 10 ? "0" + h : h.toString();
-                                    root.updateTimerFromInputs();
-                                }
-                                onClicked: {
-                                    hoursInput.forceActiveFocus();
-                                    hoursInput.selectAll();
                                 }
                             }
                         }
@@ -378,7 +381,9 @@ Item {
                             // Stopped view: editable
                             TextInput {
                                 id: minutesInput
-                                anchors.centerIn: parent
+                                anchors.fill: parent
+                                horizontalAlignment: TextInput.AlignHCenter
+                                verticalAlignment: TextInput.AlignVCenter
                                 visible: !root.timerRunning
                                 text: root.inputMinutes
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
@@ -386,6 +391,7 @@ Item {
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
+                                cursorVisible: activeFocus
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
@@ -410,26 +416,25 @@ Item {
 
                                 onAccepted: {
                                     secondsInput.forceActiveFocus();
+                                    secondsInput.selectAll();
                                 }
                             }
 
-                            CustomMouseArea {
+                            MouseArea {
                                 anchors.fill: parent
-                                visible: !root.timerRunning && !minutesInput.activeFocus
-                                cursorShape: Qt.IBeamCursor
-                                function onWheel(event: WheelEvent): void {
-                                    let m = parseInt(root.inputMinutes) || 0;
-                                    if (event.angleDelta.y > 0) {
-                                        m = (m + 1) % 60;
-                                    } else if (m > 0) {
-                                        m = m - 1;
+                                acceptedButtons: Qt.NoButton
+                                cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
+                                onWheel: event => {
+                                    if (!root.timerRunning) {
+                                        let m = parseInt(root.inputMinutes) || 0;
+                                        if (event.angleDelta.y > 0) {
+                                            m = (m + 1) % 60;
+                                        } else if (m > 0) {
+                                            m = m - 1;
+                                        }
+                                        root.inputMinutes = m < 10 ? "0" + m : m.toString();
+                                        root.updateTimerFromInputs();
                                     }
-                                    root.inputMinutes = m < 10 ? "0" + m : m.toString();
-                                    root.updateTimerFromInputs();
-                                }
-                                onClicked: {
-                                    minutesInput.forceActiveFocus();
-                                    minutesInput.selectAll();
                                 }
                             }
                         }
@@ -462,7 +467,9 @@ Item {
                             // Stopped view: editable
                             TextInput {
                                 id: secondsInput
-                                anchors.centerIn: parent
+                                anchors.fill: parent
+                                horizontalAlignment: TextInput.AlignHCenter
+                                verticalAlignment: TextInput.AlignVCenter
                                 visible: !root.timerRunning
                                 text: root.inputSeconds
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
@@ -470,6 +477,7 @@ Item {
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
+                                cursorVisible: activeFocus
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
@@ -495,23 +503,21 @@ Item {
                                 }
                             }
 
-                            CustomMouseArea {
+                            MouseArea {
                                 anchors.fill: parent
-                                visible: !root.timerRunning && !secondsInput.activeFocus
-                                cursorShape: Qt.IBeamCursor
-                                function onWheel(event: WheelEvent): void {
-                                    let s = parseInt(root.inputSeconds) || 0;
-                                    if (event.angleDelta.y > 0) {
-                                        s = (s + 5) % 60;
-                                    } else if (s >= 5) {
-                                        s = s - 5;
+                                acceptedButtons: Qt.NoButton
+                                cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
+                                onWheel: event => {
+                                    if (!root.timerRunning) {
+                                        let s = parseInt(root.inputSeconds) || 0;
+                                        if (event.angleDelta.y > 0) {
+                                            s = (s + 5) % 60;
+                                        } else if (s >= 5) {
+                                            s = s - 5;
+                                        }
+                                        root.inputSeconds = s < 10 ? "0" + s : s.toString();
+                                        root.updateTimerFromInputs();
                                     }
-                                    root.inputSeconds = s < 10 ? "0" + s : s.toString();
-                                    root.updateTimerFromInputs();
-                                }
-                                onClicked: {
-                                    secondsInput.forceActiveFocus();
-                                    secondsInput.selectAll();
                                 }
                             }
                         }
