@@ -8,12 +8,19 @@ import Caelestia
 import Caelestia.Config
 import qs.components
 import qs.components.filedialog
+import qs.services
 
 Item {
     id: root
 
     required property ScreenState screenState
     required property FileDialog facePicker
+
+    readonly property bool isCompactTimer: !screenState.dashboard && Timers.hasActive
+    readonly property int clockTabIndex: {
+        const idx = root.dashboardTabs.findIndex(t => t.component === clockComponent);
+        return idx >= 0 ? idx : 0;
+    }
 
     readonly property var dashboardTabs: {
         const allTabs = [
@@ -52,7 +59,9 @@ Item {
     }
 
     readonly property real nonAnimWidth: view.implicitWidth + viewWrapper.anchors.margins * 2
-    readonly property real nonAnimHeight: tabs.implicitHeight + tabs.anchors.topMargin + view.implicitHeight + viewWrapper.anchors.margins * 2
+    readonly property real nonAnimHeight: root.isCompactTimer
+        ? view.implicitHeight + viewWrapper.anchors.margins * 2
+        : tabs.implicitHeight + tabs.anchors.topMargin + view.implicitHeight + viewWrapper.anchors.margins * 2
 
     implicitWidth: nonAnimWidth
     implicitHeight: nonAnimHeight
@@ -63,18 +72,26 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.topMargin: CUtils.clamp(anchors.margins - Config.border.thickness, 0, anchors.margins)
+        anchors.topMargin: root.isCompactTimer ? 0 : CUtils.clamp(anchors.margins - Config.border.thickness, 0, anchors.margins)
         anchors.margins: Tokens.padding.large
+
+        visible: !root.isCompactTimer
+        height: root.isCompactTimer ? 0 : implicitHeight
+        opacity: root.isCompactTimer ? 0 : 1
 
         nonAnimWidth: root.nonAnimWidth - anchors.margins * 2
         screenState: root.screenState
         tabs: root.dashboardTabs
+
+        Behavior on opacity {
+            Anim {}
+        }
     }
 
     ClippingRectangle {
         id: viewWrapper
 
-        anchors.top: tabs.bottom
+        anchors.top: root.isCompactTimer ? parent.top : tabs.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -86,7 +103,7 @@ Item {
         Flickable {
             id: view
 
-            readonly property int currentIndex: root.screenState.dashboardTab
+            readonly property int currentIndex: root.isCompactTimer ? root.clockTabIndex : root.screenState.dashboardTab
             readonly property Item currentItem: {
                 repeater.count; // Trigger update on count change
                 return repeater.itemAt(currentIndex);
@@ -104,7 +121,7 @@ Item {
             contentHeight: row.implicitHeight
 
             onContentXChanged: {
-                if (!moving || !currentItem)
+                if (!moving || !currentItem || root.isCompactTimer)
                     return;
 
                 const x = contentX - currentItem.x;
@@ -115,7 +132,7 @@ Item {
             }
 
             onDragEnded: {
-                if (!currentItem)
+                if (!currentItem || root.isCompactTimer)
                     return;
 
                 const x = contentX - currentItem.x;
@@ -190,7 +207,9 @@ Item {
             Component {
                 id: clockComponent
 
-                ClockTab {}
+                ClockTab {
+                    screenState: root.screenState
+                }
             }
 
             Behavior on contentX {

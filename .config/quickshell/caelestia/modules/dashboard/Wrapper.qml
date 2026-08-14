@@ -7,6 +7,7 @@ import Caelestia.Config
 import qs.components
 import qs.components.filedialog
 import qs.utils
+import qs.services
 
 Item {
     id: root
@@ -25,7 +26,7 @@ Item {
     }
 
     readonly property real nonAnimHeight: (content.item as Content)?.nonAnimHeight ?? 0
-    readonly property bool shouldBeActive: screenState.dashboard && Config.dashboard.enabled
+    readonly property bool shouldBeActive: (screenState.dashboard || Timers.hasActive) && Config.dashboard.enabled
     property real offsetScale: shouldBeActive ? 0 : 1
 
     visible: offsetScale < 1

@@ -13,6 +13,7 @@ Scope {
         Players;
         Brightness;
         Romaji;
+        Timers;
         Weather.reload();
 
         if (GlobalConfig.utilities.vpn.enabled)

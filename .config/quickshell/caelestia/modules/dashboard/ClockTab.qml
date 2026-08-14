@@ -8,96 +8,23 @@ import qs.services
 Item {
     id: root
 
-    implicitWidth: 840
-    implicitHeight: mainLayout.implicitHeight
+    property ScreenState screenState: null
+    readonly property bool isCompact: screenState ? (!screenState.dashboard && Timers.hasActive) : false
 
-    // 1. Current Time (with milliseconds)
+    implicitWidth: {
+        if (!isCompact) return 840;
+        if (Timers.timerRunning && Timers.stopwatchRunning) return 600;
+        return 290;
+    }
+    implicitHeight: isCompact ? 155 : mainLayout.implicitHeight
+
+    // Local Current Time (with milliseconds)
     property var currentTime: new Date()
     Timer {
         interval: 30
         running: true
         repeat: true
         onTriggered: root.currentTime = new Date()
-    }
-
-    // 2. Countdown Timer
-    property int timerRemaining: 300 // 5 minutes
-    property int timerDefault: 300
-    property bool timerRunning: false
-    property string inputHours: "00"
-    property string inputMinutes: "05"
-    property string inputSeconds: "00"
-
-    function syncInputsFromRemaining() {
-        inputHours = root.getHours(root.timerRemaining);
-        inputMinutes = root.getMinutes(root.timerRemaining);
-        inputSeconds = root.getSeconds(root.timerRemaining);
-    }
-
-    function updateTimerFromInputs() {
-        const h = parseInt(inputHours) || 0;
-        const m = parseInt(inputMinutes) || 0;
-        const s = parseInt(inputSeconds) || 0;
-        root.timerDefault = h * 3600 + m * 60 + s;
-        root.timerRemaining = root.timerDefault;
-    }
-
-    Timer {
-        id: countdownTimer
-        interval: 1000
-        running: root.timerRunning
-        repeat: true
-        onTriggered: {
-            if (root.timerRemaining > 0) {
-                root.timerRemaining--;
-            } else {
-                root.timerRunning = false;
-                root.syncInputsFromRemaining();
-            }
-        }
-    }
-
-    // 3. Stopwatch (Minutes:Seconds.Milliseconds)
-    property int stopwatchMs: 0
-    property bool stopwatchRunning: false
-    Timer {
-        id: stopwatchTimer
-        interval: 30
-        running: root.stopwatchRunning
-        repeat: true
-        onTriggered: {
-            root.stopwatchMs += 30;
-        }
-    }
-
-    function getHours(seconds) {
-        const h = Math.floor(seconds / 3600);
-        return h < 10 ? "0" + h : h.toString();
-    }
-
-    function getMinutes(seconds) {
-        const m = Math.floor((seconds % 3600) / 60);
-        return m < 10 ? "0" + m : m.toString();
-    }
-
-    function getSeconds(seconds) {
-        const s = seconds % 60;
-        return s < 10 ? "0" + s : s.toString();
-    }
-
-    function getStopwatchMinutes(ms) {
-        const m = Math.floor(ms / 60000);
-        return m < 10 ? "0" + m : m.toString();
-    }
-
-    function getStopwatchSeconds(ms) {
-        const s = Math.floor((ms % 60000) / 1000);
-        return s < 10 ? "0" + s : s.toString();
-    }
-
-    function getStopwatchMs(ms) {
-        const hundredths = Math.floor((ms % 1000) / 10);
-        return hundredths < 10 ? "0" + hundredths : hundredths.toString();
     }
 
     function isDstUs(d) {
@@ -157,10 +84,11 @@ Item {
         anchors.top: parent.top
         spacing: Tokens.spacing.medium
 
-        // --- Top Row: Hero Clock Card + 3 Timezone Cards ---
+        // --- Top Row: Hero Clock Card + 3 Timezone Cards (Hidden in compact mode) ---
         RowLayout {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
+            visible: !root.isCompact
 
             // 1. Local Time Hero Card
             StyledRect {
@@ -261,10 +189,12 @@ Item {
 
             // === 1. Countdown Timer Card ===
             StyledRect {
+                id: timerCard
                 Layout.fillWidth: true
                 implicitHeight: 155
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
+                visible: !root.isCompact || Timers.timerRunning
 
                 ColumnLayout {
                     anchors.centerIn: parent
@@ -284,21 +214,21 @@ Item {
                             TextInput {
                                 id: hoursInput
                                 font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
                                 renderType: Text.NativeRendering
-                                readOnly: root.timerRunning
-                                cursorVisible: activeFocus && !root.timerRunning
+                                readOnly: Timers.timerRunning
+                                cursorVisible: activeFocus && !Timers.timerRunning
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
-                                text: root.timerRunning ? root.getHours(root.timerRemaining) : root.inputHours
+                                text: Timers.timerRunning ? Timers.getHours(Timers.timerRemaining) : Timers.inputHours
 
                                 onTextEdited: {
-                                    root.inputHours = text;
-                                    root.updateTimerFromInputs();
+                                    Timers.inputHours = text;
+                                    Timers.updateTimerFromInputs();
                                     if (text.length >= 2) {
                                         minutesInput.forceActiveFocus();
                                         minutesInput.selectAll();
@@ -309,8 +239,8 @@ Item {
                                     if (activeFocus) {
                                         selectAll();
                                     } else {
-                                        root.inputHours = (parseInt(text) || 0).toString().padStart(2, '0');
-                                        root.updateTimerFromInputs();
+                                        Timers.inputHours = (parseInt(text) || 0).toString().padStart(2, '0');
+                                        Timers.updateTimerFromInputs();
                                     }
                                 }
 
@@ -329,21 +259,21 @@ Item {
                             TextInput {
                                 id: minutesInput
                                 font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
                                 renderType: Text.NativeRendering
-                                readOnly: root.timerRunning
-                                cursorVisible: activeFocus && !root.timerRunning
+                                readOnly: Timers.timerRunning
+                                cursorVisible: activeFocus && !Timers.timerRunning
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
-                                text: root.timerRunning ? root.getMinutes(root.timerRemaining) : root.inputMinutes
+                                text: Timers.timerRunning ? Timers.getMinutes(Timers.timerRemaining) : Timers.inputMinutes
 
                                 onTextEdited: {
-                                    root.inputMinutes = text;
-                                    root.updateTimerFromInputs();
+                                    Timers.inputMinutes = text;
+                                    Timers.updateTimerFromInputs();
                                     if (text.length >= 2) {
                                         secondsInput.forceActiveFocus();
                                         secondsInput.selectAll();
@@ -354,8 +284,8 @@ Item {
                                     if (activeFocus) {
                                         selectAll();
                                     } else {
-                                        root.inputMinutes = (parseInt(text) || 0).toString().padStart(2, '0');
-                                        root.updateTimerFromInputs();
+                                        Timers.inputMinutes = (parseInt(text) || 0).toString().padStart(2, '0');
+                                        Timers.updateTimerFromInputs();
                                     }
                                 }
 
@@ -374,36 +304,36 @@ Item {
                             TextInput {
                                 id: secondsInput
                                 font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                color: Timers.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                 selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
                                 selectedTextColor: color
                                 selectByMouse: true
                                 renderType: Text.NativeRendering
-                                readOnly: root.timerRunning
-                                cursorVisible: activeFocus && !root.timerRunning
+                                readOnly: Timers.timerRunning
+                                cursorVisible: activeFocus && !Timers.timerRunning
                                 maximumLength: 2
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
-                                text: root.timerRunning ? root.getSeconds(root.timerRemaining) : root.inputSeconds
+                                text: Timers.timerRunning ? Timers.getSeconds(Timers.timerRemaining) : Timers.inputSeconds
 
                                 onTextEdited: {
-                                    root.inputSeconds = text;
-                                    root.updateTimerFromInputs();
+                                    Timers.inputSeconds = text;
+                                    Timers.updateTimerFromInputs();
                                 }
 
                                 onActiveFocusChanged: {
                                     if (activeFocus) {
                                         selectAll();
                                     } else {
-                                        root.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
-                                        root.updateTimerFromInputs();
+                                        Timers.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
+                                        Timers.updateTimerFromInputs();
                                     }
                                 }
 
                                 onAccepted: {
                                     focus = false;
-                                    root.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
-                                    root.updateTimerFromInputs();
+                                    Timers.inputSeconds = (parseInt(text) || 0).toString().padStart(2, '0');
+                                    Timers.updateTimerFromInputs();
                                 }
                             }
                         }
@@ -411,17 +341,17 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.NoButton
-                            cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
+                            cursorShape: !Timers.timerRunning ? Qt.IBeamCursor : undefined
                             onWheel: event => {
-                                if (!root.timerRunning) {
-                                    let s = parseInt(root.inputSeconds) || 0;
+                                if (!Timers.timerRunning) {
+                                    let s = parseInt(Timers.inputSeconds) || 0;
                                     if (event.angleDelta.y > 0) {
                                         s = (s + 5) % 60;
                                     } else if (s >= 5) {
                                         s = s - 5;
                                     }
-                                    root.inputSeconds = s < 10 ? "0" + s : s.toString();
-                                    root.updateTimerFromInputs();
+                                    Timers.inputSeconds = s < 10 ? "0" + s : s.toString();
+                                    Timers.updateTimerFromInputs();
                                 }
                             }
                         }
@@ -433,23 +363,11 @@ Item {
                         spacing: Tokens.spacing.medium
 
                         IconButton {
-                            icon: root.timerRunning ? "pause" : "play_arrow"
-                            type: root.timerRunning ? IconButton.Filled : IconButton.Tonal
+                            icon: Timers.timerRunning ? "pause" : "play_arrow"
+                            type: Timers.timerRunning ? IconButton.Filled : IconButton.Tonal
                             isRound: true
                             font: Tokens.font.icon.medium
-                            onClicked: {
-                                if (!root.timerRunning) {
-                                    root.updateTimerFromInputs();
-                                    if (root.timerRemaining === 0) {
-                                        root.timerRemaining = root.timerDefault > 0 ? root.timerDefault : 300;
-                                        root.syncInputsFromRemaining();
-                                    }
-                                }
-                                root.timerRunning = !root.timerRunning;
-                                if (!root.timerRunning) {
-                                    root.syncInputsFromRemaining();
-                                }
-                            }
+                            onClicked: Timers.toggleTimer()
                         }
 
                         IconButton {
@@ -457,11 +375,7 @@ Item {
                             type: IconButton.Tonal
                             isRound: true
                             font: Tokens.font.icon.medium
-                            onClicked: {
-                                root.timerRunning = false;
-                                root.timerRemaining = root.timerDefault;
-                                root.syncInputsFromRemaining();
-                            }
+                            onClicked: Timers.resetTimer()
                         }
                     }
                 }
@@ -469,10 +383,12 @@ Item {
 
             // === 2. Stopwatch Card ===
             StyledRect {
+                id: stopwatchCard
                 Layout.fillWidth: true
                 implicitHeight: 155
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
+                visible: !root.isCompact || Timers.stopwatchRunning
 
                 ColumnLayout {
                     anchors.centerIn: parent
@@ -490,7 +406,7 @@ Item {
                             spacing: 8
 
                             StyledText {
-                                text: root.getStopwatchMinutes(root.stopwatchMs)
+                                text: Timers.getStopwatchMinutes(Timers.stopwatchMs)
                                 font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
@@ -503,7 +419,7 @@ Item {
                             }
 
                             StyledText {
-                                text: root.getStopwatchSeconds(root.stopwatchMs)
+                                text: Timers.getStopwatchSeconds(Timers.stopwatchMs)
                                 font: Tokens.font.clock.size(36).weight(Font.Medium).build()
                                 color: Colours.palette.m3onSurface
                             }
@@ -516,9 +432,9 @@ Item {
                             }
 
                             StyledText {
-                                text: root.getStopwatchMs(root.stopwatchMs)
+                                text: Timers.getStopwatchMs(Timers.stopwatchMs)
                                 font: Tokens.font.clock.size(36).weight(Font.Medium).build()
-                                color: root.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
+                                color: Timers.stopwatchRunning ? Colours.palette.m3primary : Colours.palette.m3onSurface
                             }
                         }
                     }
@@ -529,11 +445,11 @@ Item {
                         spacing: Tokens.spacing.medium
 
                         IconButton {
-                            icon: root.stopwatchRunning ? "pause" : "play_arrow"
-                            type: root.stopwatchRunning ? IconButton.Filled : IconButton.Tonal
+                            icon: Timers.stopwatchRunning ? "pause" : "play_arrow"
+                            type: Timers.stopwatchRunning ? IconButton.Filled : IconButton.Tonal
                             isRound: true
                             font: Tokens.font.icon.medium
-                            onClicked: root.stopwatchRunning = !root.stopwatchRunning
+                            onClicked: Timers.toggleStopwatch()
                         }
 
                         IconButton {
@@ -541,10 +457,7 @@ Item {
                             type: IconButton.Tonal
                             isRound: true
                             font: Tokens.font.icon.medium
-                            onClicked: {
-                                root.stopwatchRunning = false;
-                                root.stopwatchMs = 0;
-                            }
+                            onClicked: Timers.resetStopwatch()
                         }
                     }
                 }
