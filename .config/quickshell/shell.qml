@@ -1,1 +1,0 @@
-/home/youki/.config/quickshell/caelestia/shell.qml

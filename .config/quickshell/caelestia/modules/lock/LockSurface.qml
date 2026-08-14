@@ -22,11 +22,19 @@ WlSessionLockSurface {
     contentItem.Config.screen: screen.name
     contentItem.Tokens.screen: screen.name
 
-    color: "transparent"
+    color: Colours.palette.m3surface
 
     Connections {
         function onUnlock(): void {
+            initAnim.stop();
             unlockAnim.start();
+        }
+
+        function onLockedChanged(): void {
+            if (root.lock.locked) {
+                unlockAnim.stop();
+                initAnim.restart();
+            }
         }
 
         target: root.lock
@@ -99,63 +107,49 @@ WlSessionLockSurface {
             to: 1
             type: Anim.StandardLarge
         }
-        SequentialAnimation {
-            ParallelAnimation {
-                Anim {
-                    target: lockContent
-                    property: "scale"
-                    to: 1
-                    type: Anim.FastSpatial
-                }
-                Anim {
-                    target: lockContent
-                    property: "rotation"
-                    to: 360
-                    duration: Tokens.anim.durations.expressiveFastSpatial
-                    easing: Tokens.anim.standardAccel
-                }
-            }
-            ParallelAnimation {
-                Anim {
-                    target: lockIcon
-                    property: "rotation"
-                    to: 360
-                    easing: Tokens.anim.standardDecel
-                }
-                Anim {
-                    type: Anim.DefaultEffects
-                    target: lockIcon
-                    property: "opacity"
-                    to: 0
-                }
-                Anim {
-                    type: Anim.DefaultEffects
-                    target: content
-                    property: "opacity"
-                    to: 1
-                }
-                Anim {
-                    target: lockContent
-                    property: "opacity"
-                    to: 1
-                    type: Anim.FastSpatial
-                }
-                Anim {
-                    target: lockBg
-                    property: "radius"
-                    to: Tokens.rounding.extraLarge * 1.5
-                }
-                Anim {
-                    target: lockContent
-                    property: "implicitWidth"
-                    to: root.screenHeight * Tokens.sizes.lock.heightMult * Tokens.sizes.lock.ratio
-                }
-                Anim {
-                    target: lockContent
-                    property: "implicitHeight"
-                    to: root.screenHeight * Tokens.sizes.lock.heightMult
-                }
-            }
+        Anim {
+            target: lockContent
+            property: "scale"
+            to: 1
+            type: Anim.FastSpatial
+        }
+        Anim {
+            type: Anim.DefaultEffects
+            target: lockIcon
+            property: "opacity"
+            to: 0
+        }
+        Anim {
+            type: Anim.DefaultEffects
+            target: content
+            property: "opacity"
+            to: 1
+        }
+        Anim {
+            target: content
+            property: "scale"
+            to: 1
+        }
+        Anim {
+            target: lockContent
+            property: "opacity"
+            to: 1
+            type: Anim.FastSpatial
+        }
+        Anim {
+            target: lockBg
+            property: "radius"
+            to: Tokens.rounding.extraLarge * 1.5
+        }
+        Anim {
+            target: lockContent
+            property: "implicitWidth"
+            to: root.screenHeight * Tokens.sizes.lock.heightMult * Tokens.sizes.lock.ratio
+        }
+        Anim {
+            target: lockContent
+            property: "implicitHeight"
+            to: root.screenHeight * Tokens.sizes.lock.heightMult
         }
     }
 
@@ -192,7 +186,7 @@ WlSessionLockSurface {
         implicitHeight: size
 
         visible: !root.isExcluded
-        rotation: 180
+        rotation: 0
 
         StyledRect {
             id: lockBg
@@ -216,7 +210,7 @@ WlSessionLockSurface {
             anchors.centerIn: parent
             text: "lock"
             fontStyle: Tokens.font.icon.builders.extraLarge.scale(4).weight(Font.Bold).build()
-            rotation: 180
+            rotation: 0
         }
 
         Content {

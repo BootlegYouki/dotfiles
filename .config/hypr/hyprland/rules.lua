@@ -117,9 +117,13 @@ tagged_rule(float_50_60_tag, {
 
 -- Games
 tagged_rule(game_tag, {
-    "steam_app_[0-9]+",  -- Steam games
-    "steam_app_default", -- Lutris games
-    "gamescope",         -- Gamescope
+    "steam_app_[0-9]+",                          -- Steam games
+    "steam_app_default",                         -- Lutris games
+    "steam_proton",                              -- TwinTailLauncher / Proton games (Genshin, HSR, ZZZ, etc.)
+    "twintaillauncher|app.twintaillauncher.ttl", -- TwinTailLauncher app
+    "wine|wine64-preloader",                     -- Generic Wine games
+    "heroic|bottles",                            -- Heroic / Bottles games
+    "gamescope",                                 -- Gamescope
 }, "class")
 
 
