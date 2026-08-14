@@ -51,10 +51,14 @@ Item {
         }
     }
 
-    function formatTime(seconds) {
+    function getMinutes(seconds) {
         const m = Math.floor(seconds / 60);
+        return m < 10 ? "0" + m : m.toString();
+    }
+
+    function getSeconds(seconds) {
         const s = seconds % 60;
-        return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        return s < 10 ? "0" + s : s.toString();
     }
 
     ColumnLayout {
@@ -117,69 +121,103 @@ Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        CircularProgress {
+                        RowLayout {
                             anchors.centerIn: parent
-                            implicitSize: 180
-                            strokeWidth: 12
-                            spacing: 0
-                            fgColour: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3primary
-                            bgColour: Colours.palette.m3surfaceVariant
-                            value: root.timerRemaining / root.timerDefault
+                            spacing: Tokens.spacing.medium
 
-                            RowLayout {
-                                anchors.centerIn: parent
+                            // Minutes
+                            ColumnLayout {
+                                Layout.alignment: Qt.AlignHCenter
                                 spacing: Tokens.spacing.small
 
-                                // Minus Button (Edit)
+                                // Plus Minute
                                 StyledRect {
-                                    visible: !root.timerRunning
-                                    implicitWidth: 32
-                                    implicitHeight: 32
-                                    radius: 16
+                                    Layout.alignment: Qt.AlignHCenter
+                                    opacity: !root.timerRunning ? 1 : 0
+                                    enabled: !root.timerRunning
+                                    implicitWidth: 32; implicitHeight: 24; radius: Tokens.rounding.small
                                     color: Colours.palette.m3surfaceVariant
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            if (root.timerDefault > 60) {
-                                                root.timerDefault -= 60;
-                                                root.timerRemaining = root.timerDefault;
-                                            }
-                                        }
-                                    }
-                                    MaterialIcon {
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { root.timerDefault += 60; root.timerRemaining = root.timerDefault; } }
+                                    MaterialIcon { anchors.centerIn: parent; text: "expand_less"; color: Colours.palette.m3onSurfaceVariant }
+                                    Behavior on opacity { Anim {} }
+                                }
+
+                                StyledText { Layout.alignment: Qt.AlignHCenter; text: qsTr("Minutes"); font: Tokens.font.label.small; color: Colours.palette.m3onSurfaceVariant }
+
+                                StyledRect {
+                                    implicitWidth: 100
+                                    implicitHeight: 100
+                                    color: Colours.tPalette.m3surfaceContainerHigh
+                                    radius: Tokens.rounding.medium
+                                    StyledText {
                                         anchors.centerIn: parent
-                                        text: "remove"
-                                        color: Colours.palette.m3onSurfaceVariant
+                                        text: root.getMinutes(root.timerRemaining)
+                                        font: Tokens.font.display.builders.large.build()
+                                        color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                     }
                                 }
 
-                                StyledText {
-                                    text: root.formatTime(root.timerRemaining)
-                                    font: Tokens.font.headline.large
-                                    color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                // Minus Minute
+                                StyledRect {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    opacity: !root.timerRunning ? 1 : 0
+                                    enabled: !root.timerRunning
+                                    implicitWidth: 32; implicitHeight: 24; radius: Tokens.rounding.small
+                                    color: Colours.palette.m3surfaceVariant
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { if (root.timerDefault >= 60) { root.timerDefault -= 60; root.timerRemaining = root.timerDefault; } } }
+                                    MaterialIcon { anchors.centerIn: parent; text: "expand_more"; color: Colours.palette.m3onSurfaceVariant }
+                                    Behavior on opacity { Anim {} }
+                                }
+                            }
+
+                            StyledText {
+                                text: ":"
+                                font: Tokens.font.display.builders.large.build()
+                                color: Colours.palette.m3onSurfaceVariant
+                            }
+
+                            // Seconds
+                            ColumnLayout {
+                                Layout.alignment: Qt.AlignHCenter
+                                spacing: Tokens.spacing.small
+
+                                // Plus Second
+                                StyledRect {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    opacity: !root.timerRunning ? 1 : 0
+                                    enabled: !root.timerRunning
+                                    implicitWidth: 32; implicitHeight: 24; radius: Tokens.rounding.small
+                                    color: Colours.palette.m3surfaceVariant
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { root.timerDefault += 1; root.timerRemaining = root.timerDefault; } }
+                                    MaterialIcon { anchors.centerIn: parent; text: "expand_less"; color: Colours.palette.m3onSurfaceVariant }
+                                    Behavior on opacity { Anim {} }
                                 }
 
-                                // Plus Button (Edit)
+                                StyledText { Layout.alignment: Qt.AlignHCenter; text: qsTr("Seconds"); font: Tokens.font.label.small; color: Colours.palette.m3onSurfaceVariant }
+
                                 StyledRect {
-                                    visible: !root.timerRunning
-                                    implicitWidth: 32
-                                    implicitHeight: 32
-                                    radius: 16
-                                    color: Colours.palette.m3surfaceVariant
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            root.timerDefault += 60;
-                                            root.timerRemaining = root.timerDefault;
-                                        }
-                                    }
-                                    MaterialIcon {
+                                    implicitWidth: 100
+                                    implicitHeight: 100
+                                    color: Colours.tPalette.m3surfaceContainerHigh
+                                    radius: Tokens.rounding.medium
+                                    StyledText {
                                         anchors.centerIn: parent
-                                        text: "add"
-                                        color: Colours.palette.m3onSurfaceVariant
+                                        text: root.getSeconds(root.timerRemaining)
+                                        font: Tokens.font.display.builders.large.build()
+                                        color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
                                     }
+                                }
+
+                                // Minus Second
+                                StyledRect {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    opacity: !root.timerRunning ? 1 : 0
+                                    enabled: !root.timerRunning
+                                    implicitWidth: 32; implicitHeight: 24; radius: Tokens.rounding.small
+                                    color: Colours.palette.m3surfaceVariant
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { if (root.timerDefault >= 1) { root.timerDefault -= 1; root.timerRemaining = root.timerDefault; } } }
+                                    MaterialIcon { anchors.centerIn: parent; text: "expand_more"; color: Colours.palette.m3onSurfaceVariant }
+                                    Behavior on opacity { Anim {} }
                                 }
                             }
                         }
@@ -257,25 +295,56 @@ Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        CircularProgress {
+                        RowLayout {
                             anchors.centerIn: parent
-                            implicitSize: 180
-                            strokeWidth: 12
-                            spacing: 0
-                            fgColour: Colours.palette.m3tertiary
-                            bgColour: Colours.palette.m3surfaceVariant
-                            value: root.stopwatchSeconds === 0 ? 1.0 : (root.stopwatchSeconds % 60) / 60
+                            spacing: Tokens.spacing.medium
 
-                            Behavior on value {
-                                enabled: root.stopwatchRunning
-                                NumberAnimation { duration: 1000 }
+                            // Minutes
+                            ColumnLayout {
+                                Layout.alignment: Qt.AlignHCenter
+                                spacing: Tokens.spacing.small
+
+                                StyledText { Layout.alignment: Qt.AlignHCenter; text: qsTr("Minutes"); font: Tokens.font.label.small; color: Colours.palette.m3onSurfaceVariant }
+
+                                StyledRect {
+                                    implicitWidth: 100
+                                    implicitHeight: 100
+                                    color: Colours.tPalette.m3surfaceContainerHigh
+                                    radius: Tokens.rounding.medium
+                                    StyledText {
+                                        anchors.centerIn: parent
+                                        text: root.getMinutes(root.stopwatchSeconds)
+                                        font: Tokens.font.display.builders.large.build()
+                                        color: Colours.palette.m3onSurface
+                                    }
+                                }
                             }
 
                             StyledText {
-                                anchors.centerIn: parent
-                                text: root.formatTime(root.stopwatchSeconds)
-                                font: Tokens.font.headline.large
-                                color: Colours.palette.m3onSurface
+                                text: ":"
+                                font: Tokens.font.display.builders.large.build()
+                                color: Colours.palette.m3onSurfaceVariant
+                            }
+
+                            // Seconds
+                            ColumnLayout {
+                                Layout.alignment: Qt.AlignHCenter
+                                spacing: Tokens.spacing.small
+
+                                StyledText { Layout.alignment: Qt.AlignHCenter; text: qsTr("Seconds"); font: Tokens.font.label.small; color: Colours.palette.m3onSurfaceVariant }
+
+                                StyledRect {
+                                    implicitWidth: 100
+                                    implicitHeight: 100
+                                    color: Colours.tPalette.m3surfaceContainerHigh
+                                    radius: Tokens.rounding.medium
+                                    StyledText {
+                                        anchors.centerIn: parent
+                                        text: root.getSeconds(root.stopwatchSeconds)
+                                        font: Tokens.font.display.builders.large.build()
+                                        color: Colours.palette.m3onSurface
+                                    }
+                                }
                             }
                         }
                     }
