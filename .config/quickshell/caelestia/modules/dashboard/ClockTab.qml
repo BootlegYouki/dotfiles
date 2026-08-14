@@ -101,7 +101,7 @@ Item {
             // 2. Countdown Timer Card
             StyledRect {
                 implicitWidth: 360
-                implicitHeight: 360
+                implicitHeight: 280
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
@@ -275,7 +275,7 @@ Item {
             // 3. Stopwatch Card
             StyledRect {
                 implicitWidth: 360
-                implicitHeight: 360
+                implicitHeight: 280
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
