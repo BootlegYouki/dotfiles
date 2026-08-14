@@ -46,114 +46,50 @@ Item {
         return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
     }
 
-    function getOffsetTime(offsetHours) {
-        const utcMs = root.currentTime.getTime() + (root.currentTime.getTimezoneOffset() * 60000);
-        const targetMs = utcMs + (3600000 * offsetHours);
-        const targetDate = new Date(targetMs);
-        return Qt.formatTime(targetDate, "hh:mm");
-    }
-
     RowLayout {
         id: mainRow
         anchors.left: parent.left
         anchors.top: parent.top
         spacing: Tokens.spacing.large
 
-        // Left Column (Clocks)
-        ColumnLayout {
-            Layout.alignment: Qt.AlignTop
-            spacing: Tokens.spacing.large
+        // Local Time Hero Card
+        StyledRect {
+            implicitWidth: 460
+            implicitHeight: 320
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.large
 
-            // Hero Local Clock
-            StyledRect {
-                implicitWidth: 460
-                implicitHeight: 160
-                color: Colours.tPalette.m3surfaceContainer
-                radius: Tokens.rounding.large
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: Tokens.padding.extraLarge
-                    spacing: Tokens.spacing.extraLarge
-
-                    MaterialIcon {
-                        text: "schedule"
-                        fontStyle: Tokens.font.icon.builders.extraLarge.scale(2.5).build()
-                        color: Colours.palette.m3primary
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 0
-
-                        StyledText {
-                            text: Qt.formatTime(root.currentTime, "hh:mm:ss")
-                            font: Tokens.font.display.builders.large.scale(1.2).build()
-                            color: Colours.palette.m3onSurface
-                        }
-                        StyledText {
-                            text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
-                            font: Tokens.font.headline.builders.small.build()
-                            color: Colours.palette.m3onSurfaceVariant
-                        }
-                    }
-                }
-            }
-
-            // World Clocks Row
-            RowLayout {
-                implicitWidth: 460
+            ColumnLayout {
+                anchors.centerIn: parent
                 spacing: Tokens.spacing.large
 
-                Repeater {
-                    model: [
-                        { name: "New York", offset: -4, icon: "public" },
-                        { name: "London", offset: 1, icon: "public" },
-                        { name: "Tokyo", offset: 9, icon: "public" }
-                    ]
-                    delegate: StyledRect {
-                        Layout.fillWidth: true
-                        implicitHeight: 120
-                        color: Colours.tPalette.m3surfaceContainer
-                        radius: Tokens.rounding.large
+                MaterialIcon {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "schedule"
+                    fontStyle: Tokens.font.icon.builders.extraLarge.scale(2.5).build()
+                    color: Colours.palette.m3primary
+                }
 
-                        ColumnLayout {
-                            anchors.centerIn: parent
-                            spacing: Tokens.spacing.small
-
-                            RowLayout {
-                                Layout.alignment: Qt.AlignHCenter
-                                spacing: Tokens.spacing.small
-
-                                MaterialIcon {
-                                    text: modelData.icon
-                                    fontStyle: Tokens.font.icon.medium
-                                    color: Colours.palette.m3secondary
-                                }
-                                StyledText {
-                                    text: modelData.name
-                                    font: Tokens.font.title.medium
-                                    color: Colours.palette.m3onSurfaceVariant
-                                }
-                            }
-                            
-                            StyledText {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: root.getOffsetTime(modelData.offset)
-                                font: Tokens.font.headline.large
-                                color: Colours.palette.m3onSurface
-                            }
-                        }
-                    }
+                StyledText {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: Qt.formatTime(root.currentTime, "hh:mm:ss")
+                    font: Tokens.font.display.builders.large.scale(1.5).build()
+                    color: Colours.palette.m3onSurface
+                }
+                
+                StyledText {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: Qt.formatDate(root.currentTime, "dddd, MMMM d")
+                    font: Tokens.font.headline.builders.small.build()
+                    color: Colours.palette.m3onSurfaceVariant
                 }
             }
         }
 
-        // Right Column (Timer)
+        // Timer Card
         StyledRect {
-            Layout.alignment: Qt.AlignTop
-            implicitWidth: 320
-            implicitHeight: 320 // Square layout like other widgets
+            implicitWidth: 460
+            implicitHeight: 320
             color: Colours.tPalette.m3surfaceContainer
             radius: Tokens.rounding.large
 
@@ -176,18 +112,68 @@ Item {
 
                     CircularProgress {
                         anchors.centerIn: parent
-                        implicitSize: 160
+                        implicitSize: 180
                         strokeWidth: 12
                         spacing: 0
                         fgColour: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3primary
                         bgColour: Colours.palette.m3surfaceVariant
                         value: root.timerRemaining / root.timerDefault
 
-                        StyledText {
+                        RowLayout {
                             anchors.centerIn: parent
-                            text: root.formatTime(root.timerRemaining)
-                            font: Tokens.font.headline.large
-                            color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                            spacing: Tokens.spacing.small
+
+                            // Minus Button
+                            StyledRect {
+                                visible: !root.timerRunning
+                                implicitWidth: 32
+                                implicitHeight: 32
+                                radius: 16
+                                color: Colours.palette.m3surfaceVariant
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (root.timerDefault > 60) {
+                                            root.timerDefault -= 60;
+                                            root.timerRemaining = root.timerDefault;
+                                        }
+                                    }
+                                }
+                                MaterialIcon {
+                                    anchors.centerIn: parent
+                                    text: "remove"
+                                    color: Colours.palette.m3onSurfaceVariant
+                                }
+                            }
+
+                            StyledText {
+                                text: root.formatTime(root.timerRemaining)
+                                font: Tokens.font.headline.large
+                                color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                            }
+
+                            // Plus Button
+                            StyledRect {
+                                visible: !root.timerRunning
+                                implicitWidth: 32
+                                implicitHeight: 32
+                                radius: 16
+                                color: Colours.palette.m3surfaceVariant
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        root.timerDefault += 60;
+                                        root.timerRemaining = root.timerDefault;
+                                    }
+                                }
+                                MaterialIcon {
+                                    anchors.centerIn: parent
+                                    text: "add"
+                                    color: Colours.palette.m3onSurfaceVariant
+                                }
+                            }
                         }
                     }
                 }
@@ -199,7 +185,7 @@ Item {
 
                     // Start/Pause Button
                     StyledRect {
-                        implicitWidth: 100
+                        implicitWidth: 120
                         implicitHeight: 45
                         radius: Tokens.rounding.large
                         color: root.timerRunning ? Colours.palette.m3secondaryContainer : Colours.palette.m3primaryContainer
@@ -223,7 +209,7 @@ Item {
 
                     // Reset Button
                     StyledRect {
-                        implicitWidth: 100
+                        implicitWidth: 120
                         implicitHeight: 45
                         radius: Tokens.rounding.large
                         color: Colours.palette.m3surfaceVariant
