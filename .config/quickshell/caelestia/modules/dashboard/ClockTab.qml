@@ -254,30 +254,32 @@ Item {
             }
         }
 
-        // --- Bottom Row: Countdown Timer & Stopwatch Cards ---
+        // --- Bottom Row: Countdown Timer & Stopwatch Cards with Side-Mounted Icon Controls ---
         RowLayout {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
 
-            // === 1. Countdown Timer Card (HH : MM : SS) ===
+            // === 1. Countdown Timer Card (HH : MM : SS + Side Buttons) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 150
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
-                ColumnLayout {
-                    anchors.centerIn: parent
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: Tokens.padding.large
                     spacing: Tokens.spacing.medium
 
-                    // Direct Editable Digital Cards: HH : MM : SS
+                    // Center Digits
                     RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignCenter
                         spacing: Tokens.spacing.small
 
                         // Hours Box
                         StyledRect {
-                            implicitWidth: 72
+                            implicitWidth: 68
                             implicitHeight: 64
                             color: (hoursInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -354,7 +356,7 @@ Item {
 
                         // Minutes Box
                         StyledRect {
-                            implicitWidth: 72
+                            implicitWidth: 68
                             implicitHeight: 64
                             color: (minutesInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -431,7 +433,7 @@ Item {
 
                         // Seconds Box
                         StyledRect {
-                            implicitWidth: 72
+                            implicitWidth: 68
                             implicitHeight: 64
                             color: (secondsInput.activeFocus && !root.timerRunning) ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -495,85 +497,67 @@ Item {
                         }
                     }
 
-                    // Action Buttons
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: Tokens.spacing.medium
+                    // Side-Mounted Vertical Icon Controls (Play/Pause & Reset)
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignVCenter
+                        spacing: Tokens.spacing.small
 
-                        StyledRect {
-                            implicitWidth: 105
-                            implicitHeight: 38
-                            radius: Tokens.rounding.full
-                            color: root.timerRunning ? Colours.palette.m3secondaryContainer : Colours.palette.m3primary
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: root.timerRunning ? qsTr("Pause") : qsTr("Start")
-                                font: Tokens.font.label.large
-                                color: root.timerRunning ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onPrimary
-                            }
-
-                            StateLayer {
-                                onClicked: {
-                                    if (!root.timerRunning) {
-                                        root.updateTimerFromInputs();
-                                        if (root.timerRemaining === 0) {
-                                            root.timerRemaining = root.timerDefault > 0 ? root.timerDefault : 300;
-                                            root.syncInputsFromRemaining();
-                                        }
-                                    }
-                                    root.timerRunning = !root.timerRunning;
-                                    if (!root.timerRunning) {
+                        IconButton {
+                            icon: root.timerRunning ? "pause" : "play_arrow"
+                            type: root.timerRunning ? IconButton.Filled : IconButton.Tonal
+                            isRound: true
+                            font: Tokens.font.icon.medium
+                            onClicked: {
+                                if (!root.timerRunning) {
+                                    root.updateTimerFromInputs();
+                                    if (root.timerRemaining === 0) {
+                                        root.timerRemaining = root.timerDefault > 0 ? root.timerDefault : 300;
                                         root.syncInputsFromRemaining();
                                     }
+                                }
+                                root.timerRunning = !root.timerRunning;
+                                if (!root.timerRunning) {
+                                    root.syncInputsFromRemaining();
                                 }
                             }
                         }
 
-                        StyledRect {
-                            implicitWidth: 105
-                            implicitHeight: 38
-                            radius: Tokens.rounding.full
-                            color: Colours.palette.m3surfaceVariant
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: qsTr("Reset")
-                                font: Tokens.font.label.large
-                                color: Colours.palette.m3onSurfaceVariant
-                            }
-
-                            StateLayer {
-                                onClicked: {
-                                    root.timerRunning = false;
-                                    root.timerRemaining = root.timerDefault;
-                                    root.syncInputsFromRemaining();
-                                }
+                        IconButton {
+                            icon: "replay"
+                            type: IconButton.Tonal
+                            isRound: true
+                            font: Tokens.font.icon.medium
+                            onClicked: {
+                                root.timerRunning = false;
+                                root.timerRemaining = root.timerDefault;
+                                root.syncInputsFromRemaining();
                             }
                         }
                     }
                 }
             }
 
-            // === 2. Stopwatch Card (MM : SS . MS) ===
+            // === 2. Stopwatch Card (MM : SS . MS + Side Buttons) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 150
                 color: Colours.tPalette.m3surfaceContainer
                 radius: Tokens.rounding.large
 
-                ColumnLayout {
-                    anchors.centerIn: parent
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: Tokens.padding.large
                     spacing: Tokens.spacing.medium
 
-                    // Digital Cards Display: MM : SS . MS (No Hours, Continues 60, 61, 62...)
+                    // Center Digits
                     RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignCenter
                         spacing: Tokens.spacing.small
 
                         // Minutes Box
                         StyledRect {
-                            implicitWidth: 72
+                            implicitWidth: 68
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -597,7 +581,7 @@ Item {
 
                         // Seconds Box
                         StyledRect {
-                            implicitWidth: 72
+                            implicitWidth: 68
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -621,7 +605,7 @@ Item {
 
                         // Milliseconds Box (Hundredths: 00 - 99)
                         StyledRect {
-                            implicitWidth: 72
+                            implicitWidth: 68
                             implicitHeight: 64
                             color: Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
@@ -635,47 +619,27 @@ Item {
                         }
                     }
 
-                    // Action Buttons
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: Tokens.spacing.medium
+                    // Side-Mounted Vertical Icon Controls (Play/Pause & Reset)
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignVCenter
+                        spacing: Tokens.spacing.small
 
-                        StyledRect {
-                            implicitWidth: 105
-                            implicitHeight: 38
-                            radius: Tokens.rounding.full
-                            color: root.stopwatchRunning ? Colours.palette.m3secondaryContainer : Colours.palette.m3primary
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: root.stopwatchRunning ? qsTr("Pause") : qsTr("Start")
-                                font: Tokens.font.label.large
-                                color: root.stopwatchRunning ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onPrimary
-                            }
-
-                            StateLayer {
-                                onClicked: root.stopwatchRunning = !root.stopwatchRunning
-                            }
+                        IconButton {
+                            icon: root.stopwatchRunning ? "pause" : "play_arrow"
+                            type: root.stopwatchRunning ? IconButton.Filled : IconButton.Tonal
+                            isRound: true
+                            font: Tokens.font.icon.medium
+                            onClicked: root.stopwatchRunning = !root.stopwatchRunning
                         }
 
-                        StyledRect {
-                            implicitWidth: 105
-                            implicitHeight: 38
-                            radius: Tokens.rounding.full
-                            color: Colours.palette.m3surfaceVariant
-
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: qsTr("Reset")
-                                font: Tokens.font.label.large
-                                color: Colours.palette.m3onSurfaceVariant
-                            }
-
-                            StateLayer {
-                                onClicked: {
-                                    root.stopwatchRunning = false;
-                                    root.stopwatchMs = 0;
-                                }
+                        IconButton {
+                            icon: "replay"
+                            type: IconButton.Tonal
+                            isRound: true
+                            font: Tokens.font.icon.medium
+                            onClicked: {
+                                root.stopwatchRunning = false;
+                                root.stopwatchMs = 0;
                             }
                         }
                     }
