@@ -18,6 +18,12 @@ Item {
 
     readonly property bool isCompactTimer: !screenState.dashboard && Timers.hasActive
 
+    onIsCompactTimerChanged: {
+        if (!isCompactTimer && view.currentItem) {
+            view.contentX = Qt.binding(() => view.currentItem?.x ?? 0);
+        }
+    }
+
     readonly property var dashboardTabs: {
         const allTabs = [
             {
@@ -176,13 +182,13 @@ Item {
         }
     }
 
-    // 2. Compact Timer View (Direct, isolated display with zero flickable horizontal shifting)
+    // 2. Compact Timer View (Isolated standalone component)
     Loader {
         id: compactTimerLoader
         anchors.centerIn: parent
         active: root.isCompactTimer
         visible: root.isCompactTimer
-        sourceComponent: clockComponent
+        sourceComponent: compactClockComponent
     }
 
     Component {
@@ -218,7 +224,15 @@ Item {
         id: clockComponent
 
         ClockTab {
-            screenState: root.screenState
+            isCompact: false
+        }
+    }
+
+    Component {
+        id: compactClockComponent
+
+        ClockTab {
+            isCompact: true
         }
     }
 

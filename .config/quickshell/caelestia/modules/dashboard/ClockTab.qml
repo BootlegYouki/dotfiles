@@ -8,8 +8,7 @@ import qs.services
 Item {
     id: root
 
-    property ScreenState screenState: null
-    readonly property bool isCompact: screenState ? (!screenState.dashboard && Timers.hasActive) : false
+    property bool isCompact: false
 
     implicitWidth: {
         if (!isCompact) return 840;
