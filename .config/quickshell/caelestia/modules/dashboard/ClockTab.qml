@@ -240,7 +240,7 @@ Item {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
 
-            // === 1. Countdown Timer Card (HH : MM : SS) ===
+            // === 1. Countdown Timer Card (HH : MM : SS - Direct Typeable Digits) ===
             StyledRect {
                 Layout.fillWidth: true
                 implicitHeight: 200
@@ -252,7 +252,7 @@ Item {
                     anchors.margins: Tokens.padding.large
                     spacing: Tokens.spacing.medium
 
-                    // Digital Cards Display: HH : MM : SS
+                    // Direct Editable Digital Cards: HH : MM : SS
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Tokens.spacing.small
@@ -261,19 +261,52 @@ Item {
                         StyledRect {
                             implicitWidth: 72
                             implicitHeight: 64
-                            color: Colours.tPalette.m3surfaceContainerHigh
+                            color: hoursInput.activeFocus ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
 
-                            StyledText {
+                            TextInput {
+                                id: hoursInput
                                 anchors.centerIn: parent
-                                text: root.getHours(root.timerRemaining)
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
+                                selectedTextColor: color
+                                selectByMouse: true
+                                cursorVisible: activeFocus && !root.timerRunning
+                                readOnly: root.timerRunning
+                                maximumLength: 2
+                                inputMethodHints: Qt.ImhDigitsOnly
+                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
+
+                                text: activeFocus ? text : root.getHours(root.timerRemaining)
+
+                                onActiveFocusChanged: {
+                                    if (activeFocus) {
+                                        selectAll();
+                                    } else {
+                                        let h = parseInt(text) || 0;
+                                        let m = parseInt(minutesInput.text) || 0;
+                                        let s = parseInt(secondsInput.text) || 0;
+                                        root.timerDefault = h * 3600 + m * 60 + s;
+                                        root.timerRemaining = root.timerDefault;
+                                    }
+                                }
+
+                                onTextEdited: {
+                                    if (text.length >= 2) {
+                                        minutesInput.forceActiveFocus();
+                                        minutesInput.selectAll();
+                                    }
+                                }
+
+                                onAccepted: {
+                                    minutesInput.forceActiveFocus();
+                                }
                             }
 
                             CustomMouseArea {
                                 anchors.fill: parent
-                                cursorShape: !root.timerRunning ? Qt.PointingHandCursor : undefined
+                                cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
                                 function onWheel(event: WheelEvent): void {
                                     if (!root.timerRunning) {
                                         if (event.angleDelta.y > 0) {
@@ -286,8 +319,8 @@ Item {
                                 }
                                 onClicked: {
                                     if (!root.timerRunning) {
-                                        root.timerDefault += 3600;
-                                        root.timerRemaining = root.timerDefault;
+                                        hoursInput.forceActiveFocus();
+                                        hoursInput.selectAll();
                                     }
                                 }
                             }
@@ -306,19 +339,52 @@ Item {
                         StyledRect {
                             implicitWidth: 72
                             implicitHeight: 64
-                            color: Colours.tPalette.m3surfaceContainerHigh
+                            color: minutesInput.activeFocus ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
 
-                            StyledText {
+                            TextInput {
+                                id: minutesInput
                                 anchors.centerIn: parent
-                                text: root.getMinutes(root.timerRemaining)
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
+                                selectedTextColor: color
+                                selectByMouse: true
+                                cursorVisible: activeFocus && !root.timerRunning
+                                readOnly: root.timerRunning
+                                maximumLength: 2
+                                inputMethodHints: Qt.ImhDigitsOnly
+                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
+
+                                text: activeFocus ? text : root.getMinutes(root.timerRemaining)
+
+                                onActiveFocusChanged: {
+                                    if (activeFocus) {
+                                        selectAll();
+                                    } else {
+                                        let h = parseInt(hoursInput.text) || 0;
+                                        let m = parseInt(text) || 0;
+                                        let s = parseInt(secondsInput.text) || 0;
+                                        root.timerDefault = h * 3600 + m * 60 + s;
+                                        root.timerRemaining = root.timerDefault;
+                                    }
+                                }
+
+                                onTextEdited: {
+                                    if (text.length >= 2) {
+                                        secondsInput.forceActiveFocus();
+                                        secondsInput.selectAll();
+                                    }
+                                }
+
+                                onAccepted: {
+                                    secondsInput.forceActiveFocus();
+                                }
                             }
 
                             CustomMouseArea {
                                 anchors.fill: parent
-                                cursorShape: !root.timerRunning ? Qt.PointingHandCursor : undefined
+                                cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
                                 function onWheel(event: WheelEvent): void {
                                     if (!root.timerRunning) {
                                         if (event.angleDelta.y > 0) {
@@ -331,8 +397,8 @@ Item {
                                 }
                                 onClicked: {
                                     if (!root.timerRunning) {
-                                        root.timerDefault += 60;
-                                        root.timerRemaining = root.timerDefault;
+                                        minutesInput.forceActiveFocus();
+                                        minutesInput.selectAll();
                                     }
                                 }
                             }
@@ -351,19 +417,50 @@ Item {
                         StyledRect {
                             implicitWidth: 72
                             implicitHeight: 64
-                            color: Colours.tPalette.m3surfaceContainerHigh
+                            color: secondsInput.activeFocus ? Colours.palette.m3surfaceVariant : Colours.tPalette.m3surfaceContainerHigh
                             radius: Tokens.rounding.medium
 
-                            StyledText {
+                            TextInput {
+                                id: secondsInput
                                 anchors.centerIn: parent
-                                text: root.getSeconds(root.timerRemaining)
                                 font: Tokens.font.clock.size(28).weight(Font.Medium).build()
                                 color: root.timerRemaining === 0 ? Colours.palette.m3error : Colours.palette.m3onSurface
+                                selectionColor: Qt.alpha(Colours.palette.m3primary, 0.4)
+                                selectedTextColor: color
+                                selectByMouse: true
+                                cursorVisible: activeFocus && !root.timerRunning
+                                readOnly: root.timerRunning
+                                maximumLength: 2
+                                inputMethodHints: Qt.ImhDigitsOnly
+                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
+
+                                text: activeFocus ? text : root.getSeconds(root.timerRemaining)
+
+                                onActiveFocusChanged: {
+                                    if (activeFocus) {
+                                        selectAll();
+                                    } else {
+                                        let h = parseInt(hoursInput.text) || 0;
+                                        let m = parseInt(minutesInput.text) || 0;
+                                        let s = parseInt(text) || 0;
+                                        root.timerDefault = h * 3600 + m * 60 + s;
+                                        root.timerRemaining = root.timerDefault;
+                                    }
+                                }
+
+                                onAccepted: {
+                                    focus = false;
+                                    let h = parseInt(hoursInput.text) || 0;
+                                    let m = parseInt(minutesInput.text) || 0;
+                                    let s = parseInt(text) || 0;
+                                    root.timerDefault = h * 3600 + m * 60 + s;
+                                    root.timerRemaining = root.timerDefault;
+                                }
                             }
 
                             CustomMouseArea {
                                 anchors.fill: parent
-                                cursorShape: !root.timerRunning ? Qt.PointingHandCursor : undefined
+                                cursorShape: !root.timerRunning ? Qt.IBeamCursor : undefined
                                 function onWheel(event: WheelEvent): void {
                                     if (!root.timerRunning) {
                                         if (event.angleDelta.y > 0) {
@@ -376,60 +473,19 @@ Item {
                                 }
                                 onClicked: {
                                     if (!root.timerRunning) {
-                                        root.timerDefault += 10;
-                                        root.timerRemaining = root.timerDefault;
+                                        secondsInput.forceActiveFocus();
+                                        secondsInput.selectAll();
                                     }
                                 }
                             }
                         }
                     }
 
-                    // Quick Presets / Progress Bar
+                    // Active Progress Bar / Spacer
                     Item {
                         Layout.fillWidth: true
                         implicitHeight: 26
 
-                        // When stopped: Quick preset chips
-                        RowLayout {
-                            anchors.centerIn: parent
-                            spacing: Tokens.spacing.small
-                            visible: !root.timerRunning
-
-                            Repeater {
-                                model: [
-                                    { label: "-1m", delta: -60 },
-                                    { label: "+1m", delta: 60 },
-                                    { label: "+5m", delta: 300 },
-                                    { label: "+15m", delta: 900 },
-                                    { label: "+1h", delta: 3600 }
-                                ]
-                                delegate: StyledRect {
-                                    implicitWidth: 46
-                                    implicitHeight: 24
-                                    radius: Tokens.rounding.full
-                                    color: Colours.palette.m3surfaceVariant
-
-                                    StyledText {
-                                        anchors.centerIn: parent
-                                        text: modelData.label
-                                        font: Tokens.font.label.small
-                                        color: Colours.palette.m3onSurfaceVariant
-                                    }
-
-                                    StateLayer {
-                                        onClicked: {
-                                            const newVal = root.timerDefault + modelData.delta;
-                                            if (newVal >= 10) {
-                                                root.timerDefault = newVal;
-                                                root.timerRemaining = root.timerDefault;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // When running: Clean sleek progress bar
                         StyledProgressBar {
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -572,7 +628,7 @@ Item {
                         }
                     }
 
-                    // Spacer to match preset height of timer card
+                    // Spacer to match progress bar space of timer card
                     Item {
                         Layout.fillWidth: true
                         implicitHeight: 26
