@@ -81,15 +81,15 @@ Variants {
                     implicitHeight: contentRow.implicitHeight + Tokens.padding.medium * 2
 
                     radius: Tokens.rounding.large
-                    color: Colours.tPalette.m3surfaceContainer
-                    border.color: Qt.alpha(Colours.palette.m3outlineVariant, 0.4)
+                    color: Colours.layer(Colours.palette.m3surfaceContainer, 2)
+                    border.color: Colours.palette.m3outlineVariant
                     border.width: 1
 
                     layer.enabled: true
                     layer.effect: MultiEffect {
                         shadowEnabled: true
                         shadowBlur: 16
-                        shadowColor: Qt.alpha(Colours.palette.m3shadow, 0.45)
+                        shadowColor: Qt.alpha(Colours.palette.m3shadow, 0.6)
                         shadowVerticalOffset: 4
                     }
 
@@ -99,57 +99,30 @@ Variants {
                         anchors.centerIn: parent
                         spacing: Tokens.spacing.medium
 
-                        // Icon badge with pulsing ring matching Caelestia primary color
-                        Item {
-                            implicitWidth: 34
-                            implicitHeight: 34
-
-                            Rectangle {
-                                id: iconBg
-                                anchors.fill: parent
-                                radius: Tokens.rounding.medium
-                                color: Qt.alpha(Colours.palette.m3primary, 0.15)
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: Tokens.rounding.medium
-                                color: "transparent"
-                                border.color: Colours.palette.m3primary
-                                border.width: 1.5
-
-                                SequentialAnimation on opacity {
-                                    running: pill.isActive
-                                    loops: Animation.Infinite
-                                    NumberAnimation { from: 0.25; to: 0.9; duration: 900; easing.type: Easing.InOutSine }
-                                    NumberAnimation { from: 0.9; to: 0.25; duration: 900; easing.type: Easing.InOutSine }
-                                }
-
-                                SequentialAnimation on scale {
-                                    running: pill.isActive
-                                    loops: Animation.Infinite
-                                    NumberAnimation { from: 0.96; to: 1.06; duration: 900; easing.type: Easing.InOutSine }
-                                    NumberAnimation { from: 1.06; to: 0.96; duration: 900; easing.type: Easing.InOutSine }
-                                }
-                            }
+                        // Icon badge matching Notification appIcon circular badge
+                        StyledRect {
+                            implicitWidth: 36
+                            implicitHeight: 36
+                            radius: Tokens.rounding.full
+                            color: Colours.palette.m3primaryContainer
 
                             MaterialIcon {
                                 anchors.centerIn: parent
                                 animate: true
                                 text: "sports_esports"
-                                color: Colours.palette.m3primary
-                                fontStyle: Tokens.font.icon.builders.medium.weight(Font.Bold).build()
+                                color: Colours.palette.m3onPrimaryContainer
+                                fontStyle: Tokens.font.icon.medium
                             }
                         }
 
-                        // Text Column matching dashboard typography
+                        // Text Column with crisp Material 3 typography
                         ColumnLayout {
                             spacing: 1
 
                             StyledText {
                                 text: qsTr("Auto-Loot Active")
                                 font: Tokens.font.title.small
-                                color: Colours.palette.m3primary
+                                color: Colours.palette.m3onSurface
                             }
 
                             StyledText {
@@ -159,19 +132,19 @@ Variants {
                             }
                         }
 
-                        // Active ON badge using M3 primary container tokens
+                        // Status Badge
                         StyledRect {
                             implicitWidth: onLabel.implicitWidth + 14
                             implicitHeight: onLabel.implicitHeight + 6
-                            radius: Tokens.rounding.small
-                            color: Colours.palette.m3primaryContainer
+                            radius: Tokens.rounding.full
+                            color: Colours.palette.m3primary
 
                             StyledText {
                                 id: onLabel
                                 anchors.centerIn: parent
                                 text: "ON"
                                 font: Tokens.font.label.small
-                                color: Colours.palette.m3onPrimaryContainer
+                                color: Colours.palette.m3onPrimary
                             }
                         }
                     }
