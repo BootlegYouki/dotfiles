@@ -24,6 +24,7 @@ Singleton {
         FloatingWindow {
             id: win
 
+            screen: Screens.activeScreen
             color: Colours.tPalette.m3surface
             surfaceFormat.opaque: false
 
