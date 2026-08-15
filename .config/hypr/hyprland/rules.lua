@@ -68,6 +68,7 @@ tagged_rule(opaque_tag, {
     "krita|gimp|inkscape|darktable", -- Image editors
     "resolve|kdenlive|shotcut",      -- Video editors
     "blender|godot",                 -- 3D editors
+    "io.github.bluemancz.hyprmod|hyprmod", -- HyprMod
 }, "class")
 
 
@@ -105,7 +106,8 @@ tagged_rule(float_60_70_tag, {
 
 -- 70% x 80%
 tagged_rule(float_70_80_tag, {
-    "org.gnome.Settings", -- System settings
+    "org.gnome.Settings",                  -- System settings
+    "io.github.bluemancz.hyprmod|hyprmod", -- HyprMod
 }, "class")
 
 -- 50% x 60%

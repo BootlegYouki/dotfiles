@@ -11,6 +11,7 @@ return {
     editor                     = "zeditor",
     fileExplorer               = "nautilus",
     audioSettings              = "pavucontrol",
+    settings                   = "hyprmod",
 
     -- Touchpad
     touchpadDisableTyping      = true,
@@ -116,6 +117,7 @@ return {
     kbBrowser                  = "SUPER + W",
     kbFileExplorer             = "SUPER + E",
     kbAudioSettings            = "CTRL + ALT + V",
+    kbSettings                 = "SUPER + I",
 
     -- Utilities
     kbScreenshot               = "Print",

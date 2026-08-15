@@ -171,6 +171,7 @@ create_bind(vars.kbTerminal, hl.dsp.exec_cmd(vars.terminal))
 create_bind(vars.kbBrowser, hl.dsp.exec_cmd(vars.browser))
 create_bind(vars.kbFileExplorer, hl.dsp.exec_cmd(vars.fileExplorer))
 create_bind(vars.kbAudioSettings, hl.dsp.exec_cmd(vars.audioSettings))
+create_bind(vars.kbSettings, hl.dsp.exec_cmd(vars.settings))
 
 -- Utilities
 create_bind(vars.kbScreenshot, hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/screenshot.sh fullscreen"), locked)
