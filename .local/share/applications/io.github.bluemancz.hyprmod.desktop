@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Settings
+GenericName=System Settings
+Comment=A native GTK4/libadwaita settings app for Hyprland
+Exec=hyprmod
+Icon=preferences-system
+Terminal=false
+Categories=Settings;DesktopSettings;GTK;
+Keywords=settings;system;preferences;hyprland;compositor;wayland;configuration;monitors;keybinds;hyprmod;
+StartupNotify=true
+StartupWMClass=io.github.bluemancz.hyprmod
