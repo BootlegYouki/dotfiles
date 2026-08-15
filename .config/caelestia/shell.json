@@ -21,6 +21,7 @@
         "excludedScreens": [
             "DP-1"
         ],
+        "persistent": true,
         "tray": {
             "compact": true
         },

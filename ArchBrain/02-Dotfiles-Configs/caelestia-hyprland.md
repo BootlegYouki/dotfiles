@@ -43,6 +43,15 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
 - `SUPER + SHIFT + N` -> Night Light Toggle (via custom `nightlight` script)
 - `SUPER + ALT + A` -> Startup Applications Manager (`autostart-manager`)
 
+## Dashboard Enhancements
+- **Agenda & Events System (`Events.qml`, `ClockTab.qml`)**:
+  - Replaced static timezone cards with an interactive Agenda & Events manager.
+  - **Fixed 150px Height**: Card stays strictly locked at 150px height across all states (no container jumping).
+  - **3-Step Sliding Creator**: 1. Event Name ➔ 2. 7-Day Horizontal Week Strip ➔ 3. 24h Scrollable Time Picker.
+  - **Single & Multi-Event View**: 2-row layout (`{Event Title}` + `{MMM d, HH:mm} ({Countdown})`) with seamless infinite marquee loop for long titles and mouse-wheel vertical slide navigation across multiple events.
+  - **Data Persistence**: Stored locally in `~/.local/state/caelestia/events.json`.
+
 ## Related Notes
 - [[custom-scripts]]
 - [[system-services]]
+
