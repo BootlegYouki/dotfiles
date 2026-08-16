@@ -41,6 +41,7 @@ Explicitly installed core packages driving the OS, DE, and Shell experience.
 - `spotify` (Music)
 - `discord` (Communication)
 - `obsidian` (Knowledge Base & Notes)
+- `Google Office Suite` (Desktop Web Apps: Docs, Sheets, Slides)
 - `twintaillauncher-bin` / `steam` (Gaming Launchers)
 
 ## Related Notes

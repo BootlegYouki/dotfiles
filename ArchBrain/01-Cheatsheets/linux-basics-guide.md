@@ -65,6 +65,7 @@ Linux uses `systemd` to manage background services (like Bluetooth, audio, or yo
 - **Start a service:** `sudo systemctl start bluetooth`
 - **Enable a service to start on boot:** `sudo systemctl enable bluetooth`
 - **Do both at once:** `sudo systemctl enable --now bluetooth`
+- **SSD Auto-TRIM Timer:** `systemctl status fstrim.timer` (See [[ssd-trim-and-maintenance]])
 
 ### User-Level Services (No Sudo)
 For services that only run when *you* are logged in (like `caelestia-romaji.service`):
