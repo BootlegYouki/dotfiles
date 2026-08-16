@@ -116,8 +116,8 @@ local function cycle_special_workspaces(dir)
     end
 end
 
--- Super + Down -> Moves DOWN the sidebar (towards bottom icon)
-hl.bind("SUPER + Down", cycle_special_workspaces(1), repeating)
+-- Ctrl + Super + Down -> Moves DOWN the sidebar (towards bottom icon)
+hl.bind("CTRL + SUPER + Down", cycle_special_workspaces(1), repeating)
 
--- Super + Up -> Moves UP the sidebar (towards top icon)
-hl.bind("SUPER + Up", cycle_special_workspaces(-1), repeating)
+-- Ctrl + Super + Up -> Moves UP the sidebar (towards top icon)
+hl.bind("CTRL + SUPER + Up", cycle_special_workspaces(-1), repeating)

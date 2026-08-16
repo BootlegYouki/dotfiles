@@ -4,7 +4,7 @@ Explicitly installed core packages driving the OS, DE, and Shell experience.
 
 ## OS: CachyOS Integration
 - `linux-cachyos` / `linux-cachyos-lts` (Custom Cachy kernels)
-- `cachyos-settings`, `cachyos-hooks`, `cachyos-micro-settings`
+- `cachyos-settings`, `cachyos-hooks`
 - `cachyos-kernel-manager`, `cachyos-packageinstaller`
 - `proton-cachyos-slr` (Gaming optimization)
 
@@ -22,6 +22,28 @@ Explicitly installed core packages driving the OS, DE, and Shell experience.
 - `quickshell-git` (The underlying QML desktop shell engine)
 
 ## Core Tools
-- `ghostty` (Terminal)
+- `ghostty` (Primary Terminal)
+- `zed` (Primary Code & Text Editor)
+- `pwvucontrol` (Primary Audio & Device Mixer)
 - `fish` (Shell)
 - `starship` (Prompt)
+- `pamac-aur` / `archlinux-appstream-data` (GUI App Store)
+- `hyprmod` (Primary GTK4/Libadwaita System Settings app, bound to `Super + I` and named "Settings")
+
+## Desktop Applications
+- `gnome-calculator` (Calculator)
+- `loupe` (Image / Photo Viewer)
+- `evince` (Document / PDF Viewer)
+- `pinta` (Image Editor / Paint.NET equivalent)
+- `gnome-system-monitor` (GUI Task & Process Manager)
+- `vlc` (Video & Media Player)
+- `brave-bin` (Web Browser)
+- `spotify` (Music)
+- `discord` (Communication)
+- `obsidian` (Knowledge Base & Notes)
+- `twintaillauncher-bin` / `steam` (Gaming Launchers)
+
+## Related Notes
+- [[gui-software-managers]]
+- [[system-services]]
+

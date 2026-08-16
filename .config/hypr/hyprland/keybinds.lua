@@ -125,7 +125,7 @@ create_bind(vars.kbGroupLockActive, hl.dsp.group.lock_active())
 
 -- Window actions
 for _, dir in ipairs({ "left", "right", "up", "down" }) do
-    create_bind("SUPER + SHIFT + " .. dir, hl.dsp.window.move({ direction = dir }))
+    create_bind({ "SUPER + " .. dir, "SUPER + SHIFT + " .. dir }, hl.dsp.window.move({ direction = dir }))
 end
 
 create_bind(vars.kbWindowDecreaseWidth, fn.resize_active_window(-10, 0), repeating)

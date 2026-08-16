@@ -8,6 +8,7 @@ Configuration for Hyprland under the Caelestia shell.
 - **Editor:** zeditor
 - **File Explorer:** nautilus
 - **Audio Settings:** pavucontrol
+- **System Settings:** hyprmod
 
 ## UI Changes
 - **Blur:** Enabled (Size: 8, Passes: 2)
@@ -20,6 +21,7 @@ Configuration for Hyprland under the Caelestia shell.
 Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hypr/userprefs.conf`:
 
 ### Windows-style shortcuts
+- `SUPER + I` -> System Settings (hyprmod)
 - `SUPER + E` -> File Manager (nautilus)
 - `SUPER + T` -> Terminal (ghostty)
 - `SUPER + W` -> Browser (brave)
@@ -32,14 +34,18 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
 - `CTRL + SHIFT + Escape` -> Task Manager / System Monitor (btop / special workspace)
 
 ### Caelestia / Hyprland specific
-- `SUPER + Z` -> Move Window
-- `SUPER + X` -> Resize Window
+- `SUPER + Left` / `Right` / `Up` / `Down` -> Move active window / swap sides in tiling layout
+- `SUPER + SHIFT + Left` / `Right` / `Up` / `Down` -> Move active window (alternative)
+- `SUPER + Z` -> Move Window (floating drag mode)
+- `SUPER + X` -> Resize Window (floating resize mode)
+- `SUPER + ALT + Left` / `Right` / `Up` / `Down` -> Resize active window dimensions
 - `SUPER + ALT + Space` -> Toggle Window Floating
 - `SUPER + Q` -> Close Window
 - `SUPER + S` -> Special Workspace Toggle
 - `SUPER + M` -> Music Workspace
 - `SUPER + D` -> Communication Workspace
 - `SUPER + C` -> Dev Workspace
+- `CTRL + SUPER + Up` / `Down` -> Cycle through open Special Workspaces
 - `SUPER + SHIFT + N` -> Night Light Toggle (via custom `nightlight` script)
 - `SUPER + ALT + A` -> Startup Applications Manager (`autostart-manager`)
 
@@ -54,4 +60,7 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
 ## Related Notes
 - [[custom-scripts]]
 - [[system-services]]
+- [[nexus-multi-monitor-geometry-overflow]]
+- [[multi-monitor-sleep-and-proton-idle-inhibit]]
+
 
