@@ -12,14 +12,16 @@ Documentation of the microphone audio fix for Realtek ALC1220 / Ryzen HD Audio C
   1. Realtek ALC1220 analog 3.5mm inputs had ALSA hardware boost maxed out (`Rear Mic Boost = 3 (+30.00dB)`).
   2. ALSA ADC capture gain was also at 100% (`Capture = 63 (+30.00dB)`).
   3. Total gain stacking was **+60dB**, amplifying tiny motherboard circuit electrical noise and immediately clipping voice input.
+  4. On system reboot, `alsa-restore.service` or shutdown state saving can restore the maxed-out defaults if not explicitly enforced.
 - **Fix:**
   - Lower `Rear Mic Boost` to `1` (+10dB).
   - Set ALSA `Capture` to ~70% (`45` / +16.50dB).
-  - Stored mixer settings via `alsactl store`.
+  - Stored mixer settings via `sudo alsactl store`.
+  - Added persistent startup enforcement to `~/.config/hypr/hyprland/execs.lua` (`amixer -c Generic_1 sset ...`).
 
 ```bash
-amixer -c 1 sset 'Rear Mic Boost' 1
-amixer -c 1 sset 'Capture' 45
+amixer -c Generic_1 sset 'Rear Mic Boost' 1
+amixer -c Generic_1 sset 'Capture' 45
 sudo alsactl store
 ```
 

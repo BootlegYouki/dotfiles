@@ -27,6 +27,10 @@ hl.on("hyprland.start", function()
     -- Night light (warm 4000K color temperature)
     hl.exec_cmd("hyprsunset -t 4000")
 
+    -- Microphone hardware gain & boost fix (prevents +60dB static clipping)
+    hl.exec_cmd("amixer -c Generic_1 sset 'Rear Mic Boost' 1")
+    hl.exec_cmd("amixer -c Generic_1 sset 'Capture' 45")
+
     -- Start shell and lock on boot
     hl.exec_cmd("caelestia shell -d")
     hl.exec_cmd("until qs ipc -c caelestia call lock lock 2>/dev/null; do sleep 0.01; done")
