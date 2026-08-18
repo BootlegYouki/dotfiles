@@ -56,6 +56,9 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
   - **3-Step Sliding Creator**: 1. Event Name ➔ 2. 7-Day Horizontal Week Strip ➔ 3. 24h Scrollable Time Picker.
   - **Single & Multi-Event View**: 2-row layout (`{Event Title}` + `{MMM d, HH:mm} ({Countdown})`) with seamless infinite marquee loop for long titles and mouse-wheel vertical slide navigation across multiple events.
   - **Data Persistence**: Stored locally in `~/.local/state/caelestia/events.json`.
+- **Countdown Timer Scrollable Time Selection (`ClockTab.qml`, `Timers.qml`)**:
+  - Added individual interactive hover blocks for Hours, Minutes, and Seconds styled at `68x52px` with smooth M3 primary tint highlights (`Colours.layer(Colours.palette.m3primary, 0.15)`).
+  - Mouse wheel scrolling up/down on any digit block increments/decrements that unit directly via reactive helper functions in `Timers.qml` (`adjustHours`, `adjustMinutes`, `adjustSeconds`).
 
 ## Related Notes
 - [[custom-scripts]]

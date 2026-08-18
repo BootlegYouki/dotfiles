@@ -104,6 +104,39 @@ Singleton {
         timerRemaining = timerDefault;
     }
 
+    function adjustHours(delta) {
+        if (timerRunning) return;
+        let h = Math.floor(timerRemaining / 3600);
+        let m = Math.floor((timerRemaining % 3600) / 60);
+        let s = timerRemaining % 60;
+        h = (h + delta + 24) % 24;
+        timerDefault = h * 3600 + m * 60 + s;
+        timerRemaining = timerDefault;
+        syncInputsFromRemaining();
+    }
+
+    function adjustMinutes(delta) {
+        if (timerRunning) return;
+        let h = Math.floor(timerRemaining / 3600);
+        let m = Math.floor((timerRemaining % 3600) / 60);
+        let s = timerRemaining % 60;
+        m = (m + delta + 60) % 60;
+        timerDefault = h * 3600 + m * 60 + s;
+        timerRemaining = timerDefault;
+        syncInputsFromRemaining();
+    }
+
+    function adjustSeconds(delta) {
+        if (timerRunning) return;
+        let h = Math.floor(timerRemaining / 3600);
+        let m = Math.floor((timerRemaining % 3600) / 60);
+        let s = timerRemaining % 60;
+        s = (s + delta + 60) % 60;
+        timerDefault = h * 3600 + m * 60 + s;
+        timerRemaining = timerDefault;
+        syncInputsFromRemaining();
+    }
+
     function toggleTimer() {
         if (isOverdue) {
             resetTimer();
