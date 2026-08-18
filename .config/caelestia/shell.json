@@ -45,6 +45,12 @@
         }
     },
     "general": {
+        "apps": {
+            "playback": [
+                "vlc",
+                "--started-from-file"
+            ]
+        },
         "logo": "caelestia"
     },
     "launcher": {
