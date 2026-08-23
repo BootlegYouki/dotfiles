@@ -7,7 +7,7 @@ return {
 
     -- Apps
     terminal                   = "ghostty",
-    browser                    = "brave",
+    browser                    = "brave-origin",
     editor                     = "zeditor",
     fileExplorer               = "nautilus",
     audioSettings              = "pavucontrol",

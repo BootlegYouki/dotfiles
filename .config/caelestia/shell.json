@@ -51,15 +51,34 @@
                 "--started-from-file"
             ]
         },
+        "idle": {
+            "inhibitWhenAudio": true,
+            "inhibitWhenCharging": false,
+            "lockBeforeSleep": true,
+            "timeouts": [
+                {
+                    "idleAction": "lock",
+                    "respectInhibitors": true,
+                    "timeout": 300
+                },
+                {
+                    "idleAction": "dpms off",
+                    "respectInhibitors": true,
+                    "returnAction": "dpms on",
+                    "timeout": 600
+                }
+            ]
+        },
         "logo": "caelestia"
     },
     "launcher": {
         "favouriteApps": [
-            "brave-browser",
+            "brave-origin",
             "ghostty",
             "org.gnome.Nautilus"
         ],
         "hiddenApps": [
+            "brave-browser",
             "org\\.gnome\\..*",
             "avahi-discover",
             "bssh",

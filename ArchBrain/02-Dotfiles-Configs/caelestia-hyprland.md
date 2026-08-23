@@ -60,6 +60,37 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
   - Added individual interactive hover blocks for Hours, Minutes, and Seconds styled at `68x52px` with smooth M3 primary tint highlights (`Colours.layer(Colours.palette.m3primary, 0.15)`).
   - Mouse wheel scrolling up/down on any digit block increments/decrements that unit directly via reactive helper functions in `Timers.qml` (`adjustHours`, `adjustMinutes`, `adjustSeconds`).
 
+## Idle Config (shell.json `general.idle`)
+
+> [!WARNING]
+> Caelestia's **default idle timeouts** include `suspendThenHibernate` at 600s — this WILL suspend you mid-game if not overridden.
+
+The caelestia defaults have:
+- 180s → lock
+- 300s → dpms off
+- 600s → **suspend-then-hibernate** ← dangerous for gaming
+
+**The fix** is to explicitly set `general.idle` in [`~/.config/caelestia/shell.json`](~/.config/caelestia/shell.json):
+
+```json
+"idle": {
+    "lockBeforeSleep": true,
+    "inhibitWhenAudio": true,
+    "inhibitWhenCharging": false,
+    "timeouts": [
+        { "timeout": 300, "idleAction": "lock", "respectInhibitors": true },
+        { "timeout": 600, "idleAction": "dpms off", "returnAction": "dpms on", "respectInhibitors": true }
+    ]
+}
+```
+
+**Why Hyprland's `idle_inhibit = "always"` window rule alone isn't enough:**
+- Quickshell's `IdleMonitor` uses `ext-idle-notify-v1` protocol
+- Hyprland sets `inhibitingIdle: 1` on the game window via `zwp-idle-inhibit-manager-v1`
+- These two protocols don't always communicate reliably → game can still trigger idle
+- `gamemoded` also fails to inhibit: `ERROR: Failed to call Inhibit on org.freedesktop.ScreenSaver` (no provider for that DBus name on Wayland)
+- **Explicit `respectInhibitors: true` on all timeouts + no auto-suspend entry = safe**
+
 ## Related Notes
 - [[custom-scripts]]
 - [[system-services]]
