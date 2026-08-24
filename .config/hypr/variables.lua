@@ -101,7 +101,7 @@ return {
     kbPinWindow                = "SUPER + P",
     kbWindowFullscreen         = "F11",
     kbWindowBorderedFullscreen = "SUPER + F",
-    kbToggleWindowFloating     = "SUPER + ALT + Space",
+    kbToggleWindowFloating     = { "SUPER + G", "SUPER + ALT + Space" },
     kbCloseWindow              = "SUPER + Q",
 
     -- Special workspaces toggles

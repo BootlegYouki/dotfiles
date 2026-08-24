@@ -72,6 +72,118 @@
         "logo": "caelestia"
     },
     "launcher": {
+        "actions": [
+            {
+                "command": [
+                    "autocomplete",
+                    "calc"
+                ],
+                "dangerous": false,
+                "description": "Do simple math equations (powered by Qalc)",
+                "enabled": true,
+                "icon": "calculate",
+                "name": "Calculator"
+            },
+            {
+                "command": [
+                    "autocomplete",
+                    "wallpaper"
+                ],
+                "dangerous": false,
+                "description": "Select or change desktop wallpaper",
+                "enabled": true,
+                "icon": "wallpaper",
+                "name": "Wallpapers"
+            },
+            {
+                "command": [
+                    "autocomplete",
+                    "scheme"
+                ],
+                "dangerous": false,
+                "description": "Change the Material 3 colour scheme",
+                "enabled": true,
+                "icon": "palette",
+                "name": "Scheme"
+            },
+            {
+                "command": [
+                    "autocomplete",
+                    "variant"
+                ],
+                "dangerous": false,
+                "description": "Change the Material 3 colour variant",
+                "enabled": true,
+                "icon": "format_paint",
+                "name": "Variant"
+            },
+            {
+                "command": [
+                    "setMode",
+                    "dark"
+                ],
+                "dangerous": false,
+                "description": "Switch UI theme to dark mode",
+                "enabled": true,
+                "icon": "dark_mode",
+                "name": "Dark Mode"
+            },
+            {
+                "command": [
+                    "setMode",
+                    "light"
+                ],
+                "dangerous": false,
+                "description": "Switch UI theme to light mode",
+                "enabled": true,
+                "icon": "light_mode",
+                "name": "Light Mode"
+            },
+            {
+                "command": [
+                    "loginctl",
+                    "lock-session"
+                ],
+                "dangerous": false,
+                "description": "Lock the current session",
+                "enabled": true,
+                "icon": "lock",
+                "name": "Lock Screen"
+            },
+            {
+                "command": [
+                    "systemctl",
+                    "suspend"
+                ],
+                "dangerous": false,
+                "description": "Suspend system to RAM",
+                "enabled": true,
+                "icon": "bedtime",
+                "name": "Suspend"
+            },
+            {
+                "command": [
+                    "systemctl",
+                    "reboot"
+                ],
+                "dangerous": true,
+                "description": "Reboot the system",
+                "enabled": true,
+                "icon": "restart_alt",
+                "name": "Restart"
+            },
+            {
+                "command": [
+                    "systemctl",
+                    "poweroff"
+                ],
+                "dangerous": true,
+                "description": "Power off the computer",
+                "enabled": true,
+                "icon": "power_settings_new",
+                "name": "Shutdown"
+            }
+        ],
         "favouriteApps": [
             "brave-origin",
             "ghostty",
@@ -79,7 +191,7 @@
         ],
         "hiddenApps": [
             "brave-browser",
-            "org\\.gnome\\..*",
+            "org\\.gnome\\.(?!Nautilus).*",
             "avahi-discover",
             "bssh",
             "bvnc",

@@ -21,7 +21,7 @@ Searcher {
     Variants {
         id: variants
 
-        model: (GlobalConfig.launcher.actions.values ?? Array.from(GlobalConfig.launcher.actions ?? [])).filter(a => (a.enabled ?? true) && (GlobalConfig.launcher.enableDangerousActions || !(a.dangerous ?? false)))
+        model: (Array.isArray(GlobalConfig.launcher.actions) ? GlobalConfig.launcher.actions : Array.from(GlobalConfig.launcher.actions ?? [])).filter(a => (a.enabled ?? true) && (GlobalConfig.launcher.enableDangerousActions || !(a.dangerous ?? false)))
 
         Action {}
     }

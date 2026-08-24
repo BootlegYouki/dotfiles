@@ -155,7 +155,31 @@ end)
 create_bind(vars.kbPinWindow, hl.dsp.window.pin())
 create_bind(vars.kbWindowFullscreen, hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 create_bind(vars.kbWindowBorderedFullscreen, hl.dsp.window.fullscreen({ mode = "maximized" }))
-create_bind(vars.kbToggleWindowFloating, hl.dsp.window.float())
+create_bind(vars.kbToggleWindowFloating, function()
+    local win = hl.get_active_window()
+    if not win then return end
+
+    if win.fullscreen and win.fullscreen > 0 then
+        hl.dispatch(hl.dsp.window.fullscreen({ action = "unset", mode = "maximized" }))
+        hl.dispatch(hl.dsp.window.fullscreen({ action = "unset", mode = "fullscreen" }))
+    end
+
+    if win.floating then
+        -- Snap back into tiling management layout
+        hl.dispatch(hl.dsp.window.float({ action = "off" }))
+    else
+        -- Float the window, give it a comfortable size, and center it
+        hl.dispatch(hl.dsp.window.float({ action = "on" }))
+        local screen = hl.get_active_monitor()
+        if screen and screen.width and screen.height then
+            local scale = (type(screen.scale) == "number" and screen.scale > 0) and screen.scale or 1
+            local w = math.floor((screen.width / scale) * 0.65)
+            local h = math.floor((screen.height / scale) * 0.75)
+            hl.dispatch(hl.dsp.window.resize({ x = w, y = h, relative = false }))
+        end
+        hl.dispatch(hl.dsp.window.center())
+    end
+end)
 create_bind(vars.kbCloseWindow, hl.dsp.window.close())
 
 -- Special workspace toggles

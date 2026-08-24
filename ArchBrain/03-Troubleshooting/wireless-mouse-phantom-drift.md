@@ -55,8 +55,24 @@ print('Event counts per device:', counts)
   2. Power cycle the mouse switch (OFF -> ON) to reset the onboard MCU.
   3. Re-plug the 2.4GHz USB wireless dongle.
 
+## DPMS Display Sleep Reopening (Display Wakes Immediately After Inactivity)
+
+### Symptoms
+- When display turns off due to inactivity timeout (DPMS disabled / off), it immediately wakes up / turns back on for no apparent reason.
+
+### Root Cause
+- Hyprland's `misc.mouse_move_enables_dpms` was set to `true` in [`~/.config/hypr/hyprland/misc.lua`](~/.config/hypr/hyprland/misc.lua).
+- The `CX Wireless mouse 1k dongle Mouse` periodically emits ambient sensor jitter / high-resolution wheel pulses (`EV_REL`, `REL_WHEEL_HI_RES`) even when resting stationary.
+- Furthermore, the secondary monitor (`DP-1`, Dell P2219H) uses a DisplayPort-to-HDMI adapter. When DPMS cuts power to the DP clock, the adapter chip power-cycles, dropping and pulling the HPD (Hot-Plug Detect) line.
+- Linux DRM / Aquamarine interpreted this HPD pulse as a hardware monitor hotplug event (`enabledState changed false -> true`), causing Hyprland to modeset and force both displays back ON.
+
+### Resolution
+1. **Disabled Mouse Motion Wake**: Set `mouse_move_enables_dpms = false` (with `key_press_enables_dpms = true`) in `~/.config/hypr/hyprland/misc.lua` and `~/dotfiles/.config/hypr/hyprland/misc.lua`.
+2. **Forced DRM Connector State**: Added `video=DP-1:1920x1080@60e` to `/etc/sdboot-manage.conf`, `/etc/kernel/cmdline`, and regenerated systemd-boot loader entries (`sudo sdboot-manage gen`). The kernel now pins `DP-1` as permanently connected, ignoring adapter HPD reset pulses during DPMS sleep.
+
 ---
 
 ## Related Notes
 - [[caelestia-hyprland]]
+- [[multi-monitor-sleep-and-proton-idle-inhibit]]
 - [[system-services]]
