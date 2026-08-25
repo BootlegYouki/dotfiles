@@ -15,10 +15,8 @@ env = LC_MEASUREMENT,en_GB.UTF-8
 # Ctrl + Shift + Esc -> Task Manager / System Monitor (Handled by kbSystemMonitorWs in variables.lua)
 # bind = CTRL SHIFT, Escape, exec, btop
 
-# Super + C -> Universal Copy (Handled by kbCopy in variables.lua / keybinds.lua)
-# Super + V -> Universal Paste (Handled by kbPaste in variables.lua / keybinds.lua)
-# Ctrl + Super + V -> Clipboard History Manager (Handled by kbClipboard in variables.lua)
-# bind = CTRL_SUPER, V, exec, caelestia clipboard
+# Windows + V -> Clipboard History Manager (Handled by kbClipboard in variables.lua)
+# bind = SUPER, V, exec, caelestia clipboard
 
 # Windows + . -> Emoji Picker (Handled by kbEmoji in variables.lua)
 # bind = SUPER, period, exec, caelestia emoji

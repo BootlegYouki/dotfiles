@@ -110,7 +110,7 @@ return {
     kbMusicWs                  = "SUPER + M",
     kbCommunicationWs          = "SUPER + D",
     kbTodoWs                   = "SUPER + R",
-    kbDevWs                    = "",
+    kbDevWs                    = "SUPER + C",
 
     -- Apps
     kbTerminal                 = "SUPER + T",
@@ -145,10 +145,8 @@ return {
     kbRestoreLock              = "SUPER + ALT + L",
     kbSleep                    = "SUPER + SHIFT + L",
 
-    -- Clipboard and universal copy/paste
-    kbCopy                     = "SUPER + C",
-    kbPaste                    = "SUPER + V",
-    kbClipboard                = "CTRL + SUPER + V",
+    -- Clipboard and emoji picker
+    kbClipboard                = "SUPER + V",
     kbClipboardDel             = "SUPER + ALT + V",
     kbClipboardPasteLatest     = "CTRL + SHIFT + ALT + V",
     kbWallpaperPrev            = "SUPER + Comma",

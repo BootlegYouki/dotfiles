@@ -239,55 +239,7 @@ create_bind(
 -- Sleep
 create_bind(vars.kbSleep, hl.dsp.exec_cmd(vars.sleepGestureCmd), locked)
 
--- Clipboard & Universal Copy/Paste
-local terminal_classes = {
-    ["ghostty"] = true,
-    ["com.mitchellh.ghostty"] = true,
-    ["kitty"] = true,
-    ["alacritty"] = true,
-    ["foot"] = true,
-    ["footclient"] = true,
-    ["wezterm"] = true,
-    ["org.wezfurlong.wezterm"] = true,
-    ["xterm"] = true,
-    ["urxvt"] = true,
-    ["rxvt"] = true,
-    ["gnome-terminal"] = true,
-    ["org.gnome.terminal"] = true,
-    ["konsole"] = true,
-    ["org.kde.konsole"] = true,
-    ["tilix"] = true,
-    ["terminator"] = true,
-    ["xfce4-terminal"] = true,
-    ["rio"] = true,
-}
-
-local function is_terminal(win)
-    if not win or not win.class then return false end
-    local class = win.class:lower()
-    if terminal_classes[class] then return true end
-    for term, _ in pairs(terminal_classes) do
-        if class:find(term, 1, true) then return true end
-    end
-    return false
-end
-
-local function universal_copy()
-    local win = hl.get_active_window()
-    local mods = is_terminal(win) and "CTRL SHIFT" or "CTRL"
-    hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = "c", state = "down" }))
-    hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = "c", state = "up" }))
-end
-
-local function universal_paste()
-    local win = hl.get_active_window()
-    local mods = is_terminal(win) and "CTRL SHIFT" or "CTRL"
-    hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = "v", state = "down" }))
-    hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = "v", state = "up" }))
-end
-
-create_bind(vars.kbCopy, universal_copy)
-create_bind(vars.kbPaste, universal_paste)
+-- Clipboard
 create_bind(vars.kbClipboard, hl.dsp.exec_cmd("pkill fuzzel || caelestia clipboard"))
 create_bind(vars.kbClipboardDel, hl.dsp.exec_cmd("pkill fuzzel || caelestia clipboard -d"))
 create_bind(

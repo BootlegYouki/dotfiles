@@ -25,7 +25,9 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
 - `SUPER + E` -> File Manager (nautilus)
 - `SUPER + T` -> Terminal (ghostty)
 - `SUPER + W` -> Browser (brave)
-- `SUPER + V` -> Clipboard History Manager
+- `SUPER + C` -> Universal Copy (Terminal: `Ctrl+Shift+C`, GUI/Websites: `Ctrl+C` via balanced `send_key_state` down/up)
+- `SUPER + V` -> Universal Paste (Terminal: `Ctrl+Shift+V`, GUI/Websites: `Ctrl+V` via balanced `send_key_state` down/up)
+- `CTRL + SUPER + V` -> Clipboard History Manager (Caelestia / Cliphist)
 - `SUPER + Period` / `Comma` -> Next/Prev Wallpaper
 - `SUPER + L` -> Lock Screen
 - `SUPER + F` -> Bordered Fullscreen / Maximized
@@ -46,7 +48,6 @@ Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hyp
 - `SUPER + S` -> Special Workspace Toggle
 - `SUPER + M` -> Music Workspace
 - `SUPER + D` -> Communication Workspace
-- `SUPER + C` -> Dev Workspace
 - `CTRL + SUPER + Up` / `Down` -> Cycle through open Special Workspaces
 - `SUPER + SHIFT + N` -> Night Light Toggle (via custom `nightlight` script)
 - `SUPER + ALT + A` -> Startup Applications Manager (`autostart-manager`)
