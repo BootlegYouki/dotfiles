@@ -123,6 +123,11 @@ Item {
         }
 
         Popout {
+            name: "camera"
+            sourceComponent: Camera {}
+        }
+
+        Popout {
             name: "nightlight"
             sourceComponent: NightLight {
                 popouts: root.popouts

@@ -171,6 +171,18 @@ StyledRect {
             }
         }
 
+        // Camera icon
+        WrappedLoader {
+            name: "camera"
+            active: true
+
+            sourceComponent: MaterialIcon {
+                animate: true
+                text: "photo_camera"
+                color: root.colour
+            }
+        }
+
         // Night Light icon
         WrappedLoader {
             name: "nightlight"

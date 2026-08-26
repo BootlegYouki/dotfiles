@@ -12,6 +12,7 @@ Scope {
         Notifs;
         Players;
         Brightness;
+        CameraSettings;
         Romaji;
         Timers;
         MacroState;
