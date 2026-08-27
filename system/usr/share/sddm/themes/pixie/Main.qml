@@ -8,7 +8,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
-import QtQuick.LocalStorage
 import "components"
 
 Rectangle {
@@ -33,50 +32,7 @@ Rectangle {
         return Screen.virtualX === 0 && Screen.virtualY === 0;
     }
 
-    function syncSetPasswordMode(active) {
-        SessionState.inPasswordMode = active;
-        try {
-            var db = LocalStorage.openDatabaseSync("PixieSDDM", "1.0", "Pixie State", 10000);
-            db.transaction(function(tx) {
-                tx.executeSql("CREATE TABLE IF NOT EXISTS state (k TEXT PRIMARY KEY, v INT)");
-                tx.executeSql("INSERT OR REPLACE INTO state (k, v) VALUES ('inPasswordMode', ?)", [active ? 1 : 0]);
-            });
-        } catch (e) {
-            console.log("Pixie LocalStorage Write Error: " + e);
-        }
-    }
-
-    function syncGetPasswordMode() {
-        try {
-            var db = LocalStorage.openDatabaseSync("PixieSDDM", "1.0", "Pixie State", 10000);
-            var val = 0;
-            db.readTransaction(function(tx) {
-                tx.executeSql("CREATE TABLE IF NOT EXISTS state (k TEXT PRIMARY KEY, v INT)");
-                var rs = tx.executeSql("SELECT v FROM state WHERE k='inPasswordMode'");
-                if (rs.rows.length > 0) {
-                    val = rs.rows.item(0).v;
-                }
-            });
-            return val === 1;
-        } catch (e) {
-            return false;
-        }
-    }
-
-    Timer {
-        id: syncPoll
-        interval: 50
-        running: true
-        repeat: true
-        onTriggered: {
-            var remoteVal = container.syncGetPasswordMode();
-            if (SessionState.inPasswordMode !== remoteVal) {
-                SessionState.inPasswordMode = remoteVal;
-            }
-        }
-    }
-
-    focus: isPrimaryScreen && !SessionState.inPasswordMode
+    focus: isPrimaryScreen && !loginState.visible
 
     // User & Session Logic (Root Level)
     property int userIndex: 0
@@ -85,9 +41,6 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("PIXIE SCREEN DEBUG: name=" + Screen.name + " primary=" + Screen.primary + " virtualX=" + Screen.virtualX + " virtualY=" + Screen.virtualY + " w=" + Screen.width + " h=" + Screen.height + " isPrimary=" + isPrimaryScreen);
-        if (isPrimaryScreen) {
-            container.syncSetPasswordMode(false);
-        }
         if (typeof userModel !== "undefined" && userModel.lastIndex >= 0) userIndex = userModel.lastIndex;
         if (typeof sessionModel !== "undefined" && sessionModel.lastIndex >= 0) sessionIndex = sessionModel.lastIndex;
     }
@@ -103,7 +56,7 @@ Rectangle {
     }
 
     function doLogin() {
-        if (!SessionState.inPasswordMode || isLoggingIn) return;
+        if (!loginState.visible || isLoggingIn) return;
 
         var user = "";
         if (typeof userModel !== "undefined" && userModel.count > 0) {
@@ -316,8 +269,8 @@ Rectangle {
         source: backgroundImage
         blurEnabled: true
         blurMax: 64
-        blur: SessionState.inPasswordMode ? 1.0 : 0.0
-        opacity: SessionState.inPasswordMode ? 1.0 : 0.0
+        blur: isPrimaryScreen ? (loginState.visible ? 1.0 : 0.0) : 1.0
+        opacity: isPrimaryScreen ? (loginState.visible ? 1.0 : 0.0) : 1.0
         autoPaddingEnabled: false
 
         Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
@@ -327,7 +280,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         color: "black"
-        opacity: SessionState.inPasswordMode ? 0.6 : (isPrimaryScreen ? 0.4 : 0.0)
+        opacity: isPrimaryScreen ? (loginState.visible ? 0.6 : 0.4) : 0.6
         Behavior on opacity { NumberAnimation { duration: 400 } }
     }
 
@@ -347,9 +300,9 @@ Rectangle {
 
     Shortcut {
         sequence: "Escape"
-        enabled: isPrimaryScreen && SessionState.inPasswordMode
+        enabled: isPrimaryScreen && loginState.visible
         onActivated: {
-            container.syncSetPasswordMode(false);
+            loginState.visible = false;
             loginState.isError = false;
             passwordField.text = "";
             container.focus = true;
@@ -358,7 +311,7 @@ Rectangle {
 
     Shortcut {
         sequences: ["Return", "Enter"]
-        enabled: isPrimaryScreen && SessionState.inPasswordMode
+        enabled: isPrimaryScreen && loginState.visible
         onActivated: container.doLogin()
     }
 
@@ -382,7 +335,7 @@ Rectangle {
     Item {
         id: lockState
         anchors.fill: parent
-        visible: isPrimaryScreen && !SessionState.inPasswordMode
+        visible: isPrimaryScreen && !loginState.visible
         opacity: visible ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 400 } }
 
@@ -411,25 +364,16 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                container.syncSetPasswordMode(true);
+                loginState.visible = true;
                 passwordField.forceActiveFocus();
             }
-        }
-    }
-
-    // Allow clicking secondary screen to also trigger password mode on primary
-    MouseArea {
-        anchors.fill: parent
-        enabled: !isPrimaryScreen && !SessionState.inPasswordMode
-        onClicked: {
-            container.syncSetPasswordMode(true);
         }
     }
 
     Item {
         id: loginState
         anchors.fill: parent
-        visible: isPrimaryScreen && SessionState.inPasswordMode
+        visible: false
         opacity: (isPrimaryScreen && visible) ? 1 : 0
         z: 10
         Behavior on opacity { NumberAnimation { duration: 400 } }
@@ -655,7 +599,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: 18
                     color: "white"
-                    focus: isPrimaryScreen && SessionState.inPasswordMode
+                    focus: isPrimaryScreen && loginState.visible
                     enabled: !container.isLoggingIn
 
                     background: Rectangle {
@@ -728,8 +672,8 @@ Rectangle {
 
     Keys.onPressed: function(event) {
         if (!isPrimaryScreen) return;
-        if (!SessionState.inPasswordMode) {
-            container.syncSetPasswordMode(true);
+        if (!loginState.visible) {
+            loginState.visible = true;
             passwordField.forceActiveFocus();
             event.accepted = true;
         }
