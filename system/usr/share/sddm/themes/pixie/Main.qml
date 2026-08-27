@@ -8,6 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
+import QtCore
 import "components"
 
 Rectangle {
@@ -32,6 +33,24 @@ Rectangle {
         return Screen.virtualX === 0 && Screen.virtualY === 0;
     }
 
+    Settings {
+        id: globalSync
+        category: "PixieSDDM"
+        property bool inPasswordMode: false
+    }
+
+    Timer {
+        id: syncPoll
+        interval: 100
+        running: true
+        repeat: true
+        onTriggered: {
+            if (SessionState.inPasswordMode !== globalSync.inPasswordMode) {
+                SessionState.inPasswordMode = globalSync.inPasswordMode;
+            }
+        }
+    }
+
     focus: isPrimaryScreen && !SessionState.inPasswordMode
 
     // User & Session Logic (Root Level)
@@ -41,6 +60,10 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("PIXIE SCREEN DEBUG: name=" + Screen.name + " primary=" + Screen.primary + " virtualX=" + Screen.virtualX + " virtualY=" + Screen.virtualY + " w=" + Screen.width + " h=" + Screen.height + " isPrimary=" + isPrimaryScreen);
+        if (isPrimaryScreen) {
+            globalSync.inPasswordMode = false;
+            SessionState.inPasswordMode = false;
+        }
         if (typeof userModel !== "undefined" && userModel.lastIndex >= 0) userIndex = userModel.lastIndex;
         if (typeof sessionModel !== "undefined" && sessionModel.lastIndex >= 0) sessionIndex = sessionModel.lastIndex;
     }
@@ -268,6 +291,7 @@ Rectangle {
         anchors.fill: parent
         source: backgroundImage
         blurEnabled: true
+        blurMax: 64
         blur: SessionState.inPasswordMode ? 1.0 : 0.0
         opacity: SessionState.inPasswordMode ? 1.0 : 0.0
         autoPaddingEnabled: false
@@ -301,6 +325,7 @@ Rectangle {
         sequence: "Escape"
         enabled: isPrimaryScreen && SessionState.inPasswordMode
         onActivated: {
+            globalSync.inPasswordMode = false;
             SessionState.inPasswordMode = false;
             loginState.isError = false;
             passwordField.text = "";
@@ -363,9 +388,20 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
+                globalSync.inPasswordMode = true;
                 SessionState.inPasswordMode = true;
                 passwordField.forceActiveFocus();
             }
+        }
+    }
+
+    // Allow clicking secondary screen to also trigger password mode on primary
+    MouseArea {
+        anchors.fill: parent
+        enabled: !isPrimaryScreen && !SessionState.inPasswordMode
+        onClicked: {
+            globalSync.inPasswordMode = true;
+            SessionState.inPasswordMode = true;
         }
     }
 
@@ -672,6 +708,7 @@ Rectangle {
     Keys.onPressed: function(event) {
         if (!isPrimaryScreen) return;
         if (!SessionState.inPasswordMode) {
+            globalSync.inPasswordMode = true;
             SessionState.inPasswordMode = true;
             passwordField.forceActiveFocus();
             event.accepted = true;
