@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
-import QtCore
+import QtQuick.LocalStorage
 import "components"
 
 Rectangle {
@@ -33,20 +33,45 @@ Rectangle {
         return Screen.virtualX === 0 && Screen.virtualY === 0;
     }
 
-    Settings {
-        id: globalSync
-        category: "PixieSDDM"
-        property bool inPasswordMode: false
+    function syncSetPasswordMode(active) {
+        SessionState.inPasswordMode = active;
+        try {
+            var db = LocalStorage.openDatabaseSync("PixieSDDM", "1.0", "Pixie State", 10000);
+            db.transaction(function(tx) {
+                tx.executeSql("CREATE TABLE IF NOT EXISTS state (k TEXT PRIMARY KEY, v INT)");
+                tx.executeSql("INSERT OR REPLACE INTO state (k, v) VALUES ('inPasswordMode', ?)", [active ? 1 : 0]);
+            });
+        } catch (e) {
+            console.log("Pixie LocalStorage Write Error: " + e);
+        }
+    }
+
+    function syncGetPasswordMode() {
+        try {
+            var db = LocalStorage.openDatabaseSync("PixieSDDM", "1.0", "Pixie State", 10000);
+            var val = 0;
+            db.readTransaction(function(tx) {
+                tx.executeSql("CREATE TABLE IF NOT EXISTS state (k TEXT PRIMARY KEY, v INT)");
+                var rs = tx.executeSql("SELECT v FROM state WHERE k='inPasswordMode'");
+                if (rs.rows.length > 0) {
+                    val = rs.rows.item(0).v;
+                }
+            });
+            return val === 1;
+        } catch (e) {
+            return false;
+        }
     }
 
     Timer {
         id: syncPoll
-        interval: 100
+        interval: 50
         running: true
         repeat: true
         onTriggered: {
-            if (SessionState.inPasswordMode !== globalSync.inPasswordMode) {
-                SessionState.inPasswordMode = globalSync.inPasswordMode;
+            var remoteVal = container.syncGetPasswordMode();
+            if (SessionState.inPasswordMode !== remoteVal) {
+                SessionState.inPasswordMode = remoteVal;
             }
         }
     }
@@ -61,8 +86,7 @@ Rectangle {
     Component.onCompleted: {
         console.log("PIXIE SCREEN DEBUG: name=" + Screen.name + " primary=" + Screen.primary + " virtualX=" + Screen.virtualX + " virtualY=" + Screen.virtualY + " w=" + Screen.width + " h=" + Screen.height + " isPrimary=" + isPrimaryScreen);
         if (isPrimaryScreen) {
-            globalSync.inPasswordMode = false;
-            SessionState.inPasswordMode = false;
+            container.syncSetPasswordMode(false);
         }
         if (typeof userModel !== "undefined" && userModel.lastIndex >= 0) userIndex = userModel.lastIndex;
         if (typeof sessionModel !== "undefined" && sessionModel.lastIndex >= 0) sessionIndex = sessionModel.lastIndex;
@@ -325,8 +349,7 @@ Rectangle {
         sequence: "Escape"
         enabled: isPrimaryScreen && SessionState.inPasswordMode
         onActivated: {
-            globalSync.inPasswordMode = false;
-            SessionState.inPasswordMode = false;
+            container.syncSetPasswordMode(false);
             loginState.isError = false;
             passwordField.text = "";
             container.focus = true;
@@ -388,8 +411,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                globalSync.inPasswordMode = true;
-                SessionState.inPasswordMode = true;
+                container.syncSetPasswordMode(true);
                 passwordField.forceActiveFocus();
             }
         }
@@ -400,8 +422,7 @@ Rectangle {
         anchors.fill: parent
         enabled: !isPrimaryScreen && !SessionState.inPasswordMode
         onClicked: {
-            globalSync.inPasswordMode = true;
-            SessionState.inPasswordMode = true;
+            container.syncSetPasswordMode(true);
         }
     }
 
@@ -708,8 +729,7 @@ Rectangle {
     Keys.onPressed: function(event) {
         if (!isPrimaryScreen) return;
         if (!SessionState.inPasswordMode) {
-            globalSync.inPasswordMode = true;
-            SessionState.inPasswordMode = true;
+            container.syncSetPasswordMode(true);
             passwordField.forceActiveFocus();
             event.accepted = true;
         }
