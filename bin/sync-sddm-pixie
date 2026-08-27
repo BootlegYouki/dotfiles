@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Sync current desktop wallpaper and avatar to SDDM Pixie theme
+
+WALL="${WALLPAPER_PATH:-$HOME/.local/state/caelestia/wallpaper/current}"
+SDDM_BG="/usr/share/sddm/themes/pixie/assets/background.jpg"
+SDDM_AVATAR="/usr/share/sddm/themes/pixie/assets/avatar.jpg"
+USER_FACE="$HOME/.face"
+
+if [ -f "$WALL" ]; then
+    # Ensure destination is writable
+    cp "$WALL" "$SDDM_BG" 2>/dev/null || sudo cp "$WALL" "$SDDM_BG"
+    chmod 664 "$SDDM_BG" 2>/dev/null || sudo chmod 664 "$SDDM_BG"
+fi
+
+if [ -f "$USER_FACE" ]; then
+    cp "$USER_FACE" "$SDDM_AVATAR" 2>/dev/null || sudo cp "$USER_FACE" "$SDDM_AVATAR"
+    chmod 664 "$SDDM_AVATAR" 2>/dev/null || sudo chmod 664 "$SDDM_AVATAR"
+fi

@@ -19,9 +19,9 @@
         }
     },
     "wallpaper": {
-        "postHook": "sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh --posthook"
+        "postHook": "/home/youki/.local/bin/sync-sddm-pixie"
     },
     "theme": {
-        "postHook": "sudo /usr/share/sddm/themes/caelestia/scripts/sync.sh --posthook"
+        "postHook": "/home/youki/.local/bin/sync-sddm-pixie"
     }
 }

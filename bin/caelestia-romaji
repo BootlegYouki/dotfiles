@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import socket
+import re
+import pykakasi
+
+def get_input():
+    if len(sys.argv) > 1 and sys.argv[1].strip():
+        return sys.argv[1]
+    if not sys.stdin.isatty():
+        return sys.stdin.read()
+    return ""
+
+def main():
+    inp = get_input()
+    if not inp:
+        sys.exit(0)
+
+    sock_path = f"/run/user/{os.getuid()}/caelestia-romaji.sock"
+    if os.path.exists(sock_path):
+        try:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            s.settimeout(1.0)
+            s.connect(sock_path)
+            req = {"mode": "romaji", "input": inp}
+            s.sendall((json.dumps(req, ensure_ascii=False) + '\n').encode('utf-8'))
+            out = b''
+            while True:
+                chunk = s.recv(4096)
+                if not chunk:
+                    break
+                out += chunk
+            s.close()
+            res_str = out.decode('utf-8').strip()
+            if res_str:
+                try:
+                    parsed = json.loads(res_str)
+                    if isinstance(parsed, str):
+                        print(parsed)
+                    else:
+                        print(json.dumps(parsed, ensure_ascii=False))
+                except Exception:
+                    print(res_str)
+                sys.exit(0)
+        except Exception:
+            pass
+
+    # Fallback if daemon is off
+    kks = pykakasi.kakasi()
+    jp_regex = re.compile(r'[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]')
+
+    def convert_line(line):
+        if not line or not jp_regex.search(line):
+            return line
+        cleaned = re.sub(r'[\u3400-\u9fff]+\(([\u3040-\u30ff]+)\)', r'\1', line)
+        cleaned = re.sub(r'[\u3400-\u9fff]+（([\u3040-\u30ff]+)）', r'\1', cleaned)
+        result = kks.convert(cleaned)
+        res = ' '.join([item.get('hepburn', item.get('orig', '')) for item in result])
+        return re.sub(r'\s+', ' ', res).strip()
+
+    try:
+        data = json.loads(inp)
+    except Exception:
+        data = inp
+    out = [convert_line(l) for l in data] if isinstance(data, list) else convert_line(str(data))
+    if isinstance(out, list):
+        print(json.dumps(out, ensure_ascii=False))
+    else:
+        print(out)
+
+if __name__ == '__main__':
+    main()

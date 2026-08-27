@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -e
+
+echo "[1/3] Packaging system configurations, dotfiles, skills, rules, and scripts..."
+tar -czvf /home/youki/ArchBrain/02-Dotfiles-Configs/os-configurations-backup.tar.gz \
+    -C /home/youki \
+    .config/hypr \
+    .config/fastfetch \
+    .config/fish \
+    .config/starship.toml \
+    .config/ghostty \
+    .config/autostart \
+    .config/quickshell/caelestia \
+    .local/bin/backup-system \
+    .local/bin/caelestia-romaji \
+    .local/bin/caelestia-romaji-daemon \
+    .local/bin/caelestia-wallpaper-shift \
+    .local/bin/hypr-gnome-mouse-sync \
+    .local/bin/nightlight \
+    .config/systemd/user \
+    .agents \
+    uwsm
+
+echo "[2/3] Mirroring backup to Desktop..."
+mkdir -p ~/Desktop/Caelestia-Backup/
+cp /home/youki/ArchBrain/02-Dotfiles-Configs/os-configurations-backup.tar.gz ~/Desktop/Caelestia-Backup/
+
+echo "[3/3] Syncing ArchBrain vault & tarball to Google Drive via rclone..."
+systemctl --user start archbrain-sync.service
+
+echo "✓ Full backup and Google Drive sync completed successfully!"

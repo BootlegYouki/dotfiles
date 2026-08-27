@@ -15,7 +15,9 @@ StyledClippingRect {
 
     implicitHeight: layout.implicitHeight + layout.anchors.margins * 2
     radius: Tokens.rounding.extraLarge
-    color: Colours.tPalette.m3surfaceContainer
+    color: Qt.alpha(Colours.palette.m3surfaceContainer, 0.18)
+    border.width: 1
+    border.color: Qt.alpha(Colours.palette.m3onSurface, 0.12)
 
     FadeImage {
         anchors.fill: parent

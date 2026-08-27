@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""
+Autostart Manager for Hyprland / Wayland (Caelestia)
+Scans all installed applications (.desktop files) and lets the user toggle 
+autostart on/off via Fuzzel or terminal menu. Autostart files are stored in 
+~/.config/autostart/.
+"""
+
+import os
+import sys
+import glob
+import subprocess
+import configparser
+from pathlib import Path
+
+AUTOSTART_DIR = Path.home() / ".config" / "autostart"
+APP_DIRS = [
+    Path.home() / ".local" / "share" / "applications",
+    Path("/usr/share/applications"),
+    Path("/var/lib/flatpak/exports/share/applications"),
+]
+
+def get_installed_apps():
+    apps = {}
+    for app_dir in APP_DIRS:
+        if not app_dir.exists():
+            continue
+        for desktop_file in app_dir.glob("*.desktop"):
+            file_name = desktop_file.name
+            if file_name in apps:
+                continue
+            
+            try:
+                parser = configparser.ConfigParser(interpolation=None, strict=False)
+                parser.read(desktop_file, encoding="utf-8")
+                if "Desktop Entry" not in parser:
+                    continue
+                
+                entry = parser["Desktop Entry"]
+                
+                # Ignore hidden or non-display entries (like helper utilities)
+                if entry.get("NoDisplay", "false").lower() == "true":
+                    continue
+                if entry.get("Type", "Application") != "Application":
+                    continue
+                
+                name = entry.get("Name", file_name.replace(".desktop", ""))
+                exec_cmd = entry.get("Exec", "")
+                icon = entry.get("Icon", "")
+                
+                apps[file_name] = {
+                    "name": name,
+                    "exec": exec_cmd,
+                    "icon": icon,
+                    "desktop_file": desktop_file,
+                    "filename": file_name
+                }
+            except Exception:
+                continue
+
+    # Also scan any autostart files that might not be in standard app dirs
+    AUTOSTART_DIR.mkdir(parents=True, exist_ok=True)
+    for auto_file in AUTOSTART_DIR.glob("*.desktop"):
+        file_name = auto_file.name
+        if file_name not in apps:
+            try:
+                parser = configparser.ConfigParser(interpolation=None, strict=False)
+                parser.read(auto_file, encoding="utf-8")
+                if "Desktop Entry" in parser:
+                    entry = parser["Desktop Entry"]
+                    name = entry.get("Name", file_name.replace(".desktop", ""))
+                    exec_cmd = entry.get("Exec", "")
+                    icon = entry.get("Icon", "")
+                    apps[file_name] = {
+                        "name": name,
+                        "exec": exec_cmd,
+                        "icon": icon,
+                        "desktop_file": auto_file,
+                        "filename": file_name
+                    }
+            except Exception:
+                continue
+
+    return apps
+
+def is_autostart_enabled(filename):
+    auto_file = AUTOSTART_DIR / filename
+    return auto_file.exists()
+
+def toggle_autostart(app_info):
+    filename = app_info["filename"]
+    auto_file = AUTOSTART_DIR / filename
+    AUTOSTART_DIR.mkdir(parents=True, exist_ok=True)
+    
+    currently_enabled = is_autostart_enabled(filename)
+    
+    if currently_enabled:
+        # Disable by removing autostart desktop file
+        if auto_file.exists():
+            auto_file.unlink()
+        status_msg = f"Disabled on startup: {app_info['name']}"
+    else:
+        # Enable by writing desktop file to ~/.config/autostart/
+        src_file = app_info["desktop_file"]
+        if src_file.exists() and src_file != auto_file:
+            parser = configparser.ConfigParser(interpolation=None, strict=False)
+            parser.read(src_file, encoding="utf-8")
+            if "Desktop Entry" in parser:
+                parser["Desktop Entry"]["Hidden"] = "false"
+                parser["Desktop Entry"]["X-GNOME-Autostart-enabled"] = "true"
+                with open(auto_file, "w", encoding="utf-8") as f:
+                    parser.write(f, space_around_delimiters=False)
+            else:
+                auto_file.write_text(src_file.read_text(encoding="utf-8"), encoding="utf-8")
+        else:
+            # Create a simple autostart desktop file
+            content = f"[Desktop Entry]\nType=Application\nName={app_info['name']}\nExec={app_info['exec']}\nHidden=false\nX-GNOME-Autostart-enabled=true\n"
+            auto_file.write_text(content, encoding="utf-8")
+        status_msg = f"Enabled on startup: {app_info['name']}"
+
+    # Send notification
+    subprocess.run(["notify-send", "-a", "Autostart Manager", "Startup Applications", status_msg], check=False)
+    print(status_msg)
+
+def run_fuzzel_gui(apps):
+    # Prepare list for fuzzel
+    sorted_apps = sorted(apps.values(), key=lambda x: x["name"].lower())
+    
+    menu_lines = []
+    app_map = {}
+    
+    for app in sorted_apps:
+        enabled = is_autostart_enabled(app["filename"])
+        prefix = "[✓]" if enabled else "[  ]"
+        label = f"{prefix}  {app['name']}"
+        menu_lines.append(label)
+        app_map[label] = app
+
+    fuzzel_input = "\n".join(menu_lines)
+    
+    try:
+        res = subprocess.run(
+            ["fuzzel", "--dmenu", "--prompt", "Startup Apps ❯ ", "-w", "50", "-l", "15"],
+            input=fuzzel_input,
+            text=True,
+            capture_output=True,
+            check=True
+        )
+        selected = res.stdout.strip()
+        if selected in app_map:
+            toggle_autostart(app_map[selected])
+    except subprocess.CalledProcessError:
+        pass # User cancelled
+
+def main():
+    apps = get_installed_apps()
+    if len(sys.argv) > 1 and sys.argv[1] in ["--list", "-l"]:
+        sorted_apps = sorted(apps.values(), key=lambda x: x["name"].lower())
+        print("Installed Applications Autostart Status:")
+        for app in sorted_apps:
+            enabled = is_autostart_enabled(app["filename"])
+            status = "[✓] ENABLED " if enabled else "[ ] DISABLED"
+            print(f"{status}  {app['name']}")
+    else:
+        run_fuzzel_gui(apps)
+
+if __name__ == "__main__":
+    main()

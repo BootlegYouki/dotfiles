@@ -1,0 +1,38 @@
+#!/bin/bash
+# Sync GNOME Control Center mouse settings to Hyprland in real-time via Hyprland Lua eval
+
+sync_mouse() {
+    if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ] && [ -d "/run/user/$(id -u)/hypr" ]; then
+        export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "/run/user/$(id -u)/hypr" 2>/dev/null | head -n1)
+    fi
+
+    SPEED=$(gsettings get org.gnome.desktop.peripherals.mouse speed 2>/dev/null)
+    ACCEL=$(gsettings get org.gnome.desktop.peripherals.mouse accel-profile 2>/dev/null | tr -d "'")
+    NATURAL=$(gsettings get org.gnome.desktop.peripherals.mouse natural-scroll 2>/dev/null)
+
+    if [ -z "$SPEED" ]; then
+        SPEED="0.0"
+    fi
+
+    if [ "$ACCEL" = "flat" ]; then
+        ACCEL_LUA="\"flat\""
+    else
+        ACCEL_LUA="\"adaptive\""
+    fi
+
+    if [ "$NATURAL" = "true" ]; then
+        NATURAL_LUA="true"
+    else
+        NATURAL_LUA="false"
+    fi
+
+    hyprctl eval "hl.config({ input = { sensitivity = $SPEED, accel_profile = $ACCEL_LUA, natural_scroll = $NATURAL_LUA } })" >/dev/null 2>&1
+}
+
+# Initial sync on daemon startup
+sync_mouse
+
+# Continuously monitor dconf changes from GNOME Settings GUI
+dconf watch /org/gnome/desktop/peripherals/mouse/ | while read -r line; do
+    sync_mouse
+done

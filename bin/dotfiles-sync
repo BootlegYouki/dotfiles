@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Nightly dotfiles sync — copies live configs to ~/dotfiles and pushes to GitHub
+
+set -e
+
+DOTFILES="$HOME/dotfiles"
+LOG="$HOME/.local/share/dotfiles-sync.log"
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting dotfiles sync..." >> "$LOG"
+
+# --- Configs ---
+rsync -a --delete ~/.config/hypr/          "$DOTFILES/.config/hypr/"
+rsync -a --delete ~/.config/quickshell/    "$DOTFILES/.config/quickshell/"
+rsync -a --delete ~/.config/caelestia/     "$DOTFILES/.config/caelestia/"
+rsync -a --delete ~/.config/fish/          "$DOTFILES/.config/fish/"
+rsync -a --delete ~/.config/ghostty/       "$DOTFILES/.config/ghostty/"
+rsync -a --delete ~/.config/fastfetch/     "$DOTFILES/.config/fastfetch/"
+rsync -a --delete ~/.config/fuzzel/        "$DOTFILES/.config/fuzzel/"
+rsync -a --delete ~/.config/spicetify/     "$DOTFILES/.config/spicetify/"
+rsync -a --delete ~/.config/btop/          "$DOTFILES/.config/btop/"
+rsync -a --delete ~/.config/cava/          "$DOTFILES/.config/cava/"
+rsync -a --delete ~/.config/micro/         "$DOTFILES/.config/micro/"
+rsync -a --delete ~/.config/zed/           "$DOTFILES/.config/zed/"
+rsync -a --delete ~/.config/uwsm/          "$DOTFILES/.config/uwsm/"
+rsync -a --delete ~/.config/systemd/user/  "$DOTFILES/.config/systemd/user/"
+[ -f ~/.config/starship.toml ] && cp ~/.config/starship.toml "$DOTFILES/.config/starship.toml"
+[ -f ~/.config/spotify-flags.conf ] && cp ~/.config/spotify-flags.conf "$DOTFILES/.config/spotify-flags.conf"
+
+# --- Scripts and services ---
+rsync -a --delete --exclude='agy*' --exclude='rclone' --exclude='boothub' --exclude='kwiz' --exclude='gift' --exclude='yarn*' --exclude='zed' ~/.local/bin/ "$DOTFILES/bin/"
+cp "$HOME/genshin_f_macro.py" "$DOTFILES/scripts/genshin_f_macro.py"
+
+# --- ArchBrain vault ---
+rsync -a --delete ~/ArchBrain/ "$DOTFILES/ArchBrain/"
+
+# --- Commit and push ---
+cd "$DOTFILES"
+
+if git diff --quiet && git diff --cached --quiet; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Nothing changed, skipping commit." >> "$LOG"
+    exit 0
+fi
+
+git add -A
+git commit -m "auto-sync: $(date '+%Y-%m-%d %H:%M')"
+git push
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Sync complete." >> "$LOG"

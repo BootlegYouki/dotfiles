@@ -50,7 +50,9 @@ RowLayout {
 
             bottomRightRadius: Tokens.rounding.extraLarge
             radius: Tokens.rounding.medium
-            color: Colours.tPalette.m3surfaceContainer
+            color: Qt.alpha(Colours.palette.m3surfaceContainer, 0.18)
+            border.width: 1
+            border.color: Qt.alpha(Colours.palette.m3onSurface, 0.12)
 
             NotifDock {
                 lock: root.lock

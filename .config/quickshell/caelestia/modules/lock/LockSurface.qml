@@ -192,16 +192,10 @@ WlSessionLockSurface {
             id: lockBg
 
             anchors.fill: parent
-            color: Colours.palette.m3surface
+            color: Qt.alpha(Colours.palette.m3surface, 0.22)
+            border.width: 1
+            border.color: Qt.alpha(Colours.palette.m3onSurface, 0.18)
             radius: parent.radius
-            opacity: Colours.transparency.enabled ? Colours.transparency.base : 1
-
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                blurMax: 15
-                shadowColor: Qt.alpha(Colours.palette.m3shadow, 0.7)
-            }
         }
 
         MaterialIcon {

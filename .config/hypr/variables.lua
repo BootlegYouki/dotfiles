@@ -9,7 +9,7 @@ return {
     terminal                   = "ghostty",
     browser                    = "brave-origin",
     editor                     = "zeditor",
-    fileExplorer               = "nautilus",
+    fileExplorer               = "ghostty -e yazi",
     audioSettings              = "pavucontrol",
     settings                   = "hyprmod",
 
