@@ -32,7 +32,7 @@ Rectangle {
         return Screen.virtualX === 0 && Screen.virtualY === 0;
     }
 
-    focus: isPrimaryScreen && !loginState.visible
+    focus: isPrimaryScreen && !SessionState.inPasswordMode
 
     // User & Session Logic (Root Level)
     property int userIndex: 0
@@ -56,7 +56,7 @@ Rectangle {
     }
 
     function doLogin() {
-        if (!loginState.visible || isLoggingIn) return;
+        if (!SessionState.inPasswordMode || isLoggingIn) return;
 
         var user = "";
         if (typeof userModel !== "undefined" && userModel.count > 0) {
@@ -267,9 +267,9 @@ Rectangle {
         id: backgroundBlur
         anchors.fill: parent
         source: backgroundImage
-        blurEnabled: isPrimaryScreen
-        blur: (isPrimaryScreen && loginState.visible) ? 1.0 : 0.0
-        opacity: (isPrimaryScreen && loginState.visible) ? 1.0 : 0.0
+        blurEnabled: true
+        blur: SessionState.inPasswordMode ? 1.0 : 0.0
+        opacity: SessionState.inPasswordMode ? 1.0 : 0.0
         autoPaddingEnabled: false
 
         Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
@@ -279,7 +279,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         color: "black"
-        opacity: isPrimaryScreen ? (loginState.visible ? 0.6 : 0.4) : 0.0
+        opacity: SessionState.inPasswordMode ? 0.6 : (isPrimaryScreen ? 0.4 : 0.0)
         Behavior on opacity { NumberAnimation { duration: 400 } }
     }
 
@@ -299,9 +299,9 @@ Rectangle {
 
     Shortcut {
         sequence: "Escape"
-        enabled: isPrimaryScreen && loginState.visible
+        enabled: isPrimaryScreen && SessionState.inPasswordMode
         onActivated: {
-            loginState.visible = false;
+            SessionState.inPasswordMode = false;
             loginState.isError = false;
             passwordField.text = "";
             container.focus = true;
@@ -310,7 +310,7 @@ Rectangle {
 
     Shortcut {
         sequences: ["Return", "Enter"]
-        enabled: isPrimaryScreen && loginState.visible
+        enabled: isPrimaryScreen && SessionState.inPasswordMode
         onActivated: container.doLogin()
     }
 
@@ -334,7 +334,7 @@ Rectangle {
     Item {
         id: lockState
         anchors.fill: parent
-        visible: isPrimaryScreen && !loginState.visible
+        visible: isPrimaryScreen && !SessionState.inPasswordMode
         opacity: visible ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 400 } }
 
@@ -363,7 +363,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                loginState.visible = true;
+                SessionState.inPasswordMode = true;
                 passwordField.forceActiveFocus();
             }
         }
@@ -372,7 +372,7 @@ Rectangle {
     Item {
         id: loginState
         anchors.fill: parent
-        visible: false
+        visible: isPrimaryScreen && SessionState.inPasswordMode
         opacity: (isPrimaryScreen && visible) ? 1 : 0
         z: 10
         Behavior on opacity { NumberAnimation { duration: 400 } }
@@ -598,7 +598,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: 18
                     color: "white"
-                    focus: loginState.visible
+                    focus: isPrimaryScreen && SessionState.inPasswordMode
                     enabled: !container.isLoggingIn
 
                     background: Rectangle {
@@ -671,8 +671,8 @@ Rectangle {
 
     Keys.onPressed: function(event) {
         if (!isPrimaryScreen) return;
-        if (!loginState.visible) {
-            loginState.visible = true;
+        if (!SessionState.inPasswordMode) {
+            SessionState.inPasswordMode = true;
             passwordField.forceActiveFocus();
             event.accepted = true;
         }
