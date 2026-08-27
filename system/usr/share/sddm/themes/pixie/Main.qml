@@ -15,17 +15,28 @@ Rectangle {
     width: 1920
     height: 1080
     color: config.backgroundColor
-    // Multi-Monitor primary detection
+    // Multi-Monitor primary detection (bulletproof fallback)
     readonly property bool isPrimaryScreen: {
+        // 1. If explicit config specifies a custom keyword (substring match, e.g. "hdmi")
         if (config.primaryScreen && config.primaryScreen.length > 0) {
-            if (config.primaryScreen.toLowerCase() === "primary") {
-                return (typeof Screen.primary !== "undefined" && Screen.primary) || (Screen.virtualX === 0 && Screen.virtualY === 0);
+            var target = config.primaryScreen.toLowerCase().trim();
+            if (target !== "primary" && target !== "auto" && target !== "") {
+                if (Screen.name && (Screen.name.toLowerCase() === target || Screen.name.toLowerCase().indexOf(target) !== -1 || target.indexOf(Screen.name.toLowerCase()) !== -1)) {
+                    return true;
+                }
             }
-            return Screen.name === config.primaryScreen;
         }
+
+        // 2. Qt Native Primary flag
         if (typeof Screen.primary !== "undefined" && Screen.primary) return true;
+
+        // 3. Screen at origin (0, 0)
         if (Screen.virtualX === 0 && Screen.virtualY === 0) return true;
-        return width >= height;
+
+        // 4. Orientation fallback: horizontal landscape screen is primary when secondary is vertical portrait
+        if (container.width >= container.height) return true;
+
+        return false;
     }
 
     focus: isPrimaryScreen && !loginState.visible
