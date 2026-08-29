@@ -376,9 +376,9 @@ ColumnLayout {
 
             StyledText {
                 Layout.fillWidth: true
-                text: root.speedtestState === "idle" ? qsTr("Fast.com Speedtest") :
-                      root.speedtestState === "testing" ? qsTr("Testing Speed...") :
-                      qsTr("Fast.com Speed")
+                text: root.speedtestState === "idle" ? qsTr("Speedtest") :
+                      root.speedtestState === "testing" ? qsTr("Testing...") :
+                      qsTr("Speedtest")
                 font: Tokens.font.body.builders.small.weight(Font.Medium).build()
                 color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onSurface
             }
