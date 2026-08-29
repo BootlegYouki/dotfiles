@@ -386,7 +386,7 @@ ColumnLayout {
             StyledText {
                 visible: root.speedtestState !== "idle"
                 text: root.speedtestNumber
-                font: Tokens.font.body.builders.medium.weight(Font.Bold).build()
+                font: Tokens.font.body.builders.small.weight(Font.Medium).build()
                 color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3primary
             }
         }
