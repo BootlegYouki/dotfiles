@@ -342,44 +342,26 @@ ColumnLayout {
         }
     }
 
-    // Big Speed Display Card (Appears in the middle when active)
-    StyledRect {
+    // Big Speed Display (Clean centered text in the middle when active)
+    RowLayout {
         visible: root.view === "ethernet" && root.speedtestState !== "idle"
-        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignHCenter
         Layout.topMargin: visible ? Tokens.spacing.small : 0
+        Layout.bottomMargin: visible ? Tokens.spacing.extraSmall : 0
         Layout.preferredHeight: visible ? implicitHeight : 0
-        implicitHeight: 68
-        radius: Tokens.rounding.medium
-        color: Colours.palette.m3surfaceContainerHigh
+        spacing: Tokens.spacing.extraSmall
 
-        ColumnLayout {
-            anchors.centerIn: parent
-            spacing: 2
+        StyledText {
+            text: root.speedtestValue
+            font: Tokens.font.body.builders.large.size(28).weight(Font.Bold).build()
+            color: root.speedtestState === "testing" ? Colours.palette.m3primary : Colours.palette.m3onSurface
+        }
 
-            RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: Tokens.spacing.extraSmall
-
-                StyledText {
-                    text: root.speedtestValue
-                    font: Tokens.font.body.builders.large.size(28).weight(Font.Bold).build()
-                    color: root.speedtestState === "testing" ? Colours.palette.m3primary : Colours.palette.m3onSurface
-                }
-
-                StyledText {
-                    text: "Mbps"
-                    font: Tokens.font.body.builders.small.weight(Font.Medium).build()
-                    color: Colours.palette.m3onSurfaceVariant
-                    Layout.alignment: Qt.AlignBaseline
-                }
-            }
-
-            StyledText {
-                Layout.alignment: Qt.AlignHCenter
-                text: root.speedtestState === "testing" ? qsTr("Measuring speed...") : qsTr("Download speed")
-                font: Tokens.font.label.small
-                color: root.speedtestState === "testing" ? Colours.palette.m3primary : Colours.palette.m3outline
-            }
+        StyledText {
+            text: "Mbps"
+            font: Tokens.font.body.builders.small.weight(Font.Medium).build()
+            color: Colours.palette.m3onSurfaceVariant
+            Layout.alignment: Qt.AlignBaseline
         }
     }
 
