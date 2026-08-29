@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Caelestia.Config
 import qs.components
 import qs.components.controls
@@ -18,6 +19,9 @@ ColumnLayout {
     property string view: "wireless" // "wireless" or "ethernet"
     property var passwordNetwork: null
     property bool showPasswordDialog: false
+
+    property string speedtestState: "idle" // "idle", "testing", "done", "error"
+    property string speedtestNumber: "--"
 
     spacing: Tokens.spacing.small
     width: Tokens.sizes.bar.networkWidth
@@ -338,19 +342,92 @@ ColumnLayout {
         }
     }
 
-    IconTextButton {
+    // Inline Fast.com Speedtest Card
+    StyledRect {
         visible: root.view === "ethernet"
         Layout.fillWidth: true
         Layout.topMargin: visible ? Tokens.spacing.small : 0
         Layout.preferredHeight: visible ? implicitHeight : 0
-        inactiveColour: Colours.palette.m3primaryContainer
-        inactiveOnColour: Colours.palette.m3onPrimaryContainer
-        verticalPadding: Tokens.padding.extraSmall
-        text: qsTr("Run speedtest")
-        icon: "speed"
+        implicitHeight: 42
+        radius: Tokens.rounding.medium
+        color: root.speedtestState === "testing" ? Colours.palette.m3secondaryContainer : Colours.palette.m3surfaceContainerHigh
 
-        onClicked: {
-            Quickshell.execDetached(["sh", "-c", "uwsm app -- ghostty -e sh -c 'speedtest-cli; echo \"\"; read -n 1 -s -r -p \"Press any key to close...\"' || ghostty -e sh -c 'speedtest-cli; echo \"\"; read -n 1 -s -r -p \"Press any key to close...\"'"]);
+        StateLayer {
+            radius: parent.radius
+            color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onSurface
+            disabled: root.speedtestState === "testing"
+            onClicked: {
+                root.speedtestState = "testing";
+                root.speedtestNumber = "Connecting...";
+                fastSpeedtestProc.running = true;
+            }
+        }
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: Tokens.padding.medium
+            anchors.rightMargin: Tokens.padding.medium
+            spacing: Tokens.spacing.small
+
+            MaterialIcon {
+                text: root.speedtestState === "testing" ? "speed" : (root.speedtestState === "done" ? "download" : "speed")
+                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3primary
+            }
+
+            StyledText {
+                Layout.fillWidth: true
+                text: root.speedtestState === "idle" ? qsTr("Fast.com Speedtest") :
+                      root.speedtestState === "testing" ? qsTr("Testing Speed...") :
+                      qsTr("Fast.com Speed")
+                font: Tokens.font.body.builders.small.weight(Font.Medium).build()
+                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onSurface
+            }
+
+            CircularIndicator {
+                visible: root.speedtestState === "testing"
+                running: root.speedtestState === "testing"
+                implicitSize: 18
+                strokeWidth: 2
+                colour: Colours.palette.m3onSecondaryContainer
+            }
+
+            StyledText {
+                visible: root.speedtestState !== "idle"
+                text: root.speedtestNumber
+                font: Tokens.font.body.builders.medium.weight(Font.Bold).build()
+                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3primary
+            }
+        }
+    }
+
+    Process {
+        id: fastSpeedtestProc
+
+        command: ["/home/youki/.local/bin/fast-speedtest"]
+        running: false
+
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    const info = JSON.parse(data.trim());
+                    if (info.status === "testing") {
+                        root.speedtestState = "testing";
+                        root.speedtestNumber = `${info.speed} Mbps`;
+                    } else if (info.status === "done") {
+                        root.speedtestState = "done";
+                        root.speedtestNumber = `${info.speed} Mbps`;
+                    } else if (info.status === "error") {
+                        root.speedtestState = "error";
+                        root.speedtestNumber = "Failed";
+                    }
+                } catch (e) {}
+            }
+        }
+
+        onExited: {
+            if (root.speedtestState === "testing") {
+                root.speedtestState = "done";
+            }
         }
     }
 

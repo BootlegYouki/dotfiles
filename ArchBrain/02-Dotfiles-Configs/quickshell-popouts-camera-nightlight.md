@@ -38,3 +38,14 @@ Documentation of UI and UX updates to the Caelestia Quickshell bar popouts (`~/.
 - [[caelestia-hyprland]]
 - [[boot-time-optimization-and-systemd-boot-timeout]]
 - [[system-cheatsheet]]
+
+---
+
+## 3. Fast.com Inline Speedtest (`Network.qml`)
+
+### Features & Implementation
+- **Zero-Window Headless Testing**: Runs headless Netflix Fast.com API bandwidth tests without opening terminal or browser popups.
+- **Real-Time Streaming**: [`~/.local/bin/fast-speedtest`](file:///home/youki/.local/bin/fast-speedtest) streams live Mbps metrics over JSON lines.
+- **Embedded UI**:
+  - Material 3 card container embedded directly in the Ethernet popout.
+  - Features dynamic status spinner (`CircularIndicator`) and live updating `X.X Mbps` speed numbers during and after testing.
