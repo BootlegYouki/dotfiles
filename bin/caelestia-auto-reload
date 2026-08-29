@@ -1,30 +1,31 @@
 #!/usr/bin/env bash
-# Auto-reloads Caelestia Shell when QML or config files are modified
+# Auto-reloads Caelestia Shell safely when QML or UI components are modified
 
-WATCH_DIRS=(
-    "$HOME/.config/quickshell/caelestia"
-    "$HOME/.config/caelestia"
-)
+WATCH_DIR="$HOME/.config/quickshell/caelestia"
 
-# Ensure directories exist before watching
-VALID_DIRS=()
-for d in "${WATCH_DIRS[@]}"; do
-    [ -d "$d" ] && VALID_DIRS+=("$d")
-done
-
-if [ ${#VALID_DIRS[@]} -eq 0 ]; then
-    echo "No valid directories found to watch." >&2
+if [ ! -d "$WATCH_DIR" ]; then
+    echo "Directory $WATCH_DIR not found." >&2
     exit 1
 fi
 
-echo "Watching ${VALID_DIRS[*]} for changes..."
+echo "Watching $WATCH_DIR for QML/JS changes..."
 
-inotifywait -m -r -e close_write,moved_to,delete,create "${VALID_DIRS[@]}" --format "%w%f" --exclude '(\.git|\.swp|\.bak|\.tmp|~)' 2>/dev/null | while read -r file; do
-    # Debounce rapid successive saves
-    while read -r -t 0.35 discard; do :; done
-    
-    echo "[$(date '+%H:%M:%S')] Change detected: $file -> Restarting Caelestia..."
-    qs -c caelestia kill >/dev/null 2>&1 || true
-    sleep 0.15
-    caelestia shell -d >/dev/null 2>&1 || true
+LAST_RESTART=0
+
+inotifywait -m -r -e close_write,moved_to,delete,create "$WATCH_DIR" --format "%w%f" --exclude '(\.git|\.swp|\.bak|\.tmp|\.json|~)' 2>/dev/null | while read -r file; do
+    # Only trigger on actual source code changes
+    if [[ "$file" =~ \.(qml|js|conf|lua|css|scss)$ ]]; then
+        # Debounce rapid file writes
+        while read -r -t 0.4 discard; do :; done
+        
+        NOW=$(date +%s)
+        # Enforce minimum 2-second cooldown between restarts to prevent any loop
+        if (( NOW - LAST_RESTART >= 2 )); then
+            LAST_RESTART=$NOW
+            echo "[$(date '+%H:%M:%S')] Change in $file -> Reloading Caelestia..."
+            qs -c caelestia kill >/dev/null 2>&1 || true
+            sleep 0.2
+            caelestia shell -d >/dev/null 2>&1 || true
+        fi
+    fi
 done
