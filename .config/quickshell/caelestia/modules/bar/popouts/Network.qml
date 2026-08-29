@@ -353,13 +353,13 @@ ColumnLayout {
 
         StyledText {
             text: root.speedtestValue
-            font: Tokens.font.body.builders.large.size(28).weight(Font.Bold).build()
+            font: Tokens.font.body.builders.large.size(38).weight(Font.Bold).build()
             color: root.speedtestState === "testing" ? Colours.palette.m3primary : Colours.palette.m3onSurface
         }
 
         StyledText {
             text: "Mbps"
-            font: Tokens.font.body.builders.small.weight(Font.Medium).build()
+            font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
             color: Colours.palette.m3onSurfaceVariant
             Layout.alignment: Qt.AlignBaseline
         }
