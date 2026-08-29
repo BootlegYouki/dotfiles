@@ -26,7 +26,6 @@ ColumnLayout {
     StyledText {
         visible: root.view === "wireless"
         Layout.preferredHeight: visible ? implicitHeight : 0
-        Layout.topMargin: visible ? Tokens.padding.medium : 0
         Layout.rightMargin: Tokens.padding.extraSmall
         text: qsTr("Wireless")
         font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
@@ -224,7 +223,6 @@ ColumnLayout {
     StyledText {
         visible: root.view === "ethernet"
         Layout.preferredHeight: visible ? implicitHeight : 0
-        Layout.topMargin: visible ? Tokens.padding.medium : 0
         Layout.rightMargin: Tokens.padding.extraSmall
         text: qsTr("Ethernet")
         font: Tokens.font.body.builders.medium.weight(Font.Medium).build()

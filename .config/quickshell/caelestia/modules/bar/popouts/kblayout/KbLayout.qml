@@ -24,7 +24,6 @@ ColumnLayout {
     }
 
     StyledText {
-        Layout.topMargin: Tokens.padding.medium
         Layout.rightMargin: Tokens.padding.extraSmall
         text: qsTr("Keyboard Layouts")
         font: Tokens.font.body.builders.medium.weight(Font.Medium).build()

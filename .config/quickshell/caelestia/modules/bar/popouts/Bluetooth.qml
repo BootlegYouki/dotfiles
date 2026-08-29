@@ -19,7 +19,6 @@ ColumnLayout {
     spacing: Tokens.spacing.small
 
     StyledText {
-        Layout.topMargin: Tokens.padding.medium
         Layout.rightMargin: Tokens.padding.extraSmall
         text: qsTr("Bluetooth")
         font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
