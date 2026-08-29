@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Auto-reloads Caelestia Shell when QML or config files are modified
+
+WATCH_DIRS=(
+    "$HOME/.config/quickshell/caelestia"
+    "$HOME/.config/caelestia"
+)
+
+# Ensure directories exist before watching
+VALID_DIRS=()
+for d in "${WATCH_DIRS[@]}"; do
+    [ -d "$d" ] && VALID_DIRS+=("$d")
+done
+
+if [ ${#VALID_DIRS[@]} -eq 0 ]; then
+    echo "No valid directories found to watch." >&2
+    exit 1
+fi
+
+echo "Watching ${VALID_DIRS[*]} for changes..."
+
+inotifywait -m -r -e close_write,moved_to,delete,create "${VALID_DIRS[@]}" --format "%w%f" --exclude '(\.git|\.swp|\.bak|\.tmp|~)' 2>/dev/null | while read -r file; do
+    # Debounce rapid successive saves
+    while read -r -t 0.35 discard; do :; done
+    
+    echo "[$(date '+%H:%M:%S')] Change detected: $file -> Restarting Caelestia..."
+    qs -c caelestia kill >/dev/null 2>&1 || true
+    sleep 0.15
+    caelestia shell -d >/dev/null 2>&1 || true
+done
