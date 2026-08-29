@@ -338,6 +338,22 @@ ColumnLayout {
         }
     }
 
+    IconTextButton {
+        visible: root.view === "ethernet"
+        Layout.fillWidth: true
+        Layout.topMargin: visible ? Tokens.spacing.small : 0
+        Layout.preferredHeight: visible ? implicitHeight : 0
+        inactiveColour: Colours.palette.m3primaryContainer
+        inactiveOnColour: Colours.palette.m3onPrimaryContainer
+        verticalPadding: Tokens.padding.extraSmall
+        text: qsTr("Run speedtest")
+        icon: "speed"
+
+        onClicked: {
+            Quickshell.execDetached(["sh", "-c", "uwsm app -- ghostty -e sh -c 'speedtest-cli; echo \"\"; read -n 1 -s -r -p \"Press any key to close...\"' || ghostty -e sh -c 'speedtest-cli; echo \"\"; read -n 1 -s -r -p \"Press any key to close...\"'"]);
+        }
+    }
+
     Connections {
         function onActiveChanged(): void {
             if (Nmcli.active && root.connectingToSsid === Nmcli.active.ssid) {
