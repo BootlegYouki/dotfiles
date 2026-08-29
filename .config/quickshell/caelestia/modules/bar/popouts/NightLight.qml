@@ -7,49 +7,32 @@ import qs.components
 import qs.components.controls
 import qs.services
 
-Item {
+ColumnLayout {
     id: root
 
     required property PopoutState popouts
 
-    implicitWidth: layout.implicitWidth + Tokens.padding.medium * 2
-    implicitHeight: layout.implicitHeight + Tokens.padding.medium * 2
+    width: 260
+    spacing: Tokens.spacing.medium
 
-    ColumnLayout {
-        id: layout
+    // Header Row with Title and Switch (No icon)
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: Tokens.spacing.small
 
-        anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: Tokens.spacing.medium
-        implicitWidth: 260
-
-        // Header Row with Title and Switch
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: Tokens.spacing.small
-
-            RowLayout {
-                spacing: Tokens.spacing.small
-
-                MaterialIcon {
-                    text: NightLight.enabled ? "bedtime" : "bedtime_off"
-                    color: NightLight.enabled ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
-                }
-
-                StyledText {
-                    text: qsTr("Night Light")
-                    font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
-                    color: Colours.palette.m3onSurface
-                }
-            }
-
-            Item { Layout.fillWidth: true }
-
-            StyledSwitch {
-                checked: NightLight.enabled
-                onClicked: NightLight.toggle()
-            }
+        StyledText {
+            text: qsTr("Night Light")
+            font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
+            color: Colours.palette.m3onSurface
         }
+
+        Item { Layout.fillWidth: true }
+
+        StyledSwitch {
+            checked: NightLight.enabled
+            onClicked: NightLight.toggle()
+        }
+    }
 
         // Temperature label and percentage value
         RowLayout {
@@ -105,5 +88,4 @@ Item {
                 }
             }
         }
-    }
 }
