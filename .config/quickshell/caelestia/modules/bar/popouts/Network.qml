@@ -383,14 +383,6 @@ ColumnLayout {
                 color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onSurface
             }
 
-            CircularIndicator {
-                visible: root.speedtestState === "testing"
-                running: root.speedtestState === "testing"
-                implicitSize: 18
-                strokeWidth: 2
-                fgColour: Colours.palette.m3onSecondaryContainer
-            }
-
             StyledText {
                 visible: root.speedtestState !== "idle"
                 text: root.speedtestNumber
