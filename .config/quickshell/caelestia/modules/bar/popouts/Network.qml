@@ -388,7 +388,7 @@ ColumnLayout {
                 running: root.speedtestState === "testing"
                 implicitSize: 18
                 strokeWidth: 2
-                colour: Colours.palette.m3onSecondaryContainer
+                fgColour: Colours.palette.m3onSecondaryContainer
             }
 
             StyledText {
