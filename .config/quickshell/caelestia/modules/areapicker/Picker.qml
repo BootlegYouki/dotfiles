@@ -82,7 +82,7 @@ MouseArea {
     onClientsChanged: checkClientRects(mouseX, mouseY)
 
     anchors.fill: parent
-    opacity: 0
+    opacity: root.loader.freeze ? 1 : 0
     hoverEnabled: true
     cursorShape: Qt.CrossCursor
 
@@ -181,7 +181,7 @@ MouseArea {
         }
         PropertyAction {
             target: root.loader
-            property: "activeAsync"
+            property: "active"
             value: false
         }
     }
@@ -200,7 +200,7 @@ MouseArea {
     Loader {
         id: screencopy
 
-        asynchronous: true
+        asynchronous: false
         anchors.fill: parent
 
         active: root.loader.freeze
@@ -268,6 +268,8 @@ MouseArea {
     }
 
     Behavior on opacity {
+        enabled: !root.loader.freeze
+
         Anim {
             type: Anim.StandardLarge
         }
