@@ -21,7 +21,7 @@ ColumnLayout {
     property bool showPasswordDialog: false
 
     property string speedtestState: "idle" // "idle", "testing", "done", "error"
-    property string speedtestNumber: "--"
+    property string speedtestValue: "0.0"
 
     spacing: Tokens.spacing.small
     width: Tokens.sizes.bar.networkWidth
@@ -342,52 +342,81 @@ ColumnLayout {
         }
     }
 
-    // Inline Fast.com Speedtest Card
+    // Big Speed Display Card (Appears in the middle when active)
+    StyledRect {
+        visible: root.view === "ethernet" && root.speedtestState !== "idle"
+        Layout.fillWidth: true
+        Layout.topMargin: visible ? Tokens.spacing.small : 0
+        Layout.preferredHeight: visible ? implicitHeight : 0
+        implicitHeight: 68
+        radius: Tokens.rounding.medium
+        color: Colours.palette.m3surfaceContainerHigh
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: 2
+
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: Tokens.spacing.extraSmall
+
+                StyledText {
+                    text: root.speedtestValue
+                    font: Tokens.font.body.builders.large.size(28).weight(Font.Bold).build()
+                    color: root.speedtestState === "testing" ? Colours.palette.m3primary : Colours.palette.m3onSurface
+                }
+
+                StyledText {
+                    text: "Mbps"
+                    font: Tokens.font.body.builders.small.weight(Font.Medium).build()
+                    color: Colours.palette.m3onSurfaceVariant
+                    Layout.alignment: Qt.AlignBaseline
+                }
+            }
+
+            StyledText {
+                Layout.alignment: Qt.AlignHCenter
+                text: root.speedtestState === "testing" ? qsTr("Measuring speed...") : qsTr("Download speed")
+                font: Tokens.font.label.small
+                color: root.speedtestState === "testing" ? Colours.palette.m3primary : Colours.palette.m3outline
+            }
+        }
+    }
+
+    // Run Speedtest Button
     StyledRect {
         visible: root.view === "ethernet"
         Layout.fillWidth: true
         Layout.topMargin: visible ? Tokens.spacing.small : 0
         Layout.preferredHeight: visible ? implicitHeight : 0
-        implicitHeight: 42
-        radius: Tokens.rounding.medium
-        color: root.speedtestState === "testing" ? Colours.palette.m3secondaryContainer : Colours.palette.m3surfaceContainerHigh
+        implicitHeight: 38
+        radius: Tokens.rounding.full
+        color: root.speedtestState === "testing" ? Colours.palette.m3secondaryContainer : Colours.palette.m3primaryContainer
 
         StateLayer {
             radius: parent.radius
-            color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onSurface
+            color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onPrimaryContainer
             disabled: root.speedtestState === "testing"
             onClicked: {
                 root.speedtestState = "testing";
-                root.speedtestNumber = "Connecting...";
+                root.speedtestValue = "0.0";
                 fastSpeedtestProc.running = true;
             }
         }
 
         RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: Tokens.padding.medium
-            anchors.rightMargin: Tokens.padding.medium
+            anchors.centerIn: parent
             spacing: Tokens.spacing.small
 
             MaterialIcon {
-                text: root.speedtestState === "testing" ? "speed" : (root.speedtestState === "done" ? "download" : "speed")
-                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3primary
+                text: "speed"
+                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onPrimaryContainer
             }
 
             StyledText {
-                Layout.fillWidth: true
-                text: root.speedtestState === "idle" ? qsTr("Speedtest") :
-                      root.speedtestState === "testing" ? qsTr("Testing...") :
-                      qsTr("Speedtest")
-                font: Tokens.font.body.builders.small.weight(Font.Medium).build()
-                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onSurface
-            }
-
-            StyledText {
-                visible: root.speedtestState !== "idle"
-                text: root.speedtestNumber
-                font: Tokens.font.body.builders.small.weight(Font.Medium).build()
-                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3primary
+                text: root.speedtestState === "testing" ? qsTr("Testing...") : qsTr("Run speedtest")
+                font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
+                color: root.speedtestState === "testing" ? Colours.palette.m3onSecondaryContainer : Colours.palette.m3onPrimaryContainer
             }
         }
     }
@@ -402,15 +431,12 @@ ColumnLayout {
             onRead: data => {
                 try {
                     const info = JSON.parse(data.trim());
-                    if (info.status === "testing") {
-                        root.speedtestState = "testing";
-                        root.speedtestNumber = `${info.speed} Mbps`;
-                    } else if (info.status === "done") {
-                        root.speedtestState = "done";
-                        root.speedtestNumber = `${info.speed} Mbps`;
+                    if (info.status === "testing" || info.status === "done") {
+                        root.speedtestState = info.status;
+                        root.speedtestValue = `${info.speed}`;
                     } else if (info.status === "error") {
                         root.speedtestState = "error";
-                        root.speedtestNumber = "Failed";
+                        root.speedtestValue = "--";
                     }
                 } catch (e) {}
             }
