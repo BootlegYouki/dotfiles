@@ -118,17 +118,6 @@ StyledRect {
             }
         }
 
-        // Audio icon
-        WrappedLoader {
-            name: "audio"
-            active: Config.bar?.status?.showAudio ?? false
-
-            sourceComponent: MaterialIcon {
-                animate: true
-                text: Icons.getVolumeIcon(Audio.volume, Audio.muted)
-                color: root.colour
-            }
-        }
 
         // Microphone icon
         WrappedLoader {
@@ -261,10 +250,23 @@ StyledRect {
             }
         }
 
+        // Audio icon
+        WrappedLoader {
+            name: "audio"
+            active: Config.bar?.status?.showAudio ?? true
+
+            sourceComponent: MaterialIcon {
+                animate: true
+                text: Icons.getVolumeIcon(Audio.volume, Audio.muted)
+                color: root.colour
+                fontStyle: Tokens.font.icon.medium
+            }
+        }
+
         // Battery icon
         WrappedLoader {
             name: "battery"
-            active: Config.bar?.status?.showBattery ?? true
+            active: (Config.bar?.status?.showBattery ?? false) && UPower.displayDevice.isLaptopBattery
 
             sourceComponent: MaterialIcon {
                 animate: true

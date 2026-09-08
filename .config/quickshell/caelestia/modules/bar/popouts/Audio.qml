@@ -1,85 +1,78 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Caelestia.Config
 import qs.components
 import qs.components.controls
 import qs.services
+import qs.utils
 
-Item {
+ColumnLayout {
     id: root
 
     required property PopoutState popouts
 
-    implicitWidth: layout.implicitWidth + Tokens.padding.medium * 2
-    implicitHeight: layout.implicitHeight + Tokens.padding.medium * 2
+    width: 260
+    spacing: Tokens.spacing.medium
 
-    ButtonGroup {
-        id: sinks
+    Process {
+        id: restartAudioProc
+        command: ["/home/youki/.local/bin/restart-audio"]
+        running: false
     }
 
-    ButtonGroup {
-        id: sources
+    // Header Row with Title and Settings button
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: Tokens.spacing.small
+
+        StyledText {
+            text: qsTr("Audio")
+            font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
+            color: Colours.palette.m3onSurface
+        }
+
+        Item { Layout.fillWidth: true }
     }
 
+    // Output Volume Section
     ColumnLayout {
-        id: layout
+        Layout.fillWidth: true
+        spacing: Tokens.spacing.small / 2
 
-        anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: Tokens.spacing.medium
+        RowLayout {
+            Layout.fillWidth: true
 
-        StyledText {
-            text: qsTr("Output device")
-            font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
-        }
-
-        Repeater {
-            model: Audio.sinks
-
-            StyledRadioButton {
-                id: control
-
-                required property PwNode modelData
-
-                ButtonGroup.group: sinks
-                checked: Audio.sink?.id === modelData.id
-                onClicked: Audio.setAudioSink(modelData)
-                text: modelData.description
+            StyledText {
+                text: qsTr("Volume")
+                font: Tokens.font.body.builders.small.build()
+                color: Colours.palette.m3onSurfaceVariant
             }
-        }
 
-        StyledText {
-            Layout.topMargin: Tokens.spacing.medium
-            text: qsTr("Input device")
-            font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
-        }
+            Item { Layout.fillWidth: true }
 
-        Repeater {
-            model: Audio.sources
+            StyledText {
+                text: Audio.muted ? qsTr("Muted") : `${Math.round(Audio.volume * 100)}%`
+                font: Tokens.font.body.builders.small.weight(Font.Medium).build()
+                color: Audio.muted ? Colours.palette.m3error : Colours.palette.m3primary
 
-            StyledRadioButton {
-                required property PwNode modelData
-
-                ButtonGroup.group: sources
-                checked: Audio.source?.id === modelData.id
-                onClicked: Audio.setAudioSource(modelData)
-                text: modelData.description
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (Audio.sink?.audio)
+                            Audio.sink.audio.muted = !Audio.muted;
+                    }
+                }
             }
-        }
-
-        StyledText {
-            Layout.topMargin: Tokens.spacing.medium
-            text: qsTr("Volume (%1)").arg(Audio.muted ? qsTr("Muted") : `${Math.round(Audio.volume * 100)}%`)
-            font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
         }
 
         CustomMouseArea {
             Layout.fillWidth: true
-            implicitHeight: Tokens.padding.medium * 3
+            implicitHeight: 36
 
             onWheel: event => {
                 if (event.angleDelta.y > 0)
@@ -88,26 +81,95 @@ Item {
                     Audio.decrementVolume();
             }
 
-            StyledSlider {
+            FilledSlider {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                implicitHeight: parent.implicitHeight
+                anchors.verticalCenter: parent.verticalCenter
+                implicitHeight: 36
 
+                showValueOnMove: true
+                orientation: Qt.Horizontal
+                icon: Icons.getVolumeIcon(Audio.volume, Audio.muted)
+                from: 0.0
+                to: 1.0
                 value: Audio.volume
-                onInteraction: value => Audio.setVolume(value)
+
+                onMoved: Audio.setVolume(value)
+            }
+        }
+    }
+
+    // Microphone Section
+    ColumnLayout {
+        Layout.fillWidth: true
+        spacing: Tokens.spacing.small / 2
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            StyledText {
+                text: qsTr("Microphone")
+                font: Tokens.font.body.builders.small.build()
+                color: Colours.palette.m3onSurfaceVariant
+            }
+
+            Item { Layout.fillWidth: true }
+
+            StyledText {
+                text: Audio.sourceMuted ? qsTr("Muted") : `${Math.round(Audio.sourceVolume * 100)}%`
+                font: Tokens.font.body.builders.small.weight(Font.Medium).build()
+                color: Audio.sourceMuted ? Colours.palette.m3error : Colours.palette.m3primary
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (Audio.source?.audio)
+                            Audio.source.audio.muted = !Audio.sourceMuted;
+                    }
+                }
             }
         }
 
-        IconTextButton {
+        CustomMouseArea {
             Layout.fillWidth: true
-            Layout.topMargin: Tokens.spacing.medium
-            inactiveColour: Colours.palette.m3primaryContainer
-            inactiveOnColour: Colours.palette.m3onPrimaryContainer
-            verticalPadding: Tokens.padding.extraSmall
-            text: qsTr("Open settings")
-            icon: "settings"
+            implicitHeight: 36
 
-            onClicked: root.popouts.detachRequested("audio")
+            onWheel: event => {
+                if (event.angleDelta.y > 0)
+                    Audio.incrementSourceVolume();
+                else if (event.angleDelta.y < 0)
+                    Audio.decrementSourceVolume();
+            }
+
+            FilledSlider {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                implicitHeight: 36
+
+                showValueOnMove: true
+                orientation: Qt.Horizontal
+                icon: Icons.getMicVolumeIcon(Audio.sourceVolume, Audio.sourceMuted)
+                from: 0.0
+                to: 1.0
+                value: Audio.sourceVolume
+
+                onMoved: Audio.setSourceVolume(value)
+            }
         }
+    }
+
+    // Restart Audio Button
+    IconTextButton {
+        Layout.fillWidth: true
+        Layout.topMargin: Tokens.spacing.extraSmall
+        inactiveColour: Colours.tPalette.m3surfaceContainerHigh
+        inactiveOnColour: Colours.palette.m3onSurface
+        verticalPadding: Tokens.padding.extraSmall
+        text: qsTr("Restart audio")
+        icon: "restart_alt"
+
+        onClicked: restartAudioProc.running = true
     }
 }

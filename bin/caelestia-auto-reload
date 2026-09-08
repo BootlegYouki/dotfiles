@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Auto-reloads Caelestia Shell safely when QML or UI components are modified
 
+export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
 WATCH_DIR="$HOME/.config/quickshell/caelestia"
 
 if [ ! -d "$WATCH_DIR" ]; then

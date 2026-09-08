@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+
+# Restart PipeWire audio services
+systemctl --user restart wireplumber pipewire-pulse pipewire
+
+# Wait briefly for nodes to register
+sleep 1
+
+# Ensure unmuted and sensible output volume
+wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 2>/dev/null || true
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 50% 2>/dev/null || true
+
+# Restore ALSA Master and PCM levels
+amixer -c Generic_1 sset Master 70% 2>/dev/null || true
+amixer -c Generic_1 sset PCM 100% 2>/dev/null || true
+amixer -c Generic_1 sset Front 100% 2>/dev/null || true
+
+# Restore Microphone hardware gain & boost fix (prevents +60dB static clipping)
+amixer -c Generic_1 sset 'Rear Mic Boost' 1 2>/dev/null || true
+amixer -c Generic_1 sset 'Capture' 45 2>/dev/null || true
+wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0 2>/dev/null || true
+
+# Send desktop notification
+notify-send "Audio Restored" "PipeWire services restarted and mixer settings re-applied." -i audio-volume-high 2>/dev/null || true
