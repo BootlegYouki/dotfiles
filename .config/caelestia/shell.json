@@ -22,10 +22,6 @@
             "DP-1"
         ],
         "persistent": true,
-        "status": {
-            "showAudio": true,
-            "showBattery": false
-        },
         "tray": {
             "compact": true
         },
