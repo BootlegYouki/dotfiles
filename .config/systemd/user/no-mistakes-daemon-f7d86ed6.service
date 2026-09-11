@@ -1,0 +1,16 @@
+[Unit]
+Description=no-mistakes background daemon
+
+[Service]
+Type=simple
+ExecStart=/home/youki/.no-mistakes/bin/no-mistakes daemon run --root /home/youki/.no-mistakes
+WorkingDirectory=/home/youki/.no-mistakes
+Environment="HOME=/home/youki"
+Environment="PATH=/home/youki/.local/bin:/home/youki/go/bin:/home/youki/.cargo/bin:/home/youki/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+StandardOutput=append:/home/youki/.no-mistakes/logs/daemon-bootstrap.log
+StandardError=append:/home/youki/.no-mistakes/logs/daemon-bootstrap.log
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -23,10 +23,9 @@ A recovery command that:
 
 ### B. Caelestia Shell Customization
 1. **Config (`~/.config/caelestia/shell.json`)**:
-   - Enabled `"showAudio": true` and `"showBattery": false` under `bar.status`.
+   - Note: Do NOT add `"status"` under `bar` in `shell.json`. Caelestia 2.3+ C++ `BarConfig` validates known options and raises a warning toast (`Unknown option in config: bar.status`) when unknown keys are detected.
 2. **Status Icons (`~/.config/quickshell/caelestia/modules/bar/components/StatusIcons.qml`)**:
-   - Positioned Audio icon at the bottom of the pill (below Night Light, replacing the old Battery/Scale slot) so the bar order matches: Network -> Camera -> Night Light -> Audio.
-   - Scaled with `Tokens.font.icon.medium` so it matches the optical size of surrounding icons.
+   - Handled directly in `StatusIcons.qml`: Audio is enabled by default (`active: Config.bar?.status?.showAudio ?? true`) and positioned below Night Light.
    - Battery icon conditionally suppressed on desktop systems without a physical laptop battery (`UPower.displayDevice.isLaptopBattery`).
 3. **Compact Audio Popout (`~/.config/quickshell/caelestia/modules/bar/popouts/Audio.qml`)**:
    - Redesigned into a sleek, compact panel (`width: 260`, ~170px height) matching the Night Light widget aesthetic.
