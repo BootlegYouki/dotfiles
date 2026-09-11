@@ -157,8 +157,9 @@ fi
 
 # --- Step 6: Caelestia Shell & AUR Desktop Packages ---
 echo "▶ [6/9] Installing Quickshell-git and Caelestia desktop shell dependencies..."
+# Force aur/ prefix so CachyOS doesn't hijack quickshell with outdated noctalia-qs
 aur_install \
-    quickshell-git \
+    aur/quickshell-git \
     caelestia-cli \
     caelestia-shell \
     ttf-rubik-vf \
