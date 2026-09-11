@@ -222,6 +222,12 @@ if [ -f "$TARGET_HOME/Pictures/Wallpapers/wallhaven-zywgxy.jpg" ]; then
     echo "$TARGET_HOME/Pictures/Wallpapers/wallhaven-zywgxy.jpg" > "$TARGET_HOME/.local/state/caelestia/wallpaper/path.txt"
 fi
 
+# Generate initial dynamic color scheme from wallpaper
+if command -v caelestia &>/dev/null; then
+    echo "Generating dynamic Material 3 color scheme from wallpaper..."
+    caelestia scheme -c 2>/dev/null || true
+fi
+
 # 7.7 ArchBrain Vault
 if [ -d "$DOTFILES_DIR/ArchBrain" ]; then
     mkdir -p "$TARGET_HOME/ArchBrain"
