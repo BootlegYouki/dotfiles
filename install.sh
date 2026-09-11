@@ -43,6 +43,7 @@ sudo pacman -Rdd --noconfirm \
     noctalia-qs \
     quickshell \
     caelestia-sddm \
+    caelestia-sddm-locklike-git \
     caelestia-sddm-minimalist-git \
     caelestia-shell-git \
     jack2 \
@@ -114,10 +115,10 @@ echo "▶ [5/9] Installing SDDM and Caelestia SDDM Locklike theme..."
 pacman_install \
     sddm qt6-declarative qt6-5compat qt6-svg qt6-multimedia
 
-# Install Caelestia SDDM theme and font dependencies from AUR
-if ! pacman -Qi caelestia-sddm-locklike-git &>/dev/null && ! pacman -Qi caelestia-sddm &>/dev/null; then
-    echo "Installing caelestia-sddm-locklike-git from AUR..."
-    aur_install caelestia-sddm-locklike-git
+# Install Caelestia SDDM minimalistV2 theme from AUR
+if ! pacman -Qi caelestia-sddm-minimalistv2-git &>/dev/null && ! pacman -Qi caelestia-sddm &>/dev/null; then
+    echo "Installing caelestia-sddm-minimalistv2-git from AUR..."
+    aur_install caelestia-sddm-minimalistv2-git
 fi
 
 # Deploy SDDM configuration
