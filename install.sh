@@ -45,8 +45,8 @@ sudo pacman -Rdd --noconfirm \
     caelestia-sddm \
     caelestia-sddm-minimalist-git \
     caelestia-shell-git \
-    ttf-material-symbols-variable \
-    jack2 2>/dev/null || true
+    jack2 \
+    pulseaudio 2>/dev/null || true
 
 sudo pacman -S --noconfirm --needed base-devel git pciutils
 
@@ -60,16 +60,16 @@ if ! command -v paru &>/dev/null && ! command -v yay &>/dev/null; then
     }
 fi
 
-# Auto-pick installer wrappers (auto-resolves conflicts by choosing YES instead of aborting)
+# Standard non-interactive installer wrappers (properly auto-selects default 1 for provider prompts)
 pacman_install() {
-    sudo pacman -S --noconfirm --needed "$@" 2>/dev/null || yes | sudo pacman -S --needed "$@"
+    sudo pacman -S --noconfirm --needed "$@"
 }
 
 aur_install() {
     if command -v paru &>/dev/null; then
-        paru -S --noconfirm --needed --skipreview "$@" 2>/dev/null || yes | paru -S --needed --skipreview "$@"
+        paru -S --noconfirm --needed --skipreview "$@"
     elif command -v yay &>/dev/null; then
-        yay -S --noconfirm --needed --answerclean None --answerdiff None "$@" 2>/dev/null || yes | yay -S --needed --answerclean None --answerdiff None "$@"
+        yay -S --noconfirm --needed --answerclean None --answerdiff None "$@"
     else
         echo "❌ Error: Neither paru nor yay found for AUR installation."
         exit 1
@@ -106,7 +106,8 @@ pacman_install \
     pamixer playerctl brightnessctl grim slurp wl-clipboard cliphist hyprpicker hyprsunset \
     jq socat fd ripgrep fzf zoxide direnv eza btop cava micro python-pillow python-pip python-evdev python-pykakasi \
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
-    ttf-roboto ttf-cascadia-code-nerd flatpak brave-bin discord zed vlc
+    ttf-roboto ttf-cascadia-code-nerd ttf-material-symbols-variable flatpak brave-bin discord zed vlc \
+    ddcutil lm_sensors aubio libpipewire libqalculate power-profiles-daemon swappy
 
 # --- Step 5: SDDM Display Manager & Caelestia Theme ---
 echo "▶ [5/9] Installing SDDM and Caelestia SDDM Locklike theme..."
@@ -160,7 +161,6 @@ aur_install \
     quickshell-git \
     caelestia-cli \
     caelestia-shell \
-    ttf-material-symbols-variable-git \
     ttf-rubik-vf \
     spotify
 
