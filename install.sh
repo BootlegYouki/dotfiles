@@ -38,6 +38,16 @@ sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring 2>/dev/null || tru
 
 # --- Step 2: Build Essentials & AUR Helper ---
 echo "▶ [2/9] Installing build essentials and ensuring AUR helper..."
+# Remove known conflicting packages before installing
+sudo pacman -Rdd --noconfirm \
+    noctalia-qs \
+    quickshell \
+    caelestia-sddm \
+    caelestia-sddm-minimalist-git \
+    caelestia-shell-git \
+    ttf-material-symbols-variable \
+    jack2 2>/dev/null || true
+
 sudo pacman -S --noconfirm --needed base-devel git pciutils
 
 if ! command -v paru &>/dev/null && ! command -v yay &>/dev/null; then
