@@ -25,6 +25,15 @@ rsync -a --delete ~/.config/uwsm/          "$DOTFILES/.config/uwsm/"
 rsync -a --delete ~/.config/systemd/user/  "$DOTFILES/.config/systemd/user/"
 [ -f ~/.config/starship.toml ] && cp ~/.config/starship.toml "$DOTFILES/.config/starship.toml"
 [ -f ~/.config/spotify-flags.conf ] && cp ~/.config/spotify-flags.conf "$DOTFILES/.config/spotify-flags.conf"
+[ -f ~/.bash_profile ] && cp ~/.bash_profile "$DOTFILES/.bash_profile"
+[ -f ~/.face ] && cp ~/.face "$DOTFILES/assets/.face"
+[ -f ~/.face.icon ] && cp ~/.face.icon "$DOTFILES/assets/.face.icon"
+
+# --- SDDM configs ---
+if [ -d /etc/sddm.conf.d ]; then
+    mkdir -p "$DOTFILES/system/etc/sddm.conf.d"
+    rsync -a /etc/sddm.conf.d/ "$DOTFILES/system/etc/sddm.conf.d/"
+fi
 
 # --- Scripts and services ---
 rsync -a --delete --exclude='agy*' --exclude='rclone' --exclude='boothub' --exclude='kwiz' --exclude='gift' --exclude='yarn*' --exclude='zed' ~/.local/bin/ "$DOTFILES/bin/"

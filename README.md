@@ -1,49 +1,67 @@
-# 🖥️ Caelestia Desktop Dotfiles & Custom Tools
+# ❄️ Caelestia Desktop Dotfiles & System Installer
 
-A private backup of my custom CachyOS/Hyprland desktop setup, widgets, background daemons, and system documentation.
+A complete, turnkey setup and private backup of my custom CachyOS / Hyprland desktop environment, Caelestia shell widgets, SDDM display manager, background daemons, and system documentation.
+
+---
+
+## 🚀 Fresh Installation (Turnkey Setup for CachyOS / Arch Minimal)
+
+On a freshly installed CachyOS system with **no Desktop Environment (CLI only)**:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/BootlegYouki/dotfiles.git
+
+# 2. Run the automated installer
+cd dotfiles
+./install.sh
+```
+
+The installer will automatically:
+1. Update mirrors and install build essentials (`base-devel`, `git`, `yay`).
+2. Detect your GPU (NVIDIA / AMD / Intel) and install proper drivers.
+3. Install Hyprland, PipeWire audio, Ghostty, fonts, and utilities.
+4. Install and configure **SDDM with the Caelestia Locklike theme**.
+5. Install Quickshell and the Caelestia desktop shell.
+6. Deploy all configs, wallpapers, custom binary tools, and services.
+7. Set your default shell to **Fish** with the Starship prompt.
+
+Once complete, reboot with `sudo reboot` to enter the Caelestia SDDM login screen!
+
+---
+
+## 🔄 Daily Updates
+To pull the latest changes and re-sync configurations on an existing system:
+```bash
+./update.sh
+```
 
 ---
 
 ## 📁 Repository Structure
 
-*   **`.config/hypr/`**: My core Hyprland window manager configurations and keyboard shortcuts.
-*   **`.config/quickshell/caelestia/`**: The complete QML/JavaScript source code for the desktop widgets (top bar, lock screen, widgets, and lyrics display).
-*   **`.local/bin/`**: Custom scripts and binary utilities:
-    *   `caelestia-romaji-daemon` & `caelestia-romaji`: Convert Japanese/Korean lyrics and translate them to English on demand via direct socket IPC.
-    *   `caelestia-wallpaper-shift`: Rotates wallpapers automatically.
-    *   `backup-system`: System-wide backup script.
-    *   `hypr-gnome-mouse-sync`: Syncs mouse sensitivities between environments.
-    *   `nightlight`: Toggles screen color temperatures.
-*   **`scripts/genshin_f_macro.py`**: A custom python script to intercept and spam the `F` key inside Genshin Impact while leaving typing unaffected globally.
-*   **`systemd-system/genshin-f-macro.service`**: The systemd service descriptor to run the Genshin macro at boot.
-*   **`ArchBrain/`**: A complete backup of my system notes, cheatsheets, dotfile guides, and troubleshooting documentation vault.
+*   **`install.sh`**: Turnkey installer for fresh minimal CachyOS/Arch installations.
+*   **`update.sh`**: Incremental config updater.
+*   **`.config/hypr/`**: Core Hyprland window manager configurations and keybindings.
+*   **`.config/quickshell/caelestia/`**: QML/JavaScript source code for widgets (top bar, lock screen, widgets, lyrics).
+*   **`system/etc/sddm.conf.d/`**: SDDM display manager configuration (Caelestia theme).
+*   **`bin/`**: Custom scripts and utilities (`dotfiles-sync`, `caelestia-romaji`, `backup-system`, etc.).
+*   **`ArchBrain/`**: Complete Obsidian documentation vault (system notes, guides, cheatsheets).
 
 ---
 
 ## ⚡ How to Manage the Services
 
 ### 1. Romaji & Lyrics Translation Daemon
-Runs as a user-level service to Romanize and translate Spotify lyrics instantly in the desktop shell:
+Runs as a user-level service to Romanize and translate Spotify lyrics in real time:
 ```bash
-# Start/Enable on boot:
-systemctl --user enable --now caelestia-romaji.service
-
-# Restart:
-systemctl --user restart caelestia-romaji.service
-
-# Logs:
 systemctl --user status caelestia-romaji.service
+systemctl --user restart caelestia-romaji.service
 ```
 
 ### 2. Genshin Impact Loot Macro
-Runs as a system-level service to automate looting when active in the game window:
+Automates looting when active in the game window:
 ```bash
-# Start/Enable on boot:
-sudo systemctl enable --now genshin-f-macro
-
-# Stop:
-sudo systemctl stop genshin-f-macro
-
-# Logs:
 sudo systemctl status genshin-f-macro
+sudo systemctl restart genshin-f-macro
 ```
