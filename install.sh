@@ -62,14 +62,14 @@ fi
 
 # Standard non-interactive installer wrappers (properly auto-selects default 1 for provider prompts)
 pacman_install() {
-    sudo pacman -S --noconfirm --needed "$@"
+    sudo pacman -S --noconfirm --needed --overwrite "*" "$@"
 }
 
 aur_install() {
     if command -v paru &>/dev/null; then
-        paru -S --noconfirm --needed --skipreview "$@"
+        paru -S --noconfirm --needed --skipreview --overwrite "*" "$@"
     elif command -v yay &>/dev/null; then
-        yay -S --noconfirm --needed --answerclean None --answerdiff None "$@"
+        yay -S --noconfirm --needed --answerclean None --answerdiff None --overwrite "*" "$@"
     else
         echo "❌ Error: Neither paru nor yay found for AUR installation."
         exit 1
