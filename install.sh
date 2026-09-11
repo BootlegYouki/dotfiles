@@ -134,11 +134,18 @@ fi
 sudo systemctl enable sddm
 echo "  ✓ SDDM enabled"
 
+# Remove conflicting CachyOS quickshell forks if present
+if pacman -Qi noctalia-qs &>/dev/null || pacman -Qi quickshell &>/dev/null; then
+    echo "Removing conflicting quickshell/noctalia-qs package..."
+    sudo pacman -Rdd --noconfirm noctalia-qs quickshell 2>/dev/null || true
+fi
+
 # --- Step 6: Caelestia Shell & AUR Desktop Packages ---
-echo "▶ [6/9] Installing Quickshell and Caelestia desktop dependencies..."
+echo "▶ [6/9] Installing Quickshell-git and Caelestia desktop shell dependencies..."
 aur_install \
     quickshell-git \
     caelestia-cli \
+    caelestia-shell \
     ttf-material-symbols-variable-git \
     ttf-rubik-vf \
     spotify
