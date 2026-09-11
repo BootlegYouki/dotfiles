@@ -60,12 +60,16 @@ if ! command -v paru &>/dev/null && ! command -v yay &>/dev/null; then
     }
 fi
 
-# Non-interactive AUR installer wrapper to prevent review / cleanbuild pauses
+# Auto-pick installer wrappers (auto-resolves conflicts by choosing YES instead of aborting)
+pacman_install() {
+    sudo pacman -S --noconfirm --needed "$@" 2>/dev/null || yes | sudo pacman -S --needed "$@"
+}
+
 aur_install() {
     if command -v paru &>/dev/null; then
-        paru -S --noconfirm --needed --skipreview "$@"
+        paru -S --noconfirm --needed --skipreview "$@" 2>/dev/null || yes | paru -S --needed --skipreview "$@"
     elif command -v yay &>/dev/null; then
-        yay -S --noconfirm --needed --answerclean None --answerdiff None "$@"
+        yay -S --noconfirm --needed --answerclean None --answerdiff None "$@" 2>/dev/null || yes | yay -S --needed --answerclean None --answerdiff None "$@"
     else
         echo "❌ Error: Neither paru nor yay found for AUR installation."
         exit 1
@@ -85,18 +89,18 @@ echo "Detected hardware: $GPU_INFO"
 
 if echo "$GPU_INFO" | grep -iq "nvidia"; then
     echo "  → NVIDIA GPU detected: installing nvidia-dkms and utilities..."
-    sudo pacman -S --noconfirm --needed nvidia-dkms nvidia-utils libva-nvidia-driver || true
+    pacman_install nvidia-dkms nvidia-utils libva-nvidia-driver || true
 elif echo "$GPU_INFO" | grep -iq "amd"; then
     echo "  → AMD GPU detected: installing mesa and vulkan-radeon..."
-    sudo pacman -S --noconfirm --needed mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon || true
+    pacman_install mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon || true
 elif echo "$GPU_INFO" | grep -iq "intel"; then
     echo "  → Intel GPU detected: installing intel-media-driver and vulkan-intel..."
-    sudo pacman -S --noconfirm --needed mesa lib32-mesa intel-media-driver vulkan-intel || true
+    pacman_install mesa lib32-mesa intel-media-driver vulkan-intel || true
 fi
 
 # --- Step 4: Official Pacman Packages ---
 echo "▶ [4/9] Installing Hyprland, audio, desktop apps, and system utilities..."
-sudo pacman -S --noconfirm --needed \
+pacman_install \
     hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring polkit-kde-agent \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
     pamixer playerctl brightnessctl grim slurp wl-clipboard cliphist hyprpicker hyprsunset \
@@ -106,7 +110,7 @@ sudo pacman -S --noconfirm --needed \
 
 # --- Step 5: SDDM Display Manager & Caelestia Theme ---
 echo "▶ [5/9] Installing SDDM and Caelestia SDDM Locklike theme..."
-sudo pacman -S --noconfirm --needed \
+pacman_install \
     sddm qt6-declarative qt6-5compat qt6-svg qt6-multimedia
 
 # Install Caelestia SDDM theme and font dependencies from AUR
