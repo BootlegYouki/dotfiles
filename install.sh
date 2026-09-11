@@ -190,6 +190,9 @@ for item in "$DOTFILES_DIR/.config/"*; do
     fi
 done
 
+# Clean up obsolete 2.3.0 QML files if previously present
+rm -f "$TARGET_HOME/.config/quickshell/caelestia/services/NetworkUsage.qml" 2>/dev/null || true
+
 # 7.2 System-wide Quickshell QML
 sudo mkdir -p /etc/xdg/quickshell/caelestia
 if [ -d "$TARGET_HOME/.config/quickshell/caelestia" ]; then
