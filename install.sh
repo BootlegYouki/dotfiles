@@ -349,6 +349,7 @@ echo "✓ Hyprland & UWSM session configured."
 echo "✓ Default shell set to Fish with Starship prompt."
 echo "✓ Desktop widgets, wallpapers, and fonts restored."
 echo ""
-echo "Please reboot your system now:"
-echo "  sudo reboot"
+echo "Rebooting system in 3 seconds (press Ctrl+C to cancel)..."
 echo "=========================================================="
+sleep 3
+sudo reboot
