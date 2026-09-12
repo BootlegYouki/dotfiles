@@ -13,11 +13,3 @@ hl.monitor({
     scale = 1,
     transform = 3
 })
-
--- Universal fallback for laptops (eDP-1) or any newly connected display
-hl.monitor({
-    output = "",
-    mode = "preferred",
-    position = "auto",
-    scale = 1.0
-})
