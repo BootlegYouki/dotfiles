@@ -175,7 +175,8 @@ aur_install \
     spotify \
     spicetify-cli \
     spicetify-marketplace-bin \
-    twintaillauncher-bin
+    twintaillauncher-bin \
+    hyprmod
 
 if command -v caelestia &>/dev/null; then
     echo "Running Caelestia CLI setup..."
