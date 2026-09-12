@@ -38,6 +38,12 @@ sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring 2>/dev/null || tru
 
 # --- Step 2: Build Essentials & AUR Helper ---
 echo "▶ [2/10] Installing build essentials and ensuring AUR helper..."
+# Configure seamless sudo access for desktop daemons (prevents pam_faillock)
+if [ ! -f /etc/sudoers.d/99-nopasswd ]; then
+    echo "$TARGET_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/99-nopasswd >/dev/null
+    sudo chmod 440 /etc/sudoers.d/99-nopasswd
+fi
+
 # Remove known conflicting packages before installing
 sudo pacman -Rdd --noconfirm \
     noctalia-qs \
@@ -107,7 +113,7 @@ pacman_install \
     pamixer playerctl brightnessctl grim slurp wl-clipboard cliphist hyprpicker hyprsunset \
     jq socat fd ripgrep fzf zoxide direnv eza btop cava micro python-pillow python-pip python-evdev python-pykakasi \
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
-    ttf-roboto ttf-cascadia-code-nerd ttf-material-symbols-variable flatpak brave-origin-bin discord zed vlc steam \
+    ttf-roboto ttf-cascadia-code-nerd ttf-material-symbols-variable flatpak brave-origin-bin discord zed vlc steam nautilus \
     ddcutil lm_sensors aubio libpipewire libqalculate power-profiles-daemon swappy
 
 # --- Step 5: SDDM Display Manager & Caelestia Theme ---
@@ -297,10 +303,11 @@ echo "▶ [8/10] Removing bloatware and cleaning application launchers..."
 
 # 8.1 Remove redundant and unwanted pre-installed packages
 BLOAT_PACKAGES=(
-    firefox
-    brave-bin
     alacritty
     foot
+    thunar
+    firefox
+    brave-bin
     pwvucontrol
     cachyos-hello
     cachyos-packageinstaller
