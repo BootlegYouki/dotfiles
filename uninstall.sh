@@ -22,8 +22,8 @@ echo "=========================================================="
 echo ""
 
 # 1. Stop & Disable Services
-echo "▶ [1/6] Stopping and disabling display manager and services..."
-systemctl disable --now sddm 2>/dev/null || true
+echo "▶ [1/6] Disabling display manager and background services..."
+systemctl disable sddm 2>/dev/null || true
 systemctl disable --now genshin-f-macro.service 2>/dev/null || true
 systemctl set-default multi-user.target 2>/dev/null || true
 
@@ -152,7 +152,8 @@ if [ -d "$TARGET_HOME/dotfiles" ]; then
     sudo -u "$TARGET_USER" git -C "$TARGET_HOME/dotfiles" clean -fd 2>/dev/null || true
 fi
 
-# Start TTY login prompt
+# Stop SDDM and start TTY login prompt
+systemctl stop sddm 2>/dev/null || true
 systemctl restart getty@tty1 2>/dev/null || true
 
 echo ""
