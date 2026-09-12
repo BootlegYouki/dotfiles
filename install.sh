@@ -32,12 +32,12 @@ SUDO_KEEP_ALIVE_PID=$!
 trap 'kill "$SUDO_KEEP_ALIVE_PID" 2>/dev/null || true' EXIT
 
 # --- Step 1: Package Databases & Mirrors ---
-echo "▶ [1/9] Refreshing mirrors and updating package databases..."
+echo "▶ [1/10] Refreshing mirrors and updating package databases..."
 sudo cachyos-rate-mirrors 2>/dev/null || true
 sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring 2>/dev/null || true
 
 # --- Step 2: Build Essentials & AUR Helper ---
-echo "▶ [2/9] Installing build essentials and ensuring AUR helper..."
+echo "▶ [2/10] Installing build essentials and ensuring AUR helper..."
 # Remove known conflicting packages before installing
 sudo pacman -Rdd --noconfirm \
     noctalia-qs \
@@ -84,7 +84,7 @@ if pacman -Qi jack2 &>/dev/null; then
 fi
 
 # --- Step 3: GPU Hardware Driver Detection ---
-echo "▶ [3/9] Detecting GPU hardware and installing display drivers..."
+echo "▶ [3/10] Detecting GPU hardware and installing display drivers..."
 GPU_INFO="$(lspci | grep -Ei 'vga|3d|display' || true)"
 echo "Detected hardware: $GPU_INFO"
 
@@ -100,7 +100,7 @@ elif echo "$GPU_INFO" | grep -iq "intel"; then
 fi
 
 # --- Step 4: Official Pacman Packages ---
-echo "▶ [4/9] Installing Hyprland, audio, desktop apps, and system utilities..."
+echo "▶ [4/10] Installing Hyprland, audio, desktop apps, and system utilities..."
 pacman_install \
     hyprland uwsm ghostty waybar fish starship fastfetch gnome-keyring polkit-kde-agent \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
@@ -111,7 +111,7 @@ pacman_install \
     ddcutil lm_sensors aubio libpipewire libqalculate power-profiles-daemon swappy
 
 # --- Step 5: SDDM Display Manager & Caelestia Theme ---
-echo "▶ [5/9] Installing SDDM and Caelestia SDDM Locklike theme..."
+echo "▶ [5/10] Installing SDDM and Caelestia SDDM Locklike theme..."
 pacman_install \
     sddm qt6-declarative qt6-5compat qt6-svg qt6-multimedia
 
@@ -159,7 +159,7 @@ if pacman -Qi noctalia-qs &>/dev/null || pacman -Qi quickshell &>/dev/null; then
 fi
 
 # --- Step 6: Caelestia Shell & AUR Desktop Packages ---
-echo "▶ [6/9] Installing Quickshell-git and Caelestia desktop shell dependencies..."
+echo "▶ [6/10] Installing Quickshell-git and Caelestia desktop shell dependencies..."
 # Force aur/ prefix so CachyOS doesn't hijack quickshell with outdated noctalia-qs
 aur_install \
     aur/quickshell-git \
@@ -177,7 +177,7 @@ if command -v caelestia &>/dev/null; then
 fi
 
 # --- Step 7: Restoring Dotfiles & User Configurations ---
-echo "▶ [7/9] Restoring user configurations to ~/.config and ~/.local..."
+echo "▶ [7/10] Restoring user configurations to ~/.config and ~/.local..."
 
 # 7.1 .config files
 mkdir -p "$TARGET_HOME/.config"
@@ -292,8 +292,56 @@ if command -v spicetify &>/dev/null && [ -d "/opt/spotify" ]; then
     sudo -u "$TARGET_USER" spicetify backup apply 2>/dev/null || sudo -u "$TARGET_USER" spicetify apply 2>/dev/null || true
 fi
 
-# --- Step 8: Set Default Login Shell to Fish ---
-echo "▶ [8/9] Setting default login shell to Fish..."
+# --- Step 8: Debloat Pre-Installed Packages & Clean Launchers ---
+echo "▶ [8/10] Removing bloatware and cleaning application launchers..."
+
+# 8.1 Remove redundant and unwanted pre-installed packages
+BLOAT_PACKAGES=(
+    firefox
+    brave-bin
+    alacritty
+    foot
+    pwvucontrol
+    cachyos-hello
+    cachyos-packageinstaller
+    meld
+)
+
+for b_pkg in "${BLOAT_PACKAGES[@]}"; do
+    if pacman -Qi "$b_pkg" &>/dev/null; then
+        echo "  - Removing bloat package: $b_pkg..."
+        sudo pacman -Rdd --noconfirm "$b_pkg" 2>/dev/null || true
+    fi
+done
+
+# 8.2 Hide unwanted library GUI shortcuts from launcher without breaking dependencies
+mkdir -p "$TARGET_HOME/.local/share/applications"
+HIDDEN_DESKTOP_FILES=(
+    qv4l2.desktop
+    qvidcap.desktop
+    lstopo.desktop
+    xgps.desktop
+    xgpsspeed.desktop
+    uuctl.desktop
+    avahi-discover.desktop
+    bssh.desktop
+    bvnc.desktop
+    xfce4-about.desktop
+    thunar-settings.desktop
+    thunar-bulk-rename.desktop
+)
+
+for dfile in "${HIDDEN_DESKTOP_FILES[@]}"; do
+    if [ -f "/usr/share/applications/$dfile" ]; then
+        echo "  - Hiding launcher shortcut: $dfile"
+        cp "/usr/share/applications/$dfile" "$TARGET_HOME/.local/share/applications/$dfile"
+        echo "NoDisplay=true" >> "$TARGET_HOME/.local/share/applications/$dfile"
+    fi
+done
+update-desktop-database "$TARGET_HOME/.local/share/applications" 2>/dev/null || true
+
+# --- Step 9: Set Default Login Shell to Fish ---
+echo "▶ [9/10] Setting default login shell to Fish..."
 FISH_BIN="$(command -v fish || echo "/usr/bin/fish")"
 if [ "$SHELL" != "$FISH_BIN" ]; then
     if grep -Fxq "$FISH_BIN" /etc/shells; then
@@ -313,8 +361,8 @@ sudo chown -R "$TARGET_USER:$TARGET_USER" \
     "$TARGET_HOME/.face.icon" \
     "$TARGET_HOME/.bash_profile" 2>/dev/null || true
 
-# --- Step 9: Enable Services & Pacman Hooks ---
-echo "▶ [9/9] Enabling user daemons and system services..."
+# --- Step 10: Enable Services & Pacman Hooks ---
+echo "▶ [10/10] Enabling user daemons and system services..."
 
 # Pacman Hooks
 if [ -d "$DOTFILES_DIR/system/etc/pacman.d/hooks" ]; then
