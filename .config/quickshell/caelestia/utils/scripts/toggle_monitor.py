@@ -13,7 +13,7 @@ def get_monitors():
 
 def get_secondary_monitor(monitors):
     for m in monitors:
-        if m["name"] != "HDMI-A-1":
+        if m.get("name") != "HDMI-A-1":
             return m
     return None
 
@@ -25,7 +25,7 @@ def eval_lua(cmd):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: toggle_monitor.py [on|off|status]", file=sys.stderr)
+        print("Usage: toggle_monitor.py [on|off|status|detect]", file=sys.stderr)
         sys.exit(1)
         
     action = sys.argv[1]
@@ -35,15 +35,14 @@ def main():
         sys.exit(0 if len(monitors) > 1 else 1)
         
     sec = get_secondary_monitor(monitors)
-    
     if not sec:
         print("No secondary monitor found.", file=sys.stderr)
         sys.exit(1)
         
-    name = sec["name"]
+    name = sec.get("name", "DP-1")
     
     if action == "status":
-        # Exit with 0 if monitor is enabled (not disabled)
+        # Exit 0 if enabled (not disabled), 1 if disabled
         sys.exit(1 if sec.get("disabled", False) else 0)
         
     elif action == "off":
@@ -51,19 +50,20 @@ def main():
         eval_lua(cmd)
         
     elif action == "on":
-        width = sec.get("width", 1920)
-        height = sec.get("height", 1080)
-        refresh = sec.get("refreshRate", 60.0)
-        x = sec.get("x", 1920)
-        y = sec.get("y", 0)
-        scale = sec.get("scale", 1)
-        transform = sec.get("transform", 0)
+        # Use user's configured defaults if disabled properties are reset to 0
+        transform = sec.get("transform", 3)
+        if transform == 0 and name == "DP-1":
+            transform = 3
+            
+        y = sec.get("y", -420)
+        if y == 0 and name == "DP-1":
+            y = -420
+            
+        x = sec.get("x", 1920) or 1920
+        scale = sec.get("scale", 1) or 1
         
-        cmd = f"hl.monitor({{ output = '{name}', disabled = false, mode = '{width}x{height}@{refresh}', position = '{x}x{y}', scale = {scale}, transform = {transform} }})"
+        cmd = f"hl.monitor({{ output = '{name}', disabled = false, mode = '1920x1080@60', position = '{x}x{y}', scale = {scale}, transform = {transform} }})"
         eval_lua(cmd)
-        
-        # Also ensure DPMS is on
-        eval_lua("hl.dispatch(hl.dsp.dpms('on'))")
         
     else:
         print(f"Unknown action: {action}", file=sys.stderr)
