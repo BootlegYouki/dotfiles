@@ -4,6 +4,10 @@
 export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 
+if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+    export HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" 2>/dev/null | head -n1)
+fi
+
 WATCH_DIR="$HOME/.config/quickshell/caelestia"
 
 if [ ! -d "$WATCH_DIR" ]; then

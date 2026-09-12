@@ -29,30 +29,19 @@ ColumnLayout {
 
     spacing: 0
 
-    StyledText {
+    MaterialIcon {
         id: indicator
 
-        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+        Layout.alignment: Qt.AlignHCenter
+        Layout.preferredWidth: Tokens.sizes.bar.innerWidth - Tokens.padding.small
         Layout.preferredHeight: Tokens.sizes.bar.innerWidth - Tokens.padding.small
 
-        animate: true
-        text: {
-            const ws = Hypr.workspaces.values.find(w => w.id === root.ws);
-            const wsName = !ws || ws.name == root.ws ? root.ws : ws.name[0];
-            let displayName = wsName.toString();
-            if (Config.bar.workspaces.capitalisation.toLowerCase() === "upper") {
-                displayName = displayName.toUpperCase();
-            } else if (Config.bar.workspaces.capitalisation.toLowerCase() === "lower") {
-                displayName = displayName.toLowerCase();
-            }
-            const label = Config.bar.workspaces.label || displayName;
-            const occupiedLabel = Config.bar.workspaces.occupiedLabel || label;
-            const activeLabel = Config.bar.workspaces.activeLabel || (root.isOccupied ? occupiedLabel : label);
-            return root.activeWsId === root.ws ? activeLabel : root.isOccupied ? occupiedLabel : label;
-        }
+        text: root.activeWsId === root.ws ? "radio_button_checked" : "radio_button_unchecked"
+        fill: 0
+        fontStyle: Tokens.font.icon.small
         color: Config.bar.workspaces.occupiedBg || root.isOccupied || root.activeWsId === root.ws ? Colours.palette.m3onSurface : Colours.layer(Colours.palette.m3outlineVariant, 2)
         verticalAlignment: Qt.AlignVCenter
-        font.family: Tokens.font.workspaces
+        horizontalAlignment: Qt.AlignHCenter
     }
 
     Loader {

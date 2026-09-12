@@ -23,6 +23,14 @@ Configuration for Hyprland under the Caelestia shell.
   - **Dashboard Cards (`Fetch.qml`, `WeatherInfo.qml`, `Media.qml`, `Resources.qml`, `Content.qml`)**: `0.18` alpha translucent fill with subtle `0.12` alpha glass borders.
   - **Password Pill (`PasswordInput.qml`)**: `0.28` alpha container with `0.40` alpha `m3primary` accent border.
 
+## Bar Workspace Indicators
+- **Component**: `~/.config/quickshell/caelestia/modules/bar/components/workspaces/Workspace.qml`
+- **Fix / Styling**:
+  - Replaced broken text capitalisation logic with dynamic Material Symbols radio button indicators:
+    - **Active workspace**: `radio_button_checked` (concentric outer ring + inner solid dot).
+    - **Inactive workspaces**: `radio_button_unchecked` (clean outer ring).
+  - Centered inside a uniform square container (`Layout.preferredWidth` & `Layout.preferredHeight` matching `Tokens.sizes.bar.innerWidth - Tokens.padding.small`) to eliminate vertical stretching / oval distortion.
+
 ## Keybindings (Shortcuts)
 Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hypr/userprefs.conf`:
 
