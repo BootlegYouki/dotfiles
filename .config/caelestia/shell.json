@@ -221,7 +221,14 @@
             "vim",
             "org.freedesktop.Xwayland",
             "gcr-viewer",
-            "gcr-prompter"
+            "gcr-prompter",
+            "ktelnetservice.*",
+            "org\\.kde\\.(kiod|knewstuff|ksecretd|kwalletd).*",
+            "polkit-.*-authentication-agent.*",
+            "org\\.quickshell",
+            "xdg-desktop-portal-.*",
+            "org\\.gnupg\\.pinentry.*",
+            "com\\.shellyorg\\.shelly-notifications"
         ]
     },
     "lock": {
