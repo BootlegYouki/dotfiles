@@ -146,8 +146,10 @@ if [ -f "$DOTFILES_DIR/assets/.face.icon" ]; then
     sudo chmod 644 "/usr/share/sddm/faces/$TARGET_USER.face.icon" "/usr/share/sddm/faces/.face.icon"
 fi
 
-# Enable SDDM display manager
+# Enable SDDM display manager and ensure graphical target
+sudo systemctl set-default graphical.target
 sudo systemctl enable sddm
+echo "  ✓ Default target set to graphical.target"
 echo "  ✓ SDDM enabled"
 
 # Remove conflicting CachyOS quickshell forks if present
