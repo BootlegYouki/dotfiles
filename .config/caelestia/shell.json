@@ -201,7 +201,27 @@
             "qvidcap",
             "xgps.*",
             "uuctl",
-            "xfce4-about"
+            "xfce4-about",
+            "Alacritty",
+            "alacritty",
+            "foot.*",
+            "thunar-bulk-rename",
+            "thunar-settings",
+            "firefox",
+            "pwvucontrol",
+            "com.saivert.pwvucontrol",
+            "cachyos-.*",
+            "org.cachyos.*",
+            "meld",
+            "org.gnome.Meld",
+            "cmake-gui",
+            ".*-geo-handler",
+            "darkly.*",
+            "kcm_darkly.*",
+            "vim",
+            "org.freedesktop.Xwayland",
+            "gcr-viewer",
+            "gcr-prompter"
         ]
     },
     "lock": {
