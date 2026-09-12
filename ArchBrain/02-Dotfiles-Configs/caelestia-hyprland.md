@@ -31,6 +31,15 @@ Configuration for Hyprland under the Caelestia shell.
     - **Inactive workspaces**: `radio_button_unchecked` (clean outer ring).
   - Centered inside a uniform square container (`Layout.preferredWidth` & `Layout.preferredHeight` matching `Tokens.sizes.bar.innerWidth - Tokens.padding.small`) to eliminate vertical stretching / oval distortion.
 
+## Launcher Debloating & Hidden Apps Filter
+- **Component**: `~/.config/caelestia/shell.json` (`launcher.hiddenApps`) and `~/.local/share/applications/`
+- **Configuration**:
+  - Filtered out unused pre-installed applications and redundant helpers:
+    - Terminals: `Alacritty`, `foot`, `footclient`, `foot-server` (keeping `ghostty`)
+    - File helpers: `thunar-bulk-rename`, `thunar-settings`, `xfce4-about` (keeping main `thunar`)
+    - Redundant tools: `pwvucontrol`, `meld`, `cmake-gui`, `cachyos-hello`, `cachyos-pi`
+    - Diagnostics & background helpers: `qv4l2`, `qvidcap`, `lstopo`, `xgps*`, `uuctl`, `avahi-discover`, `bssh`, `bvnc`, `ktelnetservice6`, `org.kde.*`, `polkit-.*`
+
 ## Keybindings (Shortcuts)
 Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hypr/userprefs.conf`:
 
