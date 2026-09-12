@@ -309,8 +309,13 @@ BLOAT_PACKAGES=(
     firefox
     brave-bin
     pwvucontrol
+    shelly
     cachyos-hello
     cachyos-packageinstaller
+    cachyos-kernel-manager
+    scx-manager
+    btrfs-assistant
+    darkly-bin
     meld
 )
 
@@ -333,9 +338,14 @@ HIDDEN_DESKTOP_FILES=(
     avahi-discover.desktop
     bssh.desktop
     bvnc.desktop
+    cmake-gui.desktop
     xfce4-about.desktop
     thunar-settings.desktop
     thunar-bulk-rename.desktop
+    cartes-geo-handler.desktop
+    google-maps-geo-handler.desktop
+    openstreetmap-geo-handler.desktop
+    wheelmap-geo-handler.desktop
 )
 
 for dfile in "${HIDDEN_DESKTOP_FILES[@]}"; do
