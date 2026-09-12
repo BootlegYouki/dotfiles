@@ -72,6 +72,12 @@ PACKAGES_TO_REMOVE=(
     ttf-material-symbols-variable
     ttf-rubik-vf
     spotify
+    spicetify-cli
+    spicetify-marketplace-bin
+    brave-origin-bin
+    brave-bin
+    twintaillauncher-bin
+    steam
     discord
     zed
     vlc

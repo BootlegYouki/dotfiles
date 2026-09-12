@@ -107,7 +107,7 @@ pacman_install \
     pamixer playerctl brightnessctl grim slurp wl-clipboard cliphist hyprpicker hyprsunset \
     jq socat fd ripgrep fzf zoxide direnv eza btop cava micro python-pillow python-pip python-evdev python-pykakasi \
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk \
-    ttf-roboto ttf-cascadia-code-nerd ttf-material-symbols-variable flatpak brave-bin discord zed vlc \
+    ttf-roboto ttf-cascadia-code-nerd ttf-material-symbols-variable flatpak brave-origin-bin discord zed vlc steam \
     ddcutil lm_sensors aubio libpipewire libqalculate power-profiles-daemon swappy
 
 # --- Step 5: SDDM Display Manager & Caelestia Theme ---
@@ -164,7 +164,10 @@ aur_install \
     caelestia-cli \
     caelestia-shell \
     ttf-rubik-vf \
-    spotify
+    spotify \
+    spicetify-cli \
+    spicetify-marketplace-bin \
+    twintaillauncher-bin
 
 if command -v caelestia &>/dev/null; then
     echo "Running Caelestia CLI setup..."
@@ -253,6 +256,34 @@ if [ -d "$DOTFILES_DIR/ArchBrain" ]; then
     cp -a "$DOTFILES_DIR/ArchBrain/." "$TARGET_HOME/ArchBrain/"
 fi
 
+# 7.8 Spicetify Setup (Themes, Marketplace & Extensions)
+if command -v spicetify &>/dev/null && [ -d "/opt/spotify" ]; then
+    echo "Configuring Spicetify, themes, and Marketplace..."
+    sudo chmod a+wr /opt/spotify 2>/dev/null || true
+    sudo chmod a+wr /opt/spotify/Apps -R 2>/dev/null || true
+
+    mkdir -p "$TARGET_HOME/.config/spotify"
+    touch "$TARGET_HOME/.config/spotify/prefs"
+
+    mkdir -p "$TARGET_HOME/.config/spicetify/CustomApps"
+    mkdir -p "$TARGET_HOME/.config/spicetify/Themes"
+
+    if [ -d "/opt/spicetify-cli/CustomApps/marketplace" ]; then
+        ln -sfn "/opt/spicetify-cli/CustomApps/marketplace" "$TARGET_HOME/.config/spicetify/CustomApps/marketplace"
+    fi
+    if [ -d "/opt/spicetify-cli/Themes/marketplace" ]; then
+        ln -sfn "/opt/spicetify-cli/Themes/marketplace" "$TARGET_HOME/.config/spicetify/Themes/marketplace"
+    fi
+
+    # Fix prefs_path in config-xpui.ini for target user
+    if [ -f "$TARGET_HOME/.config/spicetify/config-xpui.ini" ]; then
+        sed -i "s|prefs_path.*=.*|prefs_path = $TARGET_HOME/.config/spotify/prefs|" "$TARGET_HOME/.config/spicetify/config-xpui.ini"
+    fi
+
+    echo "Applying Spicetify customization..."
+    sudo -u "$TARGET_USER" spicetify backup apply 2>/dev/null || sudo -u "$TARGET_USER" spicetify apply 2>/dev/null || true
+fi
+
 # --- Step 8: Set Default Login Shell to Fish ---
 echo "▶ [8/9] Setting default login shell to Fish..."
 FISH_BIN="$(command -v fish || echo "/usr/bin/fish")"
@@ -281,6 +312,9 @@ echo "▶ [9/9] Enabling user daemons and system services..."
 if [ -d "$DOTFILES_DIR/system/etc/pacman.d/hooks" ]; then
     sudo mkdir -p /etc/pacman.d/hooks
     sudo cp -a "$DOTFILES_DIR/system/etc/pacman.d/hooks/." /etc/pacman.d/hooks/
+    if [ -f /etc/pacman.d/hooks/90-spicetify-apply.hook ]; then
+        sudo sed -i "s/youki/$TARGET_USER/g" /etc/pacman.d/hooks/90-spicetify-apply.hook 2>/dev/null || true
+    fi
 fi
 
 # Genshin macro service
