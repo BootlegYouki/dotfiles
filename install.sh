@@ -235,7 +235,13 @@ fi
 echo "Syncing wallpapers..."
 if [ ! -d "$TARGET_HOME/Pictures/Wallpapers" ]; then
     mkdir -p "$TARGET_HOME/Pictures"
-    git clone https://github.com/laustoic/laustoic-wallpaper-repo.git "$TARGET_HOME/Pictures/Wallpapers" 2>/dev/null || true
+    git clone --depth 1 https://github.com/laustoic/laustoic-wallpaper-repo.git "$TARGET_HOME/Pictures/Wallpapers" 2>/dev/null || true
+fi
+
+# Flatten subfolder if present
+if [ -d "$TARGET_HOME/Pictures/Wallpapers/Wallpapers" ]; then
+    mv "$TARGET_HOME/Pictures/Wallpapers/Wallpapers/"* "$TARGET_HOME/Pictures/Wallpapers/" 2>/dev/null || true
+    rmdir "$TARGET_HOME/Pictures/Wallpapers/Wallpapers" 2>/dev/null || true
 fi
 
 if [ -f "$TARGET_HOME/Pictures/Wallpapers/wallhaven-zywgxy.jpg" ]; then
