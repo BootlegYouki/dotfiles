@@ -190,6 +190,11 @@
             "org.gnome.Nautilus"
         ],
         "hiddenApps": [
+            "jshell.*",
+            "jconsole.*",
+            "java-.*",
+            "org\\.freedesktop\\.IBus.*",
+            "ibus.*",
             "brave-browser",
             "org\\.gnome\\.(?!Nautilus).*",
             "avahi-discover",
@@ -228,7 +233,9 @@
             "org\\.quickshell",
             "xdg-desktop-portal-.*",
             "org\\.gnupg\\.pinentry.*",
-            "com\\.shellyorg\\.shelly-notifications"
+            "com\\.shellyorg\\.shelly-notifications",
+            "jconsole-java17-openjdk",
+            "jshell-java17-openjdk"
         ]
     },
     "lock": {
@@ -249,24 +256,31 @@
     "utilities": {
         "quickToggles": [
             {
+                "enabled": true,
                 "id": "wifi"
             },
             {
+                "enabled": true,
                 "id": "ethernet"
             },
             {
+                "enabled": true,
                 "id": "bluetooth"
             },
             {
+                "enabled": true,
                 "id": "display"
             },
             {
+                "enabled": true,
                 "id": "nightlight"
             },
             {
+                "enabled": true,
                 "id": "gameMode"
             },
             {
+                "enabled": true,
                 "id": "settings"
             }
         ],

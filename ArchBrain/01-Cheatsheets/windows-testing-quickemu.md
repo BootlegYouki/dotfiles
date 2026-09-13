@@ -15,6 +15,7 @@ Lightweight, hardware-accelerated Windows 10 Enterprise LTSC KVM virtual machine
 * **vCPUs**: 4 cores
 * **RAM**: 4096 MB (Dynamic ballooning)
 * **Disk**: 64 GB QCOW2 (sparse, expands only as needed)
+* **Display**: Native SDL (`display="sdl"`, direct Wayland OpenGL acceleration)
 * **Shared Folder**: `~/Public` (automatically mounted in guest via SPICE WebDAV)
 
 ---
