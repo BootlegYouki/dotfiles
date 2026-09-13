@@ -40,6 +40,7 @@ Explicitly installed core packages driving the OS, DE, and Shell experience.
 - `brave-bin` (Web Browser - Brave)
 - `discord` (Communication)
 - `obsidian` (Knowledge Base & Notes)
+- `pi` (`@earendil-works/pi-coding-agent` AI coding agent harness with `subagent`, `todo`, `obsidian-vault`, and `bash-guard` extensions)
 - `Google Office Suite` (Desktop Web Apps: Docs, Sheets, Slides)
 - `twintaillauncher-bin` / `steam` (Gaming Launchers)
 - `jdk17-openjdk` / `android-tools` / `android-udev` (Android Development & Emulation)

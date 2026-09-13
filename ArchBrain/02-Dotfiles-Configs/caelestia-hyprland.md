@@ -1,64 +1,104 @@
 # Caelestia Hyprland Configuration
 
-Configuration for Hyprland under the Caelestia shell.
+Configuration for Hyprland under the Caelestia shell, configured via Lua (`~/.config/hypr/hyprland.lua`, `hyprland/*.lua`, `~/.config/caelestia/hypr-user.lua`, and `~/.config/hypr/hyprland-gui.lua`).
 
-## Apps
-- **Terminal:** ghostty
-- **Browser:** brave
-- **Editor:** zeditor
-- **File Explorer:** nautilus
-- **Audio Settings:** pavucontrol
-- **System Settings:** hyprmod
+---
 
-## UI Changes
+## Dual-Monitor Configuration
+
+Configured in `~/.config/caelestia/hypr-user.lua`:
+
+| Monitor | Connector | Resolution / Rate | Position | Orientation | Workspaces Assigned |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Primary** | `HDMI-A-1` (ASUS VA24E) | `1920x1080@74.99Hz` | `0x0` | Landscape (`transform = 0`) | **1 .. 10** (Default: `1`) |
+| **Secondary** | `DP-1` (Dell P2219H) | `1920x1080@60Hz` | `1920x-420` | Portrait / 270° (`transform = 3`) | **11 .. 20** (Default: `11`) |
+
+### Workspace Pinning Rules
+```lua
+for i = 1, 10 do
+    hl.workspace_rule({ workspace = tostring(i), monitor = "HDMI-A-1", default = (i == 1) })
+end
+for i = 11, 20 do
+    hl.workspace_rule({ workspace = tostring(i), monitor = "DP-1", default = (i == 11) })
+end
+```
+
+---
+
+## Core Applications
+- **Terminal:** `ghostty` (Monochrome Caelestia scheme)
+- **Browser:** `brave`
+- **Editor:** `zeditor` (`zed`)
+- **File Explorer:** `nautilus`
+- **Audio Control:** `pavucontrol`
+- **Settings GUI:** `hyprmod`
+
+---
+
+## Appearance & Window Styling (HyprMod)
+- **Rounding:** `17`
+- **Borders:** Size `2`, Active Border `0xffffffff` (solid specular white accent)
+- **Gaps:** In `3`, Out `9`
+- **Opacity:** Active `1.0`, Inactive `1.0` (Blur integrated on terminal & glass surfaces)
 - **Blur:** Enabled (Size: 8, Passes: 2)
 - **Shadows:** Enabled (Range: 15, Power: 4)
-- **Gaps:** Workspace 20, Window In 8, Window Out 18
-- **Window:** Opacity 0.95, Rounding 10, Border Size 2
-- **Cursor Theme:** sweet-cursors (Size: 24)
+
+---
+
+## Caelestia Special Workspaces Navigation
+Caelestia features persistent vertical special workspace drawer docks. Smooth cycling is configured in `hypr-user.lua`:
+- Visual Order:
+  1. `special:music`
+  2. `special:dev`
+  3. `special:communication`
+  4. `special:todo`
+  5. `special:sysmon`
+  6. `special:special`
+- **Keybindings**:
+  - `CTRL + SUPER + Down`: Cycles DOWN the sidebar special workspaces.
+  - `CTRL + SUPER + Up`: Cycles UP the sidebar special workspaces.
+
+---
+
+## Keybindings & Shortcuts Reference
+
+### Global Desktop Navigation
+- `SUPER + T`: Launch Terminal (`ghostty`)
+- `SUPER + W`: Launch Browser (`brave`)
+- `SUPER + E`: Launch File Manager (`nautilus`)
+- `SUPER + I`: Launch System Settings (`hyprmod`)
+- `SUPER + F`: Bordered Fullscreen / Maximized
+- `F11`: True Fullscreen
+- `ALT + F4`: Session Menu / Power Dialog
+- `SUPER + L`: Lock Screen (`hyprlock` / Caelestia lockscreen)
+- `SUPER + F5`: Reload Hyprland config (`hyprctl reload`)
+
+### Universal Mac/Windows Input
+- `SUPER + C`: Universal Copy (handled by `keyd` layer & Hyprland Lua)
+- `SUPER + V`: Universal Paste (handled by `keyd` layer & Hyprland Lua)
+- `SUPER + X`: Universal Cut (handled by `keyd` layer)
+- `CTRL + SUPER + V`: Clipboard History Manager (Caelestia / Cliphist)
+- `SUPER + Period` / `Comma`: Next / Previous Wallpaper (triggers `sync-sddm-pixie` hook)
+
+### Utilities & Toggles
+- `SUPER + SHIFT + N`: Toggle Night Light (4000K warm temperature via `nightlight`)
+- `SUPER + ALT + A`: Startup Applications Manager (`autostart-manager`)
+- `CTRL + SHIFT + Escape`: Task Manager / System Monitor (opens `special:sysmon` running `btop`)
+- `ALT + TAB`: Cursor toggle across monitors
+
+---
 
 ## Lockscreen Frosted Glass Styling
-- Enhanced `~/.config/quickshell/caelestia/modules/lock/` with airy, translucent frosted glass aesthetics:
-  - **Main Container (`LockSurface.qml`)**: `lockBg` uses `Qt.alpha(Colours.palette.m3surface, 0.22)` with a 1px `m3onSurface` 0.18 translucent specular border over the blurred `ScreencopyView` (`blurMax: 64`).
-  - **Dashboard Cards (`Fetch.qml`, `WeatherInfo.qml`, `Media.qml`, `Resources.qml`, `Content.qml`)**: `0.18` alpha translucent fill with subtle `0.12` alpha glass borders.
+- Configured in `~/.config/quickshell/caelestia/modules/lock/`:
+  - **Surface (`LockSurface.qml`)**: `lockBg` uses `Qt.alpha(Colours.palette.m3surface, 0.22)` with a 1px `m3onSurface` 0.18 translucent specular border over blurred `ScreencopyView` (`blurMax: 64`).
+  - **Dashboard Cards (`Fetch.qml`, `WeatherInfo.qml`, etc.)**: `0.18` alpha translucent fill with `0.12` alpha glass borders.
   - **Password Pill (`PasswordInput.qml`)**: `0.28` alpha container with `0.40` alpha `m3primary` accent border.
 
-## Bar Workspace Indicators
-- **Component**: `~/.config/quickshell/caelestia/modules/bar/components/workspaces/Workspace.qml`
-- **Fix / Styling**:
-  - Replaced broken text capitalisation logic with dynamic Material Symbols radio button indicators:
-    - **Active workspace**: `radio_button_checked` (concentric outer ring + inner solid dot).
-    - **Inactive workspaces**: `radio_button_unchecked` (clean outer ring).
-  - Centered inside a uniform square container (`Layout.preferredWidth` & `Layout.preferredHeight` matching `Tokens.sizes.bar.innerWidth - Tokens.padding.small`) to eliminate vertical stretching / oval distortion.
-
-## Launcher Debloating & Hidden Apps Filter
-- **Component**: `~/.config/caelestia/shell.json` (`launcher.hiddenApps`) and `~/.local/share/applications/`
-- **Configuration**:
-  - Filtered out unused pre-installed applications and redundant helpers:
-    - Terminals: `Alacritty`, `foot`, `footclient`, `foot-server` (keeping `ghostty`)
-    - File helpers: `thunar-bulk-rename`, `thunar-settings`, `xfce4-about` (keeping main `thunar`)
-    - Redundant tools: `pwvucontrol`, `meld`, `cmake-gui`, `cachyos-hello`, `cachyos-pi`
-    - Diagnostics & background helpers: `qv4l2`, `qvidcap`, `lstopo`, `xgps*`, `uuctl`, `avahi-discover`, `bssh`, `bvnc`, `ktelnetservice6`, `org.kde.*`, `polkit-.*`
-
-## Keybindings (Shortcuts)
-Most keybindings are mapped in `~/.config/hypr/variables.lua` and `~/.config/hypr/userprefs.conf`:
-
-### Windows-style shortcuts
-- `SUPER + I` -> System Settings (hyprmod)
-- `SUPER + E` -> File Manager (nautilus)
-- `SUPER + T` -> Terminal (ghostty)
-- `SUPER + W` -> Browser (brave)
-- `SUPER + C` -> Universal Copy (Terminal: `Ctrl+Shift+C`, GUI/Websites: `Ctrl+C` via balanced `send_key_state` down/up)
-- `SUPER + V` -> Universal Paste (Terminal: `Ctrl+Shift+V`, GUI/Websites: `Ctrl+V` via balanced `send_key_state` down/up)
-- `CTRL + SUPER + V` -> Clipboard History Manager (Caelestia / Cliphist)
-- `SUPER + Period` / `Comma` -> Next/Prev Wallpaper
-- `SUPER + L` -> Lock Screen
-- `SUPER + F` -> Bordered Fullscreen / Maximized
-- `F11` -> True Fullscreen
-- `ALT + F4` -> Session Menu / Power
-- `CTRL + SHIFT + Escape` -> Task Manager / System Monitor (btop / special workspace)
+---
 
 ## Related Notes
 - [[custom-scripts]]
-- [[system-services]]
 - [[sddm-pixie-display-manager]]
+- [[shell-terminal-config]]
+- [[quickshell-caelestia-auto-reload]]
+- [[multi-monitor-sleep-wake-hpd-and-quick-toggle-fix]]
