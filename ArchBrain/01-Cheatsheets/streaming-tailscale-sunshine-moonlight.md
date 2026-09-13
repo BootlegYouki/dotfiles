@@ -59,6 +59,12 @@ uwsm app -- sunshine
 2. On initial launch, set up an **admin username** and **password**.
 3. Sunshine configuration is stored at `~/.config/sunshine/sunshine.conf`.
 
+> [!IMPORTANT]
+> When accessing Sunshine Web UI remotely (e.g. over Tailscale IP `100.68.241.60`), Sunshine's built-in CSRF protection blocks requests unless the origin is allowed. Ensure `csrf_allowed_origins` is set in `~/.config/sunshine/sunshine.conf`:
+> ```ini
+> csrf_allowed_origins = https://100.68.241.60:47990,https://100.68.241.60,https://youki:47990,https://youki
+> ```
+
 ### Pairing with Moonlight
 1. Open **Moonlight** on your client device (phone, tablet, laptop, or work PC).
 2. Moonlight will discover your PC automatically if on the same network, or add your PC by entering its **Tailscale IP** (e.g. `100.68.241.60`).
