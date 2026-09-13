@@ -42,8 +42,10 @@ Explicitly installed core packages driving the OS, DE, and Shell experience.
 - `obsidian` (Knowledge Base & Notes)
 - `Google Office Suite` (Desktop Web Apps: Docs, Sheets, Slides)
 - `twintaillauncher-bin` / `steam` (Gaming Launchers)
+- `jdk17-openjdk` / `android-tools` / `android-udev` (Android Development & Emulation)
 
 ## Related Notes
+- [[android-sdk-emulator]]
 - [[gui-software-managers]]
 - [[system-services]]
 

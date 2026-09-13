@@ -75,4 +75,5 @@ print('Event counts per device:', counts)
 ## Related Notes
 - [[caelestia-hyprland]]
 - [[multi-monitor-sleep-and-proton-idle-inhibit]]
+- [[multi-monitor-sleep-wake-hpd-and-quick-toggle-fix]]
 - [[system-services]]
