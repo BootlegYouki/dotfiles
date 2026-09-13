@@ -42,6 +42,17 @@ Migrated from the previous pseudo-login setup (getty `tty1` autologin + Caelesti
 
 ---
 
+### 5. Headless & Remote Autologin Configuration
+- **Drop-in File**: `/etc/sddm.conf.d/autologin.conf`
+  ```ini
+  [Autologin]
+  User=youki
+  Session=hyprland-uwsm
+  ```
+- **Purpose**: Enables automatic session start into Hyprland (UWSM) upon physical power-on or AC restore without requiring interactive password entry, allowing unattended remote game streaming and headless access via Sunshine/Tailscale.
+
+---
+
 ## Testing & Verification
 To test the SDDM theme in an isolated test window:
 ```bash

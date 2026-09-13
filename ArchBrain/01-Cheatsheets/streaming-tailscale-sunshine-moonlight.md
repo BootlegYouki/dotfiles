@@ -60,11 +60,17 @@ uwsm app -- sunshine
 3. Sunshine configuration is stored at `~/.config/sunshine/sunshine.conf`.
 
 ### Pairing with Moonlight
-1. Open **Moonlight** on your client device (phone, tablet, laptop, or handheld).
-2. Moonlight will discover your PC automatically if on the same network / Tailscale mesh, or you can add your PC by entering its **Tailscale IP** (e.g. `100.x.y.z`).
+1. Open **Moonlight** on your client device (phone, tablet, laptop, or work PC).
+2. Moonlight will discover your PC automatically if on the same network, or add your PC by entering its **Tailscale IP** (e.g. `100.68.241.60`).
 3. Moonlight will display a 4-digit PIN.
-4. Go to Sunshine Web UI (`https://localhost:47990`) -> **PIN** tab -> enter the 4-digit PIN and click **Send**.
-5. Your client is now paired and ready to stream.
+4. Open Sunshine Web UI:
+   - Locally: `https://localhost:47990`
+   - Remotely over Tailscale: `https://<tailscale-ip>:47990` (e.g. `https://100.68.241.60:47990`)
+5. Navigate to the **PIN** tab -> enter the 4-digit PIN and click **Send**.
+6. Your client is now paired and ready to stream.
+
+> [!TIP]
+> Remote pairing allows pairing without physical access to the host PC. A remote client can open the host's Sunshine dashboard over Tailscale and submit the PIN itself.
 
 ---
 
