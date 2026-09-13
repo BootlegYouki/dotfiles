@@ -10,6 +10,7 @@ Comprehensive catalogue of user scripts and helper utilities installed in `~/.lo
 - **`caelestia-auto-reload`**: Active background daemon watching `~/.config/quickshell/caelestia` via `inotifywait`. Automatically reloads the Caelestia Quickshell UI on file saves.
 - **`caelestia-wallpaper-shift`**: Utility script to shift or cycle desktop wallpapers dynamically.
 - **`sync-sddm-pixie`**: Copies the active desktop wallpaper to `/usr/share/sddm/themes/pixie/assets/background.jpg` and recalculates accent colors for SDDM login screen. Triggered automatically by Caelestia post-hooks.
+- **`toggle-autologin`**: Helper utility to check (`status`), enable (`on`), disable (`off`), or `toggle` SDDM autologin (`/etc/sddm.conf.d/autologin.conf`) for unattended remote desktop streaming via Sunshine/Tailscale, integrated with Caelestia Control Center Quick Toggles.
 - **`hypr-gnome-mouse-sync`**: Daemon that reads mouse acceleration and speed settings from GNOME dconf and synchronizes them into Hyprland's input config.
 
 ## Audio & Media
