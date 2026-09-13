@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Wrapper to ensure system QEMU tools take precedence over Android SDK tools
+export PATH="/usr/bin:/usr/local/bin:${PATH}"
+exec /usr/bin/quickemu "$@"

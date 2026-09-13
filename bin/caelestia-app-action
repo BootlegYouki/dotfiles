@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -e
+
+ACTION="$1"
+APP_ID="$2"
+
+if [ -z "$ACTION" ] || [ -z "$APP_ID" ]; then
+    echo "Usage: caelestia-app-action <locate|uninstall> <app-id>"
+    exit 1
+fi
+
+# Ensure ID ends with .desktop if not present
+if [[ "$APP_ID" != *.desktop ]]; then
+    APP_FILE="${APP_ID}.desktop"
+else
+    APP_FILE="$APP_ID"
+fi
+
+# Find desktop file path
+DESKTOP_PATH=""
+SEARCH_DIRS=(
+    "$HOME/.local/share/applications"
+    "/usr/share/applications"
+    "/var/lib/flatpak/exports/share/applications"
+    "$HOME/.local/share/flatpak/exports/share/applications"
+)
+
+for dir in "${SEARCH_DIRS[@]}"; do
+    if [ -f "$dir/$APP_FILE" ]; then
+        DESKTOP_PATH="$dir/$APP_FILE"
+        break
+    fi
+done
+
+# If still not found, try globbing or case-insensitive search
+if [ -z "$DESKTOP_PATH" ]; then
+    for dir in "${SEARCH_DIRS[@]}"; do
+        match=$(find "$dir" -maxdepth 1 -iname "*$APP_ID*" -name "*.desktop" | head -n 1)
+        if [ -n "$match" ]; then
+            DESKTOP_PATH="$match"
+            break
+        fi
+    done
+fi
+
+if [ -z "$DESKTOP_PATH" ]; then
+    notify-send -u critical "App Action" "Could not locate .desktop file for: $APP_ID"
+    exit 1
+fi
+
+case "$ACTION" in
+    locate)
+        uwsm app -- nautilus --select "$DESKTOP_PATH"
+        ;;
+    uninstall)
+        # Check if it's a Flatpak
+        if [[ "$DESKTOP_PATH" == *"/flatpak/"* ]]; then
+            FLATPAK_ID="${APP_FILE%.desktop}"
+            echo "========================================"
+            echo " Flatpak Application: $FLATPAK_ID"
+            echo "========================================"
+            echo
+            flatpak uninstall "$FLATPAK_ID"
+            echo
+            read -p "Press Enter to finish..."
+            exit 0
+        fi
+
+        # Check if it's owned by a pacman package
+        PKG_NAME=$(pacman -Qqo "$DESKTOP_PATH" 2>/dev/null || true)
+
+        if [ -n "$PKG_NAME" ]; then
+            echo "========================================"
+            echo " Pacman / AUR Package: $PKG_NAME"
+            echo " Desktop Entry: $DESKTOP_PATH"
+            echo "========================================"
+            echo
+            sudo pacman -Rns "$PKG_NAME"
+            echo
+            read -p "Press Enter to finish..."
+            exit 0
+        fi
+
+        # Custom local application in ~/.local/share/applications
+        if [[ "$DESKTOP_PATH" == "$HOME/.local/share/applications"* ]]; then
+            echo "========================================"
+            echo " Custom Local Shortcut: $(basename "$DESKTOP_PATH")"
+            echo " Location: $DESKTOP_PATH"
+            echo "========================================"
+            echo
+            read -p "Remove this application shortcut? [y/N] " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                rm -f "$DESKTOP_PATH"
+                update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+                echo "Shortcut removed successfully."
+            else
+                echo "Operation cancelled."
+            fi
+            echo
+            read -p "Press Enter to finish..."
+            exit 0
+        fi
+
+        echo "Could not determine package manager for $DESKTOP_PATH."
+        read -p "Press Enter to finish..."
+        ;;
+    *)
+        echo "Unknown action: $ACTION"
+        exit 1
+        ;;
+esac
