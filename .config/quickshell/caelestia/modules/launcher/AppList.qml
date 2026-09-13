@@ -56,18 +56,41 @@ StyledListView {
 
     model: ScriptModel {
         values: root.resultsForText(root.displayText)
-        onValuesChanged: root.currentIndex = 0
+        onValuesChanged: {
+            root.currentIndex = 0;
+            root.contentY = 0;
+        }
     }
 
     spacing: Tokens.spacing.small
     orientation: Qt.Vertical
     implicitHeight: (Tokens.sizes.launcher.itemHeight + spacing) * Math.min(Config.launcher.maxShown, count) - spacing
 
-    preferredHighlightBegin: 0
-    preferredHighlightEnd: height
-    highlightRangeMode: ListView.ApplyRange
-
+    highlightRangeMode: ListView.NoHighlightRange
     highlightFollowsCurrentItem: false
+
+    Behavior on contentY {
+        enabled: !root.dragging && !root.flicking
+        NumberAnimation {
+            duration: 120
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    WheelHandler {
+        target: root
+        orientation: Qt.Vertical
+        onWheel: event => {
+            const itemStep = (Tokens.sizes.launcher.itemHeight + root.spacing) * 3;
+            const maxContentY = Math.max(0, root.contentHeight - root.height);
+            if (event.angleDelta.y < 0) {
+                root.contentY = Math.min(maxContentY, root.contentY + itemStep);
+            } else if (event.angleDelta.y > 0) {
+                root.contentY = Math.max(0, root.contentY - itemStep);
+            }
+            event.accepted = true;
+        }
+    }
     highlight: StyledRect {
         radius: Tokens.rounding.large
         color: Colours.palette.m3onSurface

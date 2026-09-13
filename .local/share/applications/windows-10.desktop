@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Windows 10
+Comment=Launch Windows 10 LTSC Virtual Machine
+Exec=uwsm app -- /home/youki/.local/bin/quickemu --vm /home/youki/windows-10.conf
+Icon=distributor-logo-windows
+Terminal=false
+Type=Application
+Categories=System;Emulator;Development;
+StartupNotify=true

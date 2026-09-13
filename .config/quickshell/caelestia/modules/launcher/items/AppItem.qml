@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Widgets
 import Caelestia.Config
 import qs.components
+import qs.components.controls
 import qs.services
 import qs.utils
 import qs.modules.launcher.services
@@ -20,9 +21,14 @@ Item {
 
     StateLayer {
         radius: Tokens.rounding.large
-        onClicked: {
-            Apps.launch(root.modelData);
-            root.screenState.launcher = false;
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                contextMenu.expanded = true;
+            } else {
+                Apps.launch(root.modelData);
+                root.screenState.launcher = false;
+            }
         }
     }
 
@@ -84,6 +90,55 @@ Item {
                 fill: 1
                 color: Colours.palette.m3primary
             }
+        }
+    }
+
+    Menu {
+        id: contextMenu
+
+        attachTo: root
+        attachSideX: Menu.Right
+        thisSideX: Menu.Right
+        attachSideY: Menu.Bottom
+        thisSideY: Menu.Top
+        marginY: Tokens.spacing.extraSmall
+
+        items: [
+            MenuItem {
+                text: qsTr("Run")
+                icon: "play_arrow"
+                onClicked: {
+                    contextMenu.expanded = false;
+                    Apps.launch(root.modelData);
+                    root.screenState.launcher = false;
+                }
+            },
+            MenuItem {
+                text: qsTr("Locate Folder")
+                icon: "folder_open"
+                onClicked: {
+                    contextMenu.expanded = false;
+                    root.screenState.launcher = false;
+                    Quickshell.execDetached(["caelestia-app-action", "locate", root.modelData.id]);
+                }
+            },
+            MenuItem {
+                text: qsTr("Uninstall")
+                icon: "delete"
+                onClicked: {
+                    contextMenu.expanded = false;
+                    root.screenState.launcher = false;
+                    Quickshell.execDetached(["ghostty", "-e", "caelestia-app-action", "uninstall", root.modelData.id]);
+                }
+            }
+        ]
+    }
+
+    Connections {
+        target: root.screenState
+        function onLauncherChanged(): void {
+            if (!root.screenState.launcher)
+                contextMenu.expanded = false;
         }
     }
 }
