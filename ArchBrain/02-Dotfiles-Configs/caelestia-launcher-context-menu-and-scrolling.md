@@ -12,6 +12,7 @@ In `~/.config/quickshell/caelestia/modules/launcher/items/AppItem.qml`:
   - **Locate Folder**: Invokes `caelestia-app-action locate <app-id>`, which opens Nautilus with the `.desktop` file highlighted and selected.
   - **Uninstall**: Invokes `ghostty -e caelestia-app-action uninstall <app-id>`, which detects package ownership (Pacman/AUR vs Flatpak vs local shortcut) and prompts for uninstallation.
 - Single active menu coordinator: Right-clicking a second app closes the previous app's menu automatically.
+- **Auto-dismiss on scroll**: Hooked `onContentYChanged` to automatically close any open popup menu the instant the user begins scrolling (via wheel, trackpad, or scrollbar).
 
 ---
 
