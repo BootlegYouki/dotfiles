@@ -16,6 +16,7 @@ StyledListView {
     required property SearchBar search
     required property ScreenState screenState
 
+    property var activeMenu: null
     property string displayText
 
     readonly property string requestedState: stateForText(search.text)
@@ -57,6 +58,8 @@ StyledListView {
     model: ScriptModel {
         values: root.resultsForText(root.displayText)
         onValuesChanged: {
+            if (root.activeMenu)
+                root.activeMenu.expanded = false;
             root.currentIndex = 0;
             root.contentY = 0;
         }
@@ -68,6 +71,11 @@ StyledListView {
 
     highlightRangeMode: ListView.NoHighlightRange
     highlightFollowsCurrentItem: false
+
+    onContentYChanged: {
+        if (root.activeMenu && root.activeMenu.expanded)
+            root.activeMenu.expanded = false;
+    }
 
     Behavior on contentY {
         enabled: !root.dragging && !root.flicking
@@ -81,6 +89,8 @@ StyledListView {
         target: root
         orientation: Qt.Vertical
         onWheel: event => {
+            if (root.activeMenu)
+                root.activeMenu.expanded = false;
             const itemStep = (Tokens.sizes.launcher.itemHeight + root.spacing) * 3;
             const maxContentY = Math.max(0, root.contentHeight - root.height);
             if (event.angleDelta.y < 0) {
@@ -274,6 +284,7 @@ StyledListView {
         id: appItem
 
         AppItem {
+            list: root
             screenState: root.screenState
         }
     }
