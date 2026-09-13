@@ -273,7 +273,7 @@
             },
             {
                 "enabled": true,
-                "id": "nightlight"
+                "id": "autologin"
             },
             {
                 "enabled": true,

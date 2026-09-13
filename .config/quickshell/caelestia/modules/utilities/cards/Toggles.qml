@@ -66,6 +66,27 @@ StyledRect {
         }
     }
 
+    property bool autoLoginEnabled: true
+
+    Process {
+        id: autoLoginCheckProc
+        command: ["sh", "-c", "if [ -f /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin status; else \"$HOME/.local/bin/toggle-autologin\" status; fi"]
+        running: true
+        onExited: (code) => {
+            root.autoLoginEnabled = (code === 0);
+        }
+    }
+
+    Connections {
+        target: root.screenState
+        function onUtilitiesChanged() {
+            if (root.screenState.utilities) {
+                dpmsCheckProc.running = true;
+                autoLoginCheckProc.running = true;
+            }
+        }
+    }
+
     readonly property var quickToggles: {
         const seenIds = new Set();
         const rawToggles = Config.utilities.quickToggles.values ?? Array.from(Config.utilities.quickToggles ?? []);
@@ -220,6 +241,32 @@ StyledRect {
                             const action = nextState ? "on" : "off";
                             procCmd.run(["sh", "-c", `if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else "$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py" ${action}; fi`]);
                             root.secondMonitorOn = nextState;
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "autologin"
+                    delegate: Toggle {
+                        icon: root.autoLoginEnabled ? "lock_open" : "lock"
+                        checked: root.autoLoginEnabled
+                        onClicked: {
+                            const nextState = !root.autoLoginEnabled;
+                            const action = nextState ? "on" : "off";
+                            procCmd.run(["sh", "-c", `if [ -f /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin ${action}; else "$HOME/.local/bin/toggle-autologin" ${action}; fi`]);
+                            root.autoLoginEnabled = nextState;
+                        }
+                    }
+                }
+                DelegateChoice {
+                    roleValue: "autoLogin"
+                    delegate: Toggle {
+                        icon: root.autoLoginEnabled ? "lock_open" : "lock"
+                        checked: root.autoLoginEnabled
+                        onClicked: {
+                            const nextState = !root.autoLoginEnabled;
+                            const action = nextState ? "on" : "off";
+                            procCmd.run(["sh", "-c", `if [ -f /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin ${action}; else "$HOME/.local/bin/toggle-autologin" ${action}; fi`]);
+                            root.autoLoginEnabled = nextState;
                         }
                     }
                 }

@@ -180,7 +180,7 @@ StyledRect {
             sourceComponent: MaterialIcon {
                 animate: true
                 text: NightLight.enabled ? "bedtime" : "bedtime_off"
-                color: NightLight.enabled ? Colours.palette.m3primary : root.colour
+                color: root.colour
             }
         }
 
