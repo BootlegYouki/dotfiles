@@ -33,6 +33,9 @@ hl.on("hyprland.start", function()
 
     -- Start desktop shell
     hl.exec_cmd("caelestia shell -d")
+
+    -- Sunshine remote game stream host
+    hl.exec_cmd("systemctl --user start sunshine")
 end)
 
 -- Resizer listeners
