@@ -12,6 +12,8 @@ In `~/.config/quickshell/caelestia/modules/launcher/items/AppItem.qml`:
   - **Locate Folder**: Invokes `caelestia-app-action locate <app-id>`, which opens Nautilus with the `.desktop` file highlighted and selected.
   - **Uninstall**: Invokes `ghostty -e caelestia-app-action uninstall <app-id>`, which detects package ownership (Pacman/AUR vs Flatpak vs local shortcut) and prompts for uninstallation.
 - Single active menu coordinator: Right-clicking a second app closes the previous app's menu automatically.
+- **Smart Boundary Flipping**: Added automatic vertical boundary detection in `Menu.qml`. If a context menu would overflow the bottom edge of the launcher window (e.g. apps near the bottom), it automatically flips to render above the item, with horizontal padding clamping.
+- **Hide from Menu Action**: Added a "Hide from Menu" button to the context menu, allowing one-click hiding of unwanted launcher entries into `shell.json:hiddenApps`.
 - **Auto-dismiss on scroll**: Hooked `onContentYChanged` to automatically close any open popup menu the instant the user begins scrolling (via wheel, trackpad, or scrollbar).
 
 ---
