@@ -11,6 +11,7 @@ import qs.modules.launcher.services
 Item {
     id: root
 
+    property var list: null
     required property DesktopEntry modelData
     required property ScreenState screenState
 
@@ -24,8 +25,14 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
+                if (root.list?.activeMenu && root.list.activeMenu !== contextMenu)
+                    root.list.activeMenu.expanded = false;
+                if (root.list)
+                    root.list.activeMenu = contextMenu;
                 contextMenu.expanded = true;
             } else {
+                if (root.list?.activeMenu)
+                    root.list.activeMenu.expanded = false;
                 Apps.launch(root.modelData);
                 root.screenState.launcher = false;
             }
@@ -96,11 +103,17 @@ Item {
     Menu {
         id: contextMenu
 
+        onExpandedChanged: {
+            if (!expanded && root.list?.activeMenu === contextMenu)
+                root.list.activeMenu = null;
+        }
+
         attachTo: root
         attachSideX: Menu.Right
         thisSideX: Menu.Right
         attachSideY: Menu.Bottom
         thisSideY: Menu.Top
+        marginX: -Tokens.padding.medium
         marginY: Tokens.spacing.extraSmall
 
         items: [
@@ -120,6 +133,15 @@ Item {
                     contextMenu.expanded = false;
                     root.screenState.launcher = false;
                     Quickshell.execDetached(["caelestia-app-action", "locate", root.modelData.id]);
+                }
+            },
+            MenuItem {
+                text: qsTr("Hide from Menu")
+                icon: "visibility_off"
+                onClicked: {
+                    contextMenu.expanded = false;
+                    const apps = GlobalConfig.launcher.hiddenApps;
+                    GlobalConfig.launcher.hiddenApps = [...apps, root.modelData.id];
                 }
             },
             MenuItem {

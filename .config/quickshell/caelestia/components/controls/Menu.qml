@@ -67,18 +67,38 @@ MouseArea {
         x: {
             watcher.transform; // mapToItem is not reactive so this forces updates
             const item = root.attachTo;
+            if (!item) return 0;
             let off = root.attachSideX === Menu.Left ? 0 : item.width;
             if (root.thisSideX === Menu.Right)
                 off -= width;
-            return item.mapToItem(root.parent, off, 0).x + root.marginX;
+            let targetX = item.mapToItem(root.parent, off, 0).x + root.marginX;
+            if (root.parent) {
+                const pad = Tokens.padding.small;
+                targetX = Math.max(pad, Math.min(root.parent.width - width - pad, targetX));
+            }
+            return targetX;
         }
         y: {
             watcher.transform; // mapToItem is not reactive so this forces updates
             const item = root.attachTo;
+            if (!item) return 0;
             let off = root.attachSideY === Menu.Top ? 0 : item.height;
             if (root.thisSideY === Menu.Bottom)
                 off -= height;
-            return item.mapToItem(root.parent, 0, off).y + root.marginY;
+            let targetY = item.mapToItem(root.parent, 0, off).y + root.marginY;
+            if (root.parent) {
+                const pad = Tokens.padding.small;
+                if (targetY + height > root.parent.height - pad) {
+                    const flippedY = item.mapToItem(root.parent, 0, 0).y - height - Math.abs(root.marginY);
+                    if (flippedY >= pad)
+                        targetY = flippedY;
+                    else
+                        targetY = Math.max(pad, root.parent.height - height - pad);
+                } else if (targetY < pad) {
+                    targetY = pad;
+                }
+            }
+            return targetY;
         }
 
         radius: Tokens.rounding.large
