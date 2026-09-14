@@ -9,16 +9,16 @@ Cold boot time was taking ~36.0 seconds due to:
 
 ## Applied Solutions
 
-### 1. Reduced systemd-boot Timeout
-Edited `/boot/loader/loader.conf` to reduce countdown timeout from 5s to 1s:
+### 1. systemd-boot Timeout Configuration
+Configured in `/boot/loader/loader.conf`:
 ```ini
 default @saved
-timeout 1
+timeout 10
 console-mode keep
 editor no
 ```
-> [!TIP]
-> You can still hold or press `Space` or `Esc` during POST to bring up the systemd-boot selection menu at any time.
+> [!NOTE]
+> Set to `timeout 10` (10-second duration) to ensure sufficient time to choose between Linux CachyOS, Windows Boot Manager (dual-boot), or external bootable entries. Pressing `Space` or arrow keys freezes the countdown.
 
 ### 2. Disabled NetworkManager-wait-online
 Disabled the redundant service that blocked local graphical login on desktop:
