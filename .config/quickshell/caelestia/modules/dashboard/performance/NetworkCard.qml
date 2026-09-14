@@ -49,14 +49,16 @@ StyledRect {
             Layout.bottomMargin: Tokens.spacing.small
             Layout.fillWidth: true
             Layout.fillHeight: true
+            clip: true
 
             SparklineItem {
                 id: sparkline
 
-                property real targetMax: 1024
+                property real targetMax: Math.max(NetworkUsage.downloadBuffer.maximum, NetworkUsage.uploadBuffer.maximum, 1024)
                 property real smoothMax: targetMax
 
                 anchors.fill: parent
+                opacity: NetworkUsage.downloadBuffer.count >= 2 ? 1 : 0
                 line1: NetworkUsage.uploadBuffer // qmllint disable missing-type
                 line1Color: Colours.palette.m3secondary
                 line1FillAlpha: 0.15
@@ -75,6 +77,14 @@ StyledRect {
                     target: NetworkUsage.downloadBuffer
                 }
 
+                Connections {
+                    function onValuesChanged(): void {
+                        sparkline.targetMax = Math.max(NetworkUsage.downloadBuffer.maximum, NetworkUsage.uploadBuffer.maximum, 1024);
+                    }
+
+                    target: NetworkUsage.uploadBuffer
+                }
+
                 NumberAnimation {
                     id: slideAnim
 
@@ -88,6 +98,12 @@ StyledRect {
 
                 Behavior on smoothMax {
                     Anim {}
+                }
+
+                Behavior on opacity {
+                    Anim {
+                        type: Anim.DefaultEffects
+                    }
                 }
             }
 

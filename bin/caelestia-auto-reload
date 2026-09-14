@@ -31,7 +31,23 @@ inotifywait -m -r -e close_write,moved_to,delete,create "$WATCH_DIR" --format "%
             LAST_RESTART=$NOW
             echo "[$(date '+%H:%M:%S')] Change in $file -> Reloading Caelestia..."
             qs -c caelestia kill >/dev/null 2>&1 || true
-            sleep 0.2
+            # Wait until previous quickshell instance completely exits to prevent layer-shell race conditions
+            for i in {1..30}; do
+                if ! pgrep -f "quickshell.*caelestia" >/dev/null 2>&1; then
+                    break
+                fi
+                sleep 0.05
+            done
+            sleep 0.15
+
+            # Refresh live Hyprland instance signature dynamically
+            if command -v hyprctl >/dev/null 2>&1; then
+                CURRENT_SIG=$(hyprctl instances -j 2>/dev/null | jq -r '.[0].instance' 2>/dev/null)
+                if [ -n "$CURRENT_SIG" ] && [ "$CURRENT_SIG" != "null" ]; then
+                    export HYPRLAND_INSTANCE_SIGNATURE="$CURRENT_SIG"
+                fi
+            fi
+
             caelestia shell -d >/dev/null 2>&1 || true
         fi
     fi

@@ -54,6 +54,18 @@ hl.window_rule({
     keep_aspect_ratio = true,
 })
 
+-- Floating lyrics
+hl.window_rule({
+    match       = { title = "Floating Lyrics" },
+    pin         = true,
+    float       = true,
+    border_size = 0,
+    no_shadow   = true,
+    no_blur     = true,
+    opaque      = false,
+    rounding    = 0,
+})
+
 
 ----------------------
 ---- Tagged rules ----
@@ -63,7 +75,6 @@ hl.window_rule({
 tagged_rule(opaque_tag, {
     "foot",                          -- Terminal
     "equibop",                       -- Discord client
-    "org.quickshell",                -- Quickshell
     "feh|imv|swappy",                -- Image viewers
     "krita|gimp|inkscape|darktable", -- Image editors
     "resolve|kdenlive|shotcut",      -- Video editors

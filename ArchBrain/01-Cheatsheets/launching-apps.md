@@ -17,6 +17,7 @@ If you are a new user operating this system without AI assistance, this cheatshe
 ### Gaming
 - **Steam:** `uwsm app -- steam`
 - **Twintail Launcher:** `uwsm app -- twintaillauncher` (or `twintail-launcher`)
+- **Roblox (Sober):** `uwsm app -- flatpak run org.vinegarhq.Sober`
 
 ### Productivity & Tools
 - **Obsidian:** `uwsm app -- obsidian`

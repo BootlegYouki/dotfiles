@@ -83,6 +83,7 @@ Singleton {
     Process {
         id: ddcProc
 
+        running: false
         command: ["ddcutil", "detect", "--brief"]
         stdout: StdioCollector {
             onStreamFinished: root.ddcMonitors = text.trim().split("\n\n").filter(d => d.startsWith("Display ")).map(d => ({

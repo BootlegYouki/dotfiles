@@ -12,8 +12,8 @@ Lightweight, hardware-accelerated Windows 10 Enterprise LTSC KVM virtual machine
 * **Config File**: `~/windows-10.conf`
 * **Data Directory**: `~/windows-10/`
 * **OS Edition**: Windows 10 Enterprise LTSC (Build 19044, x64)
-* **vCPUs**: 4 cores
-* **RAM**: 4096 MB (Dynamic ballooning)
+* **vCPUs**: 6 cores
+* **RAM**: 6144 MB (Dynamic ballooning)
 * **Disk**: 64 GB QCOW2 (sparse, expands only as needed)
 * **Display**: SPICE High-Performance Client (`display="spice"`, 1920x1080 resolution)
 * **Shared Folder**: `~/Public` (automatically mounted in guest via SPICE WebDAV)

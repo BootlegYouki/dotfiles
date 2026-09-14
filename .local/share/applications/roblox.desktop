@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Roblox
+GenericName=Roblox Player (Sober)
+Comment=Play, chat & explore on Roblox
+Icon=org.vinegarhq.Sober
+Keywords=roblox;sober;vinegar;game;gaming;experience;
+Categories=Game;
+Terminal=false
+Exec=flatpak run org.vinegarhq.Sober
+StartupWMClass=sober

@@ -83,6 +83,65 @@ Item {
                     }
                 }
             }
+
+            Item {
+                id: floatBtnItem
+
+                implicitWidth: floatBtn.implicitWidth * 0.9
+                implicitHeight: floatBtn.implicitHeight * 0.9
+
+                BlobGroup {
+                    id: floatBlobGroup
+
+                    color: FloatingLyrics.open ? Colours.palette.m3primaryContainer : Colours.palette.m3surfaceContainerHighest
+                    smoothing: Tokens.rounding.medium
+                    cornerFill: false
+
+                    Behavior on color {
+                        CAnim {}
+                    }
+                }
+
+                BlobRect {
+                    id: floatBtnRect
+
+                    anchors.fill: parent
+                    anchors.margins: !floatBtn.pressed && floatBtn.containsMouse ? -Tokens.padding.extraSmall : 0
+                    group: floatBlobGroup
+                    radius: Tokens.rounding.medium
+
+                    Behavior on anchors.margins {
+                        Anim {}
+                    }
+                }
+
+                MouseArea {
+                    id: floatBtn
+
+                    anchors.centerIn: parent
+                    implicitWidth: implicitHeight
+                    implicitHeight: floatIcon.implicitHeight + Tokens.padding.extraSmall * 2
+                    cursorShape: Qt.PointingHandCursor
+                    hoverEnabled: true
+                    onClicked: {
+                        FloatingLyrics.toggle();
+                        if (FloatingLyrics.open) {
+                            const state = ShellState.forActive();
+                            if (state)
+                                state.dashboard = false;
+                        }
+                    }
+
+                    MaterialIcon {
+                        id: floatIcon
+
+                        anchors.centerIn: parent
+                        text: "picture_in_picture_alt"
+                        color: FloatingLyrics.open ? Colours.palette.m3onPrimaryContainer : Colours.palette.m3onSurface
+                        fontStyle: Tokens.font.icon.medium
+                    }
+                }
+            }
         }
 
         LyricList {

@@ -3,6 +3,7 @@ import "modules/drawers"
 import "modules/background"
 import "modules/areapicker"
 import "modules/lock"
+import "modules/dashboard/media"
 import QtQuick
 import Quickshell
 import qs.services
@@ -34,4 +35,6 @@ ShellRoot {
     IdleMonitors {
         lock: lock
     }
+
+    FloatingLyricsWindow {}
 }
