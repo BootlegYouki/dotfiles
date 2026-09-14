@@ -22,8 +22,10 @@ echo "Target User: $TARGET_USER ($TARGET_HOME)"
 echo "Dotfiles:    $DOTFILES_DIR"
 echo ""
 
-# 1. Cache sudo credentials
-sudo -v
+# 1. Cache sudo credentials (non-interactive friendly)
+if ! sudo -n true 2>/dev/null; then
+    sudo -v
+fi
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 SUDO_KEEP_ALIVE_PID=$!
 trap 'kill "$SUDO_KEEP_ALIVE_PID" 2>/dev/null || true' EXIT
