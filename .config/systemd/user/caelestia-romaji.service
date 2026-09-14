@@ -4,7 +4,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/bin/sh -c 'if [ -d %h/.local/share/caelestia/venv ]; then %h/.local/share/caelestia/venv/bin/python3 %h/.local/bin/caelestia-romaji-daemon; else %h/.local/bin/caelestia-romaji-daemon; fi'
+ExecStart=/bin/sh -c 'if [ -d %h/.local/share/caelestia/venv ]; then %h/.local/share/caelestia/venv/bin/python3 %h/custom_scripts/caelestia-romaji-daemon; else %h/custom_scripts/caelestia-romaji-daemon; fi'
 Restart=always
 RestartSec=3
 

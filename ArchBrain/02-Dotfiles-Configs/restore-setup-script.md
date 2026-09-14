@@ -20,7 +20,8 @@ Documentation for `~/dotfiles/ArchBrain/02-Dotfiles-Configs/restore_setup.sh` wh
 - Sets up `.local/bin` executable scripts and user themes/state in `.local/state/caelestia`.
 - Clones and links the wallpaper repository (`laustoic-wallpaper-repo`).
 
-## 4. Services & Autologin
-- Deploys the `genshin-f-macro.service` to systemd and copies the python script.
+## 4. Services & Custom Scripts
+- Deploys custom daemons and scripts to `~/custom_scripts/` (`genshin_f_macro.py`, `caelestia-romaji-daemon`, `caelestia-romaji`, `toggle_monitor.py`, `toggle-autologin`).
+- Deploys the `genshin-f-macro.service` to systemd pointing to `~/custom_scripts/genshin_f_macro.py`.
 - Reloads and enables `caelestia-romaji.service` for user.
 - **TTY1 Autologin**: Disables bloated display managers (SDDM/GDM) and configures a 0-RAM overhead auto-login on `tty1` via `agetty`, which automatically launches `uwsm start hyprland-uwsm.desktop` (via the Fish config).

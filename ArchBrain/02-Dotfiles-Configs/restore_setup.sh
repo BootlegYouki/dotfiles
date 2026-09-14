@@ -141,8 +141,12 @@ LC_MEASUREMENT=en_US.UTF-8
 LC_IDENTIFICATION=en_US.UTF-8
 EOF
 
-echo "4. Restoring Genshin F-Macro..."
-cp "$DOTFILES_DIR/scripts/genshin_f_macro.py" "$TARGET_HOME/genshin_f_macro.py"
+echo "4. Restoring custom scripts & Genshin F-Macro..."
+mkdir -p "$TARGET_HOME/custom_scripts"
+if [ -d "$DOTFILES_DIR/custom_scripts" ]; then
+    cp -a "$DOTFILES_DIR/custom_scripts/." "$TARGET_HOME/custom_scripts/"
+fi
+chmod +x "$TARGET_HOME/custom_scripts/"* 2>/dev/null || true
 sudo cp "$DOTFILES_DIR/systemd-system/genshin-f-macro.service" "/etc/systemd/system/genshin-f-macro.service"
 
 echo "5. Restoring ArchBrain vault..."
@@ -156,7 +160,7 @@ if [ -d "$DOTFILES_DIR/system/etc/pacman.d/hooks" ]; then
     mkdir -p /etc/pacman.d/hooks
     cp -a "$DOTFILES_DIR/system/etc/pacman.d/hooks/." /etc/pacman.d/hooks/
 fi
-chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/genshin_f_macro.py" 2>/dev/null || true
+chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/ArchBrain" "$TARGET_HOME/custom_scripts" 2>/dev/null || true
 
 echo "6. Reloading and enabling systemd user services..."
 if [ -n "$SUDO_USER" ]; then

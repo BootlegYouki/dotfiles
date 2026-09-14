@@ -37,40 +37,14 @@ StyledRect {
         }
     }
 
-    property bool secondMonitorOn: true
-    property bool hasMultipleMonitors: false
-
-    Process {
-        id: dpmsCheckProc
-        command: ["sh", "-c", "if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py status; else \"$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py\" status; fi"]
-        running: true
-        onExited: (code) => {
-            root.secondMonitorOn = (code === 0);
-        }
-    }
-
-    Process {
-        id: monitorCheckProc
-        command: ["sh", "-c", "if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py detect; else \"$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py\" detect; fi"]
-        running: true
-        onExited: (code) => {
-            root.hasMultipleMonitors = (code === 0);
-        }
-    }
-
-    Connections {
-        target: Hypr
-        function onMonitorsChanged() {
-            dpmsCheckProc.running = true;
-            monitorCheckProc.running = true;
-        }
-    }
+    readonly property bool secondMonitorOn: Hypr.secondMonitorOn
+    readonly property bool hasMultipleMonitors: Hypr.hasMultipleMonitors
 
     property bool autoLoginEnabled: true
 
     Process {
         id: autoLoginCheckProc
-        command: ["sh", "-c", "if [ -f /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin status; else \"$HOME/.local/bin/toggle-autologin\" status; fi"]
+        command: ["sh", "-c", "if [ -x /home/youki/custom_scripts/toggle-autologin ]; then /home/youki/custom_scripts/toggle-autologin status; elif [ -x /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin status; else toggle-autologin status; fi"]
         running: true
         onExited: (code) => {
             root.autoLoginEnabled = (code === 0);
@@ -81,7 +55,7 @@ StyledRect {
         target: root.screenState
         function onUtilitiesChanged() {
             if (root.screenState.utilities) {
-                dpmsCheckProc.running = true;
+                Hypr.refreshMonitorState();
                 autoLoginCheckProc.running = true;
             }
         }
@@ -226,8 +200,8 @@ StyledRect {
                         onClicked: {
                             const nextState = !root.secondMonitorOn;
                             const action = nextState ? "on" : "off";
-                            procCmd.run(["sh", "-c", `if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else "$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py" ${action}; fi`]);
-                            root.secondMonitorOn = nextState;
+                            procCmd.run(["sh", "-c", `if [ -x /home/youki/custom_scripts/toggle_monitor.py ]; then /home/youki/custom_scripts/toggle_monitor.py ${action}; elif [ -x /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else toggle_monitor.py ${action}; fi`]);
+                            Hypr.secondMonitorOn = nextState;
                         }
                     }
                 }
@@ -239,8 +213,8 @@ StyledRect {
                         onClicked: {
                             const nextState = !root.secondMonitorOn;
                             const action = nextState ? "on" : "off";
-                            procCmd.run(["sh", "-c", `if [ -f /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else "$HOME/.config/quickshell/caelestia/utils/scripts/toggle_monitor.py" ${action}; fi`]);
-                            root.secondMonitorOn = nextState;
+                            procCmd.run(["sh", "-c", `if [ -x /home/youki/custom_scripts/toggle_monitor.py ]; then /home/youki/custom_scripts/toggle_monitor.py ${action}; elif [ -x /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ${action}; else toggle_monitor.py ${action}; fi`]);
+                            Hypr.secondMonitorOn = nextState;
                         }
                     }
                 }
@@ -252,7 +226,7 @@ StyledRect {
                         onClicked: {
                             const nextState = !root.autoLoginEnabled;
                             const action = nextState ? "on" : "off";
-                            procCmd.run(["sh", "-c", `if [ -f /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin ${action}; else "$HOME/.local/bin/toggle-autologin" ${action}; fi`]);
+                            procCmd.run(["sh", "-c", `if [ -x /home/youki/custom_scripts/toggle-autologin ]; then /home/youki/custom_scripts/toggle-autologin ${action}; elif [ -x /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin ${action}; else toggle-autologin ${action}; fi`]);
                             root.autoLoginEnabled = nextState;
                         }
                     }
@@ -265,7 +239,7 @@ StyledRect {
                         onClicked: {
                             const nextState = !root.autoLoginEnabled;
                             const action = nextState ? "on" : "off";
-                            procCmd.run(["sh", "-c", `if [ -f /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin ${action}; else "$HOME/.local/bin/toggle-autologin" ${action}; fi`]);
+                            procCmd.run(["sh", "-c", `if [ -x /home/youki/custom_scripts/toggle-autologin ]; then /home/youki/custom_scripts/toggle-autologin ${action}; elif [ -x /home/youki/.local/bin/toggle-autologin ]; then /home/youki/.local/bin/toggle-autologin ${action}; else toggle-autologin ${action}; fi`]);
                             root.autoLoginEnabled = nextState;
                         }
                     }

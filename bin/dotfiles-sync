@@ -28,7 +28,7 @@ rsync -a --delete ~/.config/systemd/user/  "$DOTFILES/.config/systemd/user/"
 
 # --- Scripts and services ---
 rsync -a --delete --exclude='agy*' --exclude='rclone' --exclude='boothub' --exclude='kwiz' --exclude='gift' --exclude='yarn*' --exclude='zed' ~/.local/bin/ "$DOTFILES/bin/"
-cp "$HOME/genshin_f_macro.py" "$DOTFILES/scripts/genshin_f_macro.py"
+rsync -a --delete ~/custom_scripts/ "$DOTFILES/custom_scripts/"
 
 # --- ArchBrain vault ---
 rsync -a --delete ~/ArchBrain/ "$DOTFILES/ArchBrain/"

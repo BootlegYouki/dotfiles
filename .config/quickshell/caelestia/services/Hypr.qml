@@ -40,6 +40,32 @@ Singleton {
     property bool hadKeyboard
     property string lastSpecialWorkspace: ""
 
+    property bool hasMultipleMonitors: true
+    property bool secondMonitorOn: false
+
+    Process {
+        id: monitorDetectProc
+        command: ["sh", "-c", "if [ -x /home/youki/custom_scripts/toggle_monitor.py ]; then /home/youki/custom_scripts/toggle_monitor.py detect; elif [ -x /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py detect; else toggle_monitor.py detect; fi"]
+        running: true
+        onExited: (code) => {
+            root.hasMultipleMonitors = (code === 0);
+        }
+    }
+
+    Process {
+        id: monitorStatusProc
+        command: ["sh", "-c", "if [ -x /home/youki/custom_scripts/toggle_monitor.py ]; then /home/youki/custom_scripts/toggle_monitor.py status; elif [ -x /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py ]; then /etc/xdg/quickshell/caelestia/utils/scripts/toggle_monitor.py status; else toggle_monitor.py status; fi"]
+        running: true
+        onExited: (code) => {
+            root.secondMonitorOn = (code === 0);
+        }
+    }
+
+    function refreshMonitorState(): void {
+        monitorDetectProc.running = true;
+        monitorStatusProc.running = true;
+    }
+
     signal configReloaded
 
     function dispatch(request: string): void {
@@ -141,6 +167,7 @@ Singleton {
                 Hyprland.refreshWorkspaces();
             } else if (n.includes("mon")) {
                 Hyprland.refreshMonitors();
+                root.refreshMonitorState();
             } else if (n.includes("workspace")) {
                 Hyprland.refreshWorkspaces();
             } else if (n.includes("window") || n.includes("group") || ["pin", "fullscreen", "changefloatingmode", "minimize"].includes(n)) {
