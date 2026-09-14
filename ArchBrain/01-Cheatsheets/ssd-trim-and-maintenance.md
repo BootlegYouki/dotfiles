@@ -49,7 +49,7 @@ sudo fstrim -av
 * `-v` / `--verbose`: Prints the amount of trimmed storage space per partition.
 
 > [!TIP]
-> On this machine's multi-device **Btrfs pool** spanning `/dev/sda2` (Kingston 480GB) and `/dev/sdb1` (SKIHOTAR 240GB), a single run of `sudo fstrim -av` trims both underlying SSDs simultaneously.
+> Following the unpooling of `/dev/sdb` for Windows dual-boot, CachyOS Linux resides solely on `/dev/sda2` (Kingston 480GB). A run of `sudo fstrim -av` trims the Linux Btrfs partition on `/dev/sda2`.
 
 ---
 

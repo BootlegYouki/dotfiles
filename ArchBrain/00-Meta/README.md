@@ -13,7 +13,7 @@
 | **CPU** | **AMD Ryzen 5 5600G** (6 cores / 12 threads @ 3.90–4.40 GHz) |
 | **GPU / Graphics** | Integrated **AMD Radeon Vega Cezanne Graphics** (`amdgpu` driver) |
 | **Memory** | 16 GB DDR4 RAM + 13.5 GB `zram0` dynamic swap |
-| **Filesystem / Storage** | Multi-device **Btrfs** spanning `sda2` (445.1 GB) & `sdb1` (223.6 GB) + 2 GB `/boot` FAT32 |
+| **Filesystem / Storage** | Single-device **Btrfs** on `sda2` (445.1 GB) + 2 GB `/boot` FAT32; dedicated Windows SSD on `sdb` (223.6 GB) |
 | **Primary Display** | `HDMI-A-1`: ASUS VA24E 24" 1920x1080 @ 75Hz (0x0, landscape) |
 | **Secondary Display** | `DP-1`: Dell P2219H 22" 1920x1080 @ 60Hz (1920x-420, portrait / 270° rotated, `transform = 3`, workspace 11) |
 | **Display Manager** | **SDDM** (Qt6) with **Pixie** theme (`/usr/share/sddm/themes/pixie`), dynamic wallpaper sync |
