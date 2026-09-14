@@ -47,8 +47,42 @@ sudo systemctl set-default graphical.target
 sudo systemctl enable sddm 2>/dev/null || true
 echo "  ✓ Default target: graphical.target (sddm enabled)"
 
-# --- Step 2: Laptop Hyprland & Caelestia Display Profile ---
-echo "▶ [2/6] Generating laptop monitor and touchpad profile for eDP-1..."
+# --- Step 2: Sync Dotfiles Configs & Binaries ---
+echo "▶ [2/6] Syncing dotfiles configurations and custom scripts..."
+
+# 2.1 Binaries
+mkdir -p "$TARGET_HOME/.local/bin"
+if [ -d "$DOTFILES_DIR/bin" ]; then
+    cp "$DOTFILES_DIR/bin/"* "$TARGET_HOME/.local/bin/" 2>/dev/null || true
+    chmod +x "$TARGET_HOME/.local/bin/"* 2>/dev/null || true
+    echo "  ✓ Synced ~/.local/bin utilities"
+fi
+
+# 2.2 Key configs
+mkdir -p "$TARGET_HOME/.config"
+for item in "$DOTFILES_DIR/.config/"*; do
+    if [ -e "$item" ]; then
+        name="$(basename "$item")"
+        if [ "$name" != "rclone" ]; then
+            if [ -d "$item" ]; then
+                mkdir -p "$TARGET_HOME/.config/$name"
+                cp -R "$item/"* "$TARGET_HOME/.config/$name/"
+            else
+                cp "$item" "$TARGET_HOME/.config/"
+            fi
+        fi
+    fi
+done
+echo "  ✓ Synced ~/.config directories (Ghostty, Fish, Fastfetch, etc.)"
+
+# Ensure shell.qml link for Quickshell
+if [ -f "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" ]; then
+    mkdir -p "$TARGET_HOME/.config/quickshell"
+    ln -sfn "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" "$TARGET_HOME/.config/quickshell/shell.qml"
+fi
+
+# --- Step 3: Laptop Hyprland & Caelestia Display Profile ---
+echo "▶ [3/6] Generating laptop monitor and touchpad profile for eDP-1..."
 mkdir -p "$TARGET_HOME/.config/caelestia"
 
 cat << 'EOF' > "$TARGET_HOME/.config/caelestia/hypr-user.lua"
@@ -196,40 +230,6 @@ hl.bind("CTRL + SUPER + Down", cycle_special_workspaces(1), repeating)
 hl.bind("CTRL + SUPER + Up", cycle_special_workspaces(-1), repeating)
 EOF
 echo "  ✓ Wrote $TARGET_HOME/.config/caelestia/hypr-user.lua (eDP-1 + Touchpad)"
-
-# --- Step 3: Sync Dotfiles Configs & Binaries ---
-echo "▶ [3/6] Syncing dotfiles configurations and custom scripts..."
-
-# 3.1 Binaries
-mkdir -p "$TARGET_HOME/.local/bin"
-if [ -d "$DOTFILES_DIR/bin" ]; then
-    cp "$DOTFILES_DIR/bin/"* "$TARGET_HOME/.local/bin/" 2>/dev/null || true
-    chmod +x "$TARGET_HOME/.local/bin/"* 2>/dev/null || true
-    echo "  ✓ Synced ~/.local/bin utilities"
-fi
-
-# 3.2 Key configs
-mkdir -p "$TARGET_HOME/.config"
-for item in "$DOTFILES_DIR/.config/"*; do
-    if [ -e "$item" ]; then
-        name="$(basename "$item")"
-        if [ "$name" != "rclone" ]; then
-            if [ -d "$item" ]; then
-                mkdir -p "$TARGET_HOME/.config/$name"
-                cp -R "$item/"* "$TARGET_HOME/.config/$name/"
-            else
-                cp "$item" "$TARGET_HOME/.config/"
-            fi
-        fi
-    fi
-done
-echo "  ✓ Synced ~/.config directories (Ghostty, Fish, Fastfetch, etc.)"
-
-# Ensure shell.qml link for Quickshell
-if [ -f "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" ]; then
-    mkdir -p "$TARGET_HOME/.config/quickshell"
-    ln -sfn "$TARGET_HOME/.config/quickshell/caelestia/shell.qml" "$TARGET_HOME/.config/quickshell/shell.qml"
-fi
 
 # --- Step 4: Sync Supercharged Pi Harness ---
 echo "▶ [4/6] Synchronizing Pi harness, subagents, and extensions..."
