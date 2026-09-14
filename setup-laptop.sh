@@ -265,7 +265,3 @@ echo "  • Touchpad natural scrolling & tap-to-click enabled"
 echo "  • Power profiles daemon running for battery efficiency"
 echo ""
 echo "Restart your laptop or SDDM to verify autologin: sudo systemctl restart sddm"
-EOF
-
-chmod +x "$DOTFILES_DIR/setup-laptop.sh"
-echo "setup-laptop.sh created and made executable."
