@@ -116,8 +116,8 @@ from machine import Pin
 WIFI_SSID = "YOUR_HOME_WIFI_NAME"
 WIFI_PASSWORD = "YOUR_WIFI_PASSWORD"
 
-BOT_TOKEN = "7123456789:ABCdefGHIjklMNOpqrsTUVwxyz" # Your BotFather Token
-ALLOWED_USER_ID = 123456789                         # Your @userinfobot ID
+BOT_TOKEN = "8903322642:AAEMQSdT9JkZv8HpxLau8EOkEIeRwDr2Vqg" # Your BotFather Token
+ALLOWED_USER_ID = 6885339389                         # Your User ID (@yohkii)
 
 # Linux Desktop Realtek Ethernet MAC Address
 PC_MAC = "30:56:0f:04:0f:3c"
