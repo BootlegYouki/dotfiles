@@ -54,6 +54,24 @@ uwsm app -- sunshine
 Sunshine creates its own virtual PipeWire sink (`sink-sunshine-stereo`) when a client connects and redirects the system default output to it.
 - **Do not hardcode a physical audio sink** (such as `audio_sink = alsa_output...`) in `~/.config/sunshine/sunshine.conf` unless you intend to bypass Sunshine's virtual sink routing. Leaving `audio_sink` unset lets Sunshine capture its own virtual sink automatically, avoiding silent audio streams on remote clients.
 
+### Multi-Monitor Auto-Toggle Prep Commands
+When streaming via Moonlight with a dual-monitor setup where the secondary vertical screen (`DP-1`) has a negative Y offset (`1920x-420`), absolute mouse coordinates sent by Moonlight map across the combined virtual bounding box (`Y: -420..1500`), causing the cursor to escape above the screen and lock before reaching the bottom.
+To ensure perfect 1:1 cursor bounds and prevent windows from opening on the invisible monitor during remote sessions, Sunshine automatically disables `DP-1` upon connection and restores it upon disconnection.
+
+Configured in `~/.config/sunshine/sunshine.conf`:
+```ini
+global_prep_cmd = [{"do": "/home/youki/.local/bin/toggle_monitor.py off", "undo": "/home/youki/.local/bin/toggle_monitor.py on"}]
+```
+And in `~/.config/sunshine/apps.json` for "Desktop" and "Steam Big Picture":
+```json
+"prep-cmd": [
+  {
+    "do": "/home/youki/.local/bin/toggle_monitor.py off",
+    "undo": "/home/youki/.local/bin/toggle_monitor.py on"
+  }
+]
+```
+
 ### Accessing the Web Configuration Interface
 1. Open your browser and navigate to:
    ```
