@@ -7,6 +7,7 @@ import Quickshell.Services.Mpris
 import Caelestia.Config
 import Caelestia.Services
 import qs.components
+import qs.components.controls
 import qs.services
 
 FloatingWindow {
@@ -15,14 +16,14 @@ FloatingWindow {
     title: "Floating Lyrics"
     color: "transparent"
     surfaceFormat.opaque: false
-    visible: FloatingLyrics.open
+    visible: FloatingLyrics.open && !!Players.active
 
-    implicitWidth: 420
-    implicitHeight: 125
+    implicitWidth: 440
+    implicitHeight: 155
     minimumSize.width: 260
-    minimumSize.height: 65
+    minimumSize.height: 80
 
-    readonly property real _rawScale: Math.max(0.90, Math.min(1.20, Math.pow(win.width / 420, 0.45)))
+    readonly property real _rawScale: Math.max(0.90, Math.min(1.20, Math.pow(win.width / 440, 0.45)))
     readonly property real effectiveScale: Math.round(_rawScale * 20) / 20
 
     readonly property int lyricWeight: effectiveScale >= 1.25 ? Font.DemiBold : Font.Medium
@@ -218,32 +219,6 @@ FloatingWindow {
 
         anchors.fill: parent
 
-        Rectangle {
-            id: backdrop
-
-            anchors.fill: parent
-            radius: Tokens.rounding.large
-            color: Qt.alpha(Colours.palette.m3surfaceContainer, 0.65)
-            border.color: Qt.alpha(Colours.palette.m3outline, 0.25)
-            border.width: 1
-            opacity: (hoverArea.containsMouse || resizeArea.containsMouse) ? 1 : 0
-
-            Behavior on opacity {
-                Anim {
-                    type: Anim.DefaultEffects
-                }
-            }
-        }
-
-        MouseArea {
-            id: hoverArea
-
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.SizeAllCursor
-            onPressed: win.startSystemMove()
-        }
-
         Item {
             id: contentArea
 
@@ -262,18 +237,73 @@ FloatingWindow {
                 spacing: Math.round(4 * win.effectiveScale)
 
                 StyledText {
+                    id: titleText
+
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    text: {
+                        const p = Players.active;
+                        if (!p)
+                            return qsTr("Floating Lyrics");
+                        const title = p.trackTitle;
+                        const artist = p.trackArtist;
+                        if (title && artist)
+                            return `${artist} - ${title}`;
+                        return title || artist || qsTr("Floating Lyrics");
+                    }
+                    font: Tokens.font.label.builders.medium.scale(win.effectiveScale * 0.95).weight(Font.Medium).build()
+                    color: Colours.palette.m3onSurfaceVariant
+                    opacity: 0.70
+                    elide: Text.ElideRight
+                }
+
+                StyledText {
                     id: line1
 
                     Layout.fillWidth: true
                     text: win.currentLineText
-                    font: Tokens.font.title.builders.small.scale(win.effectiveScale * 1.15).weight(win.lyricWeight).build()
+                    font: Tokens.font.title.builders.medium.scale(win.effectiveScale * 1.15).weight(win.lyricWeight).build()
                     lineHeightMode: Text.ProportionalHeight
                     lineHeight: 1.15
                     color: Colours.palette.m3primary
+                    style: Text.Outline
+                    styleColor: Qt.rgba(0, 0, 0, 0.85)
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     maximumLineCount: 2
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
+
+                    transform: Translate {
+                        id: line1Trans
+                        y: 0
+                    }
+
+                    onTextChanged: {
+                        if (win.visible && line1.text !== "" && line1.text !== ". . .")
+                            slideAnim1.restart();
+                    }
+
+                    ParallelAnimation {
+                        id: slideAnim1
+
+                        NumberAnimation {
+                            target: line1Trans
+                            property: "y"
+                            from: Math.round(14 * win.effectiveScale)
+                            to: 0
+                            duration: GameMode.enabled ? 0 : Tokens.anim.durations.normal
+                            easing.type: Easing.OutCubic
+                        }
+
+                        NumberAnimation {
+                            target: line1
+                            property: "opacity"
+                            from: 0.2
+                            to: 1.0
+                            duration: GameMode.enabled ? 0 : Tokens.anim.durations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                    }
                 }
 
                 StyledText {
@@ -283,7 +313,7 @@ FloatingWindow {
                     visible: !!win.nextLineText
                     text: win.nextLineText
                     opacity: 0.65
-                    font: Tokens.font.title.builders.small.scale(win.effectiveScale * 1.05).weight(win.nextLyricWeight).build()
+                    font: Tokens.font.title.builders.medium.scale(win.effectiveScale * 1.05).weight(win.nextLyricWeight).build()
                     lineHeightMode: Text.ProportionalHeight
                     lineHeight: 1.15
                     color: Colours.palette.m3onSurfaceVariant
@@ -291,21 +321,40 @@ FloatingWindow {
                     maximumLineCount: 2
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
+
+                    transform: Translate {
+                        id: line2Trans
+                        y: 0
+                    }
+
+                    onTextChanged: {
+                        if (win.visible && line2.text !== "")
+                            slideAnim2.restart();
+                    }
+
+                    ParallelAnimation {
+                        id: slideAnim2
+
+                        NumberAnimation {
+                            target: line2Trans
+                            property: "y"
+                            from: Math.round(10 * win.effectiveScale)
+                            to: 0
+                            duration: GameMode.enabled ? 0 : Tokens.anim.durations.normal
+                            easing.type: Easing.OutCubic
+                        }
+
+                        NumberAnimation {
+                            target: line2
+                            property: "opacity"
+                            from: 0.1
+                            to: 0.65
+                            duration: GameMode.enabled ? 0 : Tokens.anim.durations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                    }
                 }
             }
-        }
-
-        // Corner resize grip for intuitive dragging resize
-        MouseArea {
-            id: resizeArea
-
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            width: 24
-            height: 24
-            hoverEnabled: true
-            cursorShape: Qt.SizeFDiagCursor
-            onPressed: win.startSystemResize(Qt.RightEdge | Qt.BottomEdge)
         }
     }
 }

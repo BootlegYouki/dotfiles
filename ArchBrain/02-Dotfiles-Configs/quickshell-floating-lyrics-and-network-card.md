@@ -7,39 +7,40 @@ Documents the floating lyrics widget overlay and the NetworkCard sparkline rende
 ## 1. Floating Lyrics Widget
 
 ### Overview
-A draggable, compact desktop overlay (`FloatingWindow`) for synchronized lyrics playback with media controls and progress scrubbing.
+A draggable, compact desktop overlay (`FloatingWindow`) for synchronized lyrics playback with centered typography, smooth slide-up line transitions, and hover-activated frosted glass backdrop.
 
 ### Architecture & Components
 - **Service (`~/.config/quickshell/caelestia/services/FloatingLyrics.qml`)**:
   - Global singleton tracking `open` visibility state (`toggle()`, `show()`, `hide()`).
 - **UI Window (`~/.config/quickshell/caelestia/modules/dashboard/media/FloatingLyricsWindow.qml`)**:
-  - `Quickshell.FloatingWindow` with a fully transparent client area and borderless styling.
-  - Dimensions: base `350x95` (minimum `250x65`), comfortably displaying the active lyric and the dimmed upcoming line.
-  - Next Line Display: Rendered by a compact `ListView` using the same lyric model/current-index pattern as the dashboard lyrics list; only the first upcoming line appears below the active line with subdued opacity (`opacity: 0.45`) and black outline.
-  - Subdued Scaling: Dynamic scaling uses a gentle curve (`Math.pow(win.width / 350, 0.45)`, clamped between 0.90x and 1.20x max), allowing comfortable resizing without the font exploding in size.
-  - Compositor-Native Rounding: Removed client-side `radius` on `container` and removed `decorate = false` from Hyprland rules. Corner rounding is now rendered directly by Hyprland's GPU fragment shader (`vars.windowRounding = 10`), completely eliminating the rubber-banding corner warping, shearing, and visual tearing during window resize.
-  - Excluded from `opaque*` tag: Removed `org.quickshell` from `opaque_tag` in `rules.lua` so Hyprland's damage tracker does not force opaque pipeline assumptions onto alpha buffers.
-  - Refined Weight Transitions: Restricts lyric weights to `Font.Medium` and `Font.DemiBold`, preventing heavy blocky text when enlarged.
-  - Sliding Transition: `Translate` + `NumberAnimation` smoothly glides new lyrics upward into position as lines change.
-  - Typography: Dynamic scaling with black `Text.Outline` on lyric lines for wallpaper readability without a widget background.
-  - Vertically & Horizontally Centered: Content block (title + active lyric + next lyric) is cleanly centered (`anchors.centerIn: parent`) with generous surrounding margins, completely eliminating top/bottom boundary clipping regardless of manual window resizing.
-  - Proportional Line Height: Removed rigid `FixedHeight` line bounds; uses `Text.ProportionalHeight` (`lineHeight: 1.15`), preventing ascender clipping when lines wrap onto two lines.
-  - Pure Transparent Backdrop: Removed the translucent dark hover backdrop (`Rectangle`) and hover listener so the widget remains cleanly transparent on hover without dark popup cards obscuring the background.
-  - Clean Anti-Aliased Typography: Stripped black outlines from lyrics in favor of clean native font rendering against the frosted hover backdrop.
-  - Auto-Reload Daemon: Disabled and stopped `caelestia-auto-reload.service` to prevent compositor/shell crash cycles on file saves.
-  - Hyprland Window Rule: Configured `rounding = 0` for `Floating Lyrics` in `userprefs.conf` and `rules.lua`, allowing the QML window to handle corner geometry without compositor clipping cuts or asymmetrical corner artifacts.
-  - Corner Grip: Bottom-right resize handle (`win.startSystemResize(Qt.RightEdge | Qt.BottomEdge)`).
-  - **Lyrics**: Max 2 lines displayed with centered alignment.
-    - Line 1 (Current): Highlighted in `Colours.palette.m3primary` with black outline.
-    - Line 2 (Next): Subdued in `Colours.palette.m3outline` with black outline.
-    - Active/current lyric is positioned at the top of the compact list; following lyric delegates naturally appear underneath like the dashboard lyric view.
-    - Background track updater binding keeps lyrics synchronized even when the dashboard drawer is closed.
-  - **Controls**: Inline previous/play-next controls were removed to keep the floating overlay lyrics-focused.
+  - `Quickshell.FloatingWindow` with a transparent client area and borderless styling.
+  - Dimensions: base `440x155` (minimum `260x80`), comfortably accommodating title, active lyrics (up to 2 lines), and next lyric (up to 2 lines).
+  - Only visible when an active player exists and explicitly opened via dashboard (`visible: FloatingLyrics.open && !!Players.active`). Default is closed (`open: false`).
+  - No hover backdrop or internal mouse drag areas. Moving and resizing are handled seamlessly via standard Hyprland window bindings (`SUPER + Left Click` to drag, `SUPER + Right Click` to resize).
+  - **Track Title**: Subdued header at the top displaying `${artist} - ${title}` with `Tokens.font.label.builders.medium` (`opacity: 0.70`, centered).
+  - **Active Lyric**: Prominently rendered in `Colours.palette.m3primary` using `Tokens.font.title.builders.medium` (scaled, `Font.Medium`/`Font.DemiBold`), wrapped up to 2 lines with proportional line height (`lineHeight: 1.15`, centered) and black font outline (`style: Text.Outline`, `styleColor: Qt.rgba(0, 0, 0, 0.85)`) for sharp contrast and readability against bright backgrounds.
+  - **Next Lyric**: Placed directly below the active lyric in `Colours.palette.m3onSurfaceVariant` (`opacity: 0.65`, `Font.Normal`), wrapped up to 2 lines, centered (without outline for clean visual hierarchy).
+  - **Slide-Up Transition Animation**:
+    - Both active (`line1`) and upcoming (`line2`) lyrics incorporate a `Translate` transform paired with a `ParallelAnimation`.
+    - When lines update, text smoothly glides upward (`y` translates from +14px / +10px to 0 with `Easing.OutCubic`) while fading in, creating a fluid upward flow into position.
+    - Honors `GameMode.enabled` to zero out animations during gaming.
+  - **Hover Backdrop & Blur**:
+    - Embedded `Rectangle` with dynamic corner radius (`radius: GameMode.enabled ? 0 : Tokens.rounding.large`), smoothly animated via `Anim.DefaultEffects`.
+    - Automatically flattens to 0 rounding when Game Mode is active to match Hyprland's zero-rounding rule, and restores `Tokens.rounding.large` when Game Mode is disabled.
+    - `Colours.palette.m3surfaceContainer` (`alpha: 0.65`), and `Colours.palette.m3outline` (`alpha: 0.25`) 1px border.
+    - Fades in smoothly via `Anim.DefaultEffects` when `hoverArea` or `resizeArea` is hovered (`containsMouse`).
+  - **Close Button**: Top-right corner `IconButton` (`type: IconButton.Text`, `icon: "close"`) that fades in smoothly upon hover and calls `FloatingLyrics.hide()` when clicked.
+  - **Hyprland Compositor Blur**: Configured `no_blur = false` in `hyprland/rules.lua` and removed `noblur` from `userprefs.conf`, enabling native GPU frosted glass blur when the hover backdrop is active.
+  - **Dynamic Scaling**: Gentle curve (`Math.pow(win.width / 440, 0.45)`, clamped between 0.90x and 1.20x) with step quantization to avoid subpixel layout jitter during resize.
+  - **Corner Resize Grip**: Dedicated bottom-right resize handle (`win.startSystemResize(Qt.RightEdge | Qt.BottomEdge)`).
+  - **Synchronization**:
+    - Reactive binding dependency tracker forcing re-evaluation when `currentIndex` or `lyricList` updates.
+    - Active polling via `Timer` (`positionChanged()` + `updateIndex()`) plus `Connections` to `Players.active` for seamless lyric progression.
 - **Toggle Button (`~/.config/quickshell/caelestia/modules/dashboard/media/LyricsAndSelector.qml`)**:
   - `picture_in_picture_alt` icon button next to the translation mode button in the Lyrics card header.
   - Clicking it toggles `FloatingLyrics.open` and automatically closes the dashboard drawer (`ShellState.forActive()?.dashboard = false`).
 - **Hyprland Rules (`~/.config/hypr/hyprland/rules.lua` & `userprefs.conf`)**:
-  - Title match `Floating Lyrics`: pinned across all workspaces (`pin = true`), floating (`float = true`), borderless (`border_size = 0`), undecorated (`decorate = false`), no shadow (`no_shadow = true`), no blur (`no_blur = true`), and transparent (`opaque = false`).
+  - Title match `Floating Lyrics`: pinned across all workspaces (`pin = true`), floating (`float = true`), borderless (`border_size = 0`), undecorated (`decorate = false`), no shadow (`no_shadow = true`), no blur (`no_blur = false`), and transparent (`opaque = false`).
 
 ---
 

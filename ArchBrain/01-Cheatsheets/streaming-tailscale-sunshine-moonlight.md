@@ -50,6 +50,10 @@ systemctl --user enable sunshine
 uwsm app -- sunshine
 ```
 
+### Audio Sink Configuration (PipeWire)
+Sunshine creates its own virtual PipeWire sink (`sink-sunshine-stereo`) when a client connects and redirects the system default output to it.
+- **Do not hardcode a physical audio sink** (such as `audio_sink = alsa_output...`) in `~/.config/sunshine/sunshine.conf` unless you intend to bypass Sunshine's virtual sink routing. Leaving `audio_sink` unset lets Sunshine capture its own virtual sink automatically, avoiding silent audio streams on remote clients.
+
 ### Accessing the Web Configuration Interface
 1. Open your browser and navigate to:
    ```
