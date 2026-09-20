@@ -1,0 +1,17 @@
+[Unit]
+Description=Senki Expo Metro Bundler (SDK 54 Local CLI)
+After=network.target tailscaled.service
+
+[Service]
+Type=simple
+WorkingDirectory=%h/github/Senki
+Environment="PATH=%h/github/Senki/node_modules/.bin:/usr/local/bin:/usr/bin"
+Environment="CI=false"
+ExecStart=%h/github/Senki/node_modules/.bin/expo start --dev-client --host lan
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

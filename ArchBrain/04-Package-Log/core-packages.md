@@ -41,6 +41,7 @@ Explicitly installed core packages driving the OS, DE, and Shell experience.
 - `discord` (Communication)
 - `obsidian` (Knowledge Base & Notes)
 - `pi` (`@earendil-works/pi-coding-agent` AI coding agent harness with `subagent`, `todo`, `obsidian-vault`, and `bash-guard` extensions)
+- `llama-cpp` / `ggml-vulkan` (Local LLM inference in C/C++ with Vulkan/CPU AVX2 support)
 - `Google Office Suite` (Desktop Web Apps: Docs, Sheets, Slides)
 - `twintaillauncher-bin` / `steam` (Gaming Launchers)
 - `jdk17-openjdk` / `android-tools` / `android-udev` (Android Development & Emulation)

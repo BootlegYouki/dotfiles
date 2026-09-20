@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+MODEL="${HOME}/models/minicpm5-2b/MiniCPM5-2B-Q4_K_M.gguf"
+
+if [[ ! -f "$MODEL" ]]; then
+    echo "Error: Model file not found at $MODEL" >&2
+    exit 1
+fi
+
+exec llama-cli \
+  -m "$MODEL" \
+  -t 6 \
+  -c 8192 \
+  -n 2048 \
+  --temp 1.0 \
+  --top-p 0.95 \
+  --min-p 0.0 \
+  --color auto \
+  "$@"

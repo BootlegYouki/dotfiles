@@ -1,0 +1,14 @@
+[Unit]
+Description=Senki Host Controller Daemon
+After=network.target tailscaled.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/youki/github/Senki/daemon/senki-daemon.py --config %h/.config/senki/config.json
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

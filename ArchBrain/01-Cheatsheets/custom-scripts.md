@@ -23,6 +23,9 @@ Centralized directory for custom daemons, macros, and integration scripts (mirro
 - **`toggle-autologin`**: Helper utility to check (`status`), enable (`on`), disable (`off`), or `toggle` SDDM autologin (`/etc/sddm.conf.d/autologin.conf`) for unattended remote desktop streaming via Sunshine/Tailscale, integrated with Caelestia Control Center Quick Toggles.
 - **`hypr-gnome-mouse-sync`**: Daemon that reads mouse acceleration and speed settings from GNOME dconf and synchronizes them into Hyprland's input config.
 
+## AI & Local Models (`~/.local/bin/`)
+- **`minicpm`**: Terminal launcher for `openbmb/MiniCPM5-2B` (`MiniCPM5-2B-Q4_K_M.gguf`) using `llama-cli`. Configured with `-t 6` CPU cores, `--temp 1.0`, `--top-p 0.95`, and `--min-p 0.0`. Supports interactive chat mode, single-turn prompts (`-st`), or custom arguments.
+
 ## Audio & Media
 - **`restart-audio`**: Fast recovery utility. Restarts `pipewire.service`, `pipewire-pulse.service`, and `wireplumber.service` user units when audio routing or devices hang.
 - **`vlc`**: Wrapper script that strips recursive launch flags to prevent desktop freezes when VLC is configured as the default MIME video player.
