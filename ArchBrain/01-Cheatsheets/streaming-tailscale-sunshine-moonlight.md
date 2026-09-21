@@ -82,9 +82,9 @@ And in `~/.config/sunshine/apps.json` for "Desktop" and "Steam Big Picture":
 3. Sunshine configuration is stored at `~/.config/sunshine/sunshine.conf`.
 
 > [!IMPORTANT]
-> When accessing Sunshine Web UI remotely (e.g. over Tailscale IP `100.68.241.60`), Sunshine's built-in CSRF protection blocks requests unless the origin is allowed. Ensure `csrf_allowed_origins` is set in `~/.config/sunshine/sunshine.conf`:
+> When accessing Sunshine Web UI remotely (e.g. over Tailscale IP `100.68.241.60` or local LAN IP `192.168.100.11`), Sunshine's built-in CSRF protection blocks requests unless the origin is allowed. Ensure `csrf_allowed_origins` is set in `~/.config/sunshine/sunshine.conf`:
 > ```ini
-> csrf_allowed_origins = https://100.68.241.60:47990,https://100.68.241.60,https://youki:47990,https://youki
+> csrf_allowed_origins = https://100.68.241.60:47990,https://100.68.241.60,https://192.168.100.11:47990,https://192.168.100.11,https://localhost:47990,https://localhost,https://youki:47990,https://youki,https://youki.taild1e3e1.ts.net:47990,https://youki.taild1e3e1.ts.net
 > ```
 
 ### Pairing with Moonlight
