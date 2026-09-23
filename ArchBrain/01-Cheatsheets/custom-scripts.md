@@ -6,7 +6,7 @@ Comprehensive catalogue of user scripts and helper utilities installed on this m
 
 ## Dedicated Custom Scripts Directory (`~/custom_scripts/`)
 Centralized directory for custom daemons, macros, and integration scripts (mirrored in `~/dotfiles/custom_scripts/`):
-- **`genshin_f_macro.py`**: Event-driven Genshin Impact rapid F-spam macro daemon (`genshin-f-macro.service`). Listens on Hyprland IPC (`.socket2.sock`) to guarantee that `Ctrl + F` spamming only activates when the game window is focused, pausing automatically when switching to other apps.
+- **`genshin_f_macro.py`**: Event-driven Genshin Impact rapid F-spam macro daemon (`genshin-f-macro.service`). Listens on Hyprland IPC (`.socket2.sock`) to guarantee that `Ctrl + F` spamming only activates when the game window is focused, pausing automatically when switching to other apps. Features dynamic hotplug detection and multi-keyboard support (physical USB keyboards + Moonlight/Sunshine `Keyboard passthrough`).
 - **`caelestia-romaji-daemon`**: Python daemon (`caelestia-romaji.service`) running under `~/.local/share/caelestia/venv` that provides instantaneous Japanese romaji search matching, lyrics conversion, and Google Translate English translation. Symlinked to `~/.local/bin/caelestia-romaji-daemon`.
 - **`caelestia-romaji`**: CLI client utility communicating with `caelestia-romaji-daemon` over UNIX domain socket (`/run/user/$UID/caelestia-romaji.sock`). Symlinked to `~/.local/bin/caelestia-romaji`.
 - **`toggle_monitor.py`**: Dual-monitor controller and DPMS query script for Hyprland (`status`, `detect`, `on`, `off`). Managed persistently via Caelestia's `Hypr.qml` singleton to provide zero-delay Quick Toggles rendering.

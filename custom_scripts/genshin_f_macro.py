@@ -12,49 +12,37 @@ import glob
 import socket
 import json
 
-def find_keyboards():
-    # Only find devices that have full set of alpha keys (A-Z)
-    ALPHA_KEYS = {
-        ecodes.KEY_A, ecodes.KEY_B, ecodes.KEY_C, ecodes.KEY_D,
-        ecodes.KEY_E, ecodes.KEY_F, ecodes.KEY_G, ecodes.KEY_H,
-        ecodes.KEY_I, ecodes.KEY_J, ecodes.KEY_K, ecodes.KEY_L,
-        ecodes.KEY_M, ecodes.KEY_N, ecodes.KEY_O, ecodes.KEY_P,
-        ecodes.KEY_Q, ecodes.KEY_R, ecodes.KEY_S, ecodes.KEY_T,
-        ecodes.KEY_U, ecodes.KEY_V, ecodes.KEY_W, ecodes.KEY_X,
-        ecodes.KEY_Y, ecodes.KEY_Z,
-    }
-    candidates = []
-    for path in evdev.list_devices():
-        try:
-            dev = InputDevice(path)
-            caps = dev.capabilities()
-            if ecodes.EV_KEY not in caps:
-                continue
-            keys = set(caps[ecodes.EV_KEY])
-            if not ALPHA_KEYS.issubset(keys):
-                continue
-            name_lower = dev.name.lower()
-            if any(x in name_lower for x in ("mouse", "pointer", "ydotool", "genshin", "touchpad", "emitter")):
-                continue
-            candidates.append((dev, keys))
-        except Exception:
-            continue
+ALPHA_KEYS = {
+    ecodes.KEY_A, ecodes.KEY_B, ecodes.KEY_C, ecodes.KEY_D,
+    ecodes.KEY_E, ecodes.KEY_F, ecodes.KEY_G, ecodes.KEY_H,
+    ecodes.KEY_I, ecodes.KEY_J, ecodes.KEY_K, ecodes.KEY_L,
+    ecodes.KEY_M, ecodes.KEY_N, ecodes.KEY_O, ecodes.KEY_P,
+    ecodes.KEY_Q, ecodes.KEY_R, ecodes.KEY_S, ecodes.KEY_T,
+    ecodes.KEY_U, ecodes.KEY_V, ecodes.KEY_W, ecodes.KEY_X,
+    ecodes.KEY_Y, ecodes.KEY_Z,
+}
 
-    if not candidates:
-        return []
-    max_keys = max(len(k) for _, k in candidates)
-    return [dev for dev, keys in candidates if len(keys) == max_keys]
+def is_valid_keyboard(path):
+    try:
+        dev = InputDevice(path)
+        caps = dev.capabilities()
+        if ecodes.EV_KEY not in caps:
+            return None
+        keys = set(caps[ecodes.EV_KEY])
+        if not ALPHA_KEYS.issubset(keys):
+            return None
+        if ecodes.KEY_F not in keys:
+            return None
+        if ecodes.KEY_LEFTCTRL not in keys and ecodes.KEY_RIGHTCTRL not in keys:
+            return None
+        name_lower = dev.name.lower()
+        if any(x in name_lower for x in ("mouse", "pointer", "ydotool", "genshin", "touchpad", "emitter")):
+            return None
+        return dev
+    except Exception:
+        return None
 
-keyboards = find_keyboards()
-if not keyboards:
-    print("Error: Could not find any keyboard devices.")
-    sys.exit(1)
-
-print("Found keyboard devices (monitoring in passive mode - zero grab):")
-for kb in keyboards:
-    print(f" - {kb.name} ({kb.path})")
-
-# Virtual emitter ONLY for F keypresses - does not hijack the main keyboard!
+# Virtual emitter ONLY for F keypresses - does not hijack physical keyboards
 ui = UInput({ecodes.EV_KEY: [ecodes.KEY_F]}, name="Genshin Macro Emitter")
 print("Macro emitter created.")
 
@@ -108,7 +96,7 @@ def is_genshin_window(win_class, win_title):
     return False
 
 def set_macro_indicator(enabled):
-    # 1. Update persistent state file in /run/user/<uid>/ and /tmp/
+    # 1. Update persistent state files in /run/user/<uid>/ and /tmp/
     for state_path in (f"/run/user/{target_uid}/genshin_macro.state", "/tmp/genshin_macro.state"):
         try:
             with open(state_path, "w") as f:
@@ -117,23 +105,20 @@ def set_macro_indicator(enabled):
         except Exception:
             pass
 
-    # 2. Instantaneous direct IPC call to Quickshell Caelestia
-    env = os.environ.copy()
-    env["HOME"] = f"/home/{target_user}"
-    env["USER"] = target_user
-    env["LANG"] = "en_US.UTF-8"
-    env["XDG_RUNTIME_DIR"] = f"/run/user/{target_uid}"
-    env["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path=/run/user/{target_uid}/bus"
+    # 2. Instantaneous direct IPC call to Quickshell Caelestia running as target user
     cmd = [
+        "sudo", "-u", target_user,
+        f"XDG_RUNTIME_DIR=/run/user/{target_uid}",
+        f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{target_uid}/bus",
         "/usr/bin/qs", "ipc",
-        "-p", f"/home/{target_user}/.config/quickshell/caelestia/shell.qml",
+        "-c", "caelestia",
         "--any-display",
         "call", "macro", "set", "true" if enabled else "false"
     ]
     try:
-        subprocess.Popen(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception as e:
-        print(f"Failed to update macro indicator: {e}")
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
 
 def hypr_focus_monitor():
     global is_genshin_focused, macro_enabled
@@ -176,7 +161,7 @@ def hypr_focus_monitor():
                             print(f"[Focus Changed] Genshin focused: {is_genshin_focused} (class='{win_class}', title='{win_title}')")
                             set_macro_indicator(macro_enabled and is_genshin_focused)
             s.close()
-        except Exception as e:
+        except Exception:
             time.sleep(1.0)
 
 # Rapid F press loop (50ms down, 50ms up -> 10 clicks/sec) - ONLY when Genshin is active window!
@@ -184,14 +169,14 @@ def f_spam_loop():
     global macro_enabled, is_genshin_focused
     while macro_enabled:
         if is_genshin_focused:
-            ui.write(ecodes.EV_KEY, ecodes.KEY_F, 1) # Press down
+            ui.write(ecodes.EV_KEY, ecodes.KEY_F, 1)  # Press down
             ui.syn()
             time.sleep(0.05)
-            ui.write(ecodes.EV_KEY, ecodes.KEY_F, 0) # Release
+            ui.write(ecodes.EV_KEY, ecodes.KEY_F, 0)  # Release
             ui.syn()
             time.sleep(0.05)
         else:
-            time.sleep(0.1) # Idle pause while Genshin is unfocused
+            time.sleep(0.1)  # Idle pause while Genshin is unfocused
     # Final safety release
     ui.write(ecodes.EV_KEY, ecodes.KEY_F, 0)
     ui.syn()
@@ -218,41 +203,115 @@ try:
     focus_thread = threading.Thread(target=hypr_focus_monitor, daemon=True)
     focus_thread.start()
 
-    print("Monitoring keyboards. Press Ctrl+F in Genshin Impact to toggle rapid F-spam.")
+    print("Monitoring keyboards (dynamic hotplug enabled). Press Ctrl+F in Genshin Impact to toggle rapid F-spam.")
 
-    ctrl_pressed = False
+    devices_dict = {}  # fd -> InputDevice
+    dev_paths = {}     # path -> fd
+    held_ctrl_keys = set()  # set of (fd, code)
     last_toggle_time = 0
-    devices_dict = {kb.fd: kb for kb in keyboards}
+    last_scan_time = 0
+
+    def scan_keyboards():
+        global devices_dict, dev_paths
+        current_paths = set(evdev.list_devices())
+        for p in current_paths:
+            if p not in dev_paths:
+                dev = is_valid_keyboard(p)
+                if dev:
+                    devices_dict[dev.fd] = dev
+                    dev_paths[p] = dev.fd
+                    print(f"[Device Added] {dev.name} ({dev.path})")
+
+    # Initial keyboard scan
+    scan_keyboards()
 
     while True:
-        r, _, _ = select.select(devices_dict, [], [])
+        now = time.time()
+        # Periodic rescan every 2 seconds for hotplugged devices (Sunshine, USB, Bluetooth)
+        if now - last_scan_time >= 2.0:
+            last_scan_time = now
+            scan_keyboards()
+
+        if not devices_dict:
+            time.sleep(1.0)
+            continue
+
+        try:
+            r, _, _ = select.select(list(devices_dict.keys()), [], [], 2.0)
+        except (ValueError, OSError):
+            # One of the file descriptors became invalid, clean up dead devices
+            dead_paths = []
+            for path, fd in list(dev_paths.items()):
+                dev = devices_dict.get(fd)
+                if not dev:
+                    continue
+                try:
+                    dev.active_keys()
+                except Exception:
+                    dead_paths.append((path, fd))
+            for path, fd in dead_paths:
+                dev = devices_dict.pop(fd, None)
+                dev_paths.pop(path, None)
+                held_ctrl_keys = {item for item in held_ctrl_keys if item[0] != fd}
+                if dev:
+                    try:
+                        dev.close()
+                    except Exception:
+                        pass
+                    print(f"[Device Removed (Invalid FD)] {dev.name} ({path})")
+            continue
+
         for fd in r:
-            dev = devices_dict[fd]
+            dev = devices_dict.get(fd)
+            if not dev:
+                continue
+
             try:
                 events = list(dev.read())
             except (OSError, IOError) as e:
-                print(f"Device read error: {e}")
-                time.sleep(1)
+                # Device was unplugged / destroyed (e.g. [Errno 19] No such device)
+                dev_name = dev.name
+                dev_path = dev.path
+                devices_dict.pop(fd, None)
+                dev_paths.pop(dev_path, None)
+                held_ctrl_keys = {item for item in held_ctrl_keys if item[0] != fd}
+                try:
+                    dev.close()
+                except Exception:
+                    pass
+                print(f"[Device Disconnected] {dev_name} ({dev_path}): {e}")
                 continue
 
             for event in events:
                 if event.type == ecodes.EV_KEY:
                     if event.code in (ecodes.KEY_LEFTCTRL, ecodes.KEY_RIGHTCTRL):
-                        ctrl_pressed = (event.value in (1, 2))
+                        if event.value in (1, 2):
+                            held_ctrl_keys.add((fd, event.code))
+                        elif event.value == 0:
+                            held_ctrl_keys.discard((fd, event.code))
                     elif event.code == ecodes.KEY_F and event.value == 1:
-                        now = time.time()
-                        if ctrl_pressed and (now - last_toggle_time > 0.25):
-                            last_toggle_time = now
+                        is_ctrl_held = len(held_ctrl_keys) > 0
+                        if not is_ctrl_held:
+                            try:
+                                active = dev.active_keys()
+                                if ecodes.KEY_LEFTCTRL in active or ecodes.KEY_RIGHTCTRL in active:
+                                    is_ctrl_held = True
+                            except Exception:
+                                pass
+
+                        t_now = time.time()
+                        if is_ctrl_held and (t_now - last_toggle_time > 0.25):
+                            last_toggle_time = t_now
 
                             # Only toggle when Genshin Impact is in focus (or if turning OFF an already running macro)
                             if not is_genshin_focused and not macro_enabled:
                                 continue
 
                             macro_enabled = not macro_enabled
+                            print(f"[Macro Toggled] Enabled: {macro_enabled} (Genshin focused: {is_genshin_focused})")
                             set_macro_indicator(macro_enabled and is_genshin_focused)
                             if macro_enabled:
-                                spam_thread = threading.Thread(target=f_spam_loop)
-                                spam_thread.daemon = True
+                                spam_thread = threading.Thread(target=f_spam_loop, daemon=True)
                                 spam_thread.start()
 
 except Exception as e:
