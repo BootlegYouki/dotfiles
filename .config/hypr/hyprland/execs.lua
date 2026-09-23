@@ -27,7 +27,8 @@ hl.on("hyprland.start", function()
     -- Night light (warm 4000K color temperature)
     hl.exec_cmd("hyprsunset -t 4000")
 
-    -- Microphone hardware gain & boost fix (prevents +60dB static clipping)
+    -- Microphone hardware gain & boost fix (prevents +60dB static clipping) and ensure analog mic is default
+    hl.exec_cmd("pactl set-default-source alsa_input.pci-0000_04_00.6.analog-stereo")
     hl.exec_cmd("amixer -c Generic_1 sset 'Rear Mic Boost' 1")
     hl.exec_cmd("amixer -c Generic_1 sset 'Capture' 45")
 

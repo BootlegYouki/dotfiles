@@ -16,6 +16,9 @@ amixer -c Generic_1 sset Master 70% 2>/dev/null || true
 amixer -c Generic_1 sset PCM 100% 2>/dev/null || true
 amixer -c Generic_1 sset Front 100% 2>/dev/null || true
 
+# Ensure default source is the Realtek analog mic instead of USB webcam
+pactl set-default-source alsa_input.pci-0000_04_00.6.analog-stereo 2>/dev/null || true
+
 # Restore Microphone hardware gain & boost fix (prevents +60dB static clipping)
 amixer -c Generic_1 sset 'Rear Mic Boost' 1 2>/dev/null || true
 amixer -c Generic_1 sset 'Capture' 45 2>/dev/null || true
