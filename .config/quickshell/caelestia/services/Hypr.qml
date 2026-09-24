@@ -72,6 +72,30 @@ Singleton {
         Hyprland.dispatch(request);
     }
 
+    function focusWorkspace(ws: var): void {
+        dispatch(usingLua ? `hl.dsp.focus({ workspace = "${ws}" })` : `workspace ${ws}`);
+    }
+
+    function toggleSpecial(name: string): void {
+        dispatch(usingLua ? `hl.dsp.workspace.toggle_special("${name}")` : `togglespecialworkspace ${name}`);
+    }
+
+    function trimWsName(name: string): string {
+        return name.startsWith("special:") ? name.slice("special:".length) : name;
+    }
+
+    function toplevelsForWs(ws: int, ignoredTags = []): list<HyprlandToplevel> {
+        return toplevels.values.filter(t => t.workspace && t.workspace.id === ws && !isToplevelIgnored(t, ignoredTags));
+    }
+
+    function isToplevelIgnored(toplevel: HyprlandToplevel, ignoredTags = []): bool {
+        const ipc = toplevel?.lastIpcObject;
+        if (!ipc?.class || !ipc.mapped)
+            return true;
+
+        return ipc.tags?.some(tag => ignoredTags.includes(tag.replace(/\*$/, ""))) ?? false;
+    }
+
     function cycleSpecialWorkspace(direction: string): void {
         const openSpecials = workspaces.values.filter(w => w.name.startsWith("special:") && w.lastIpcObject.windows > 0);
 

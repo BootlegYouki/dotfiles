@@ -30,9 +30,9 @@ Documentation for resolving intermittent browser page load failures, high-latenc
 ## Resolution Steps
 
 ### 1. Configure Fast Upstream DNS on Primary Interface
-Bypassed the failing ISP router DNS by assigning Google DNS (`8.8.8.8`, `8.8.4.4`) and Cloudflare DNS (`1.1.1.1`, `1.0.0.1`):
+Bypassed the failing ISP router DNS by assigning Cloudflare DNS (`1.1.1.1`, `1.0.0.1`):
 ```bash
-sudo nmcli connection modify "Wired connection 1" ipv4.dns "8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1" ipv4.ignore-auto-dns yes
+sudo nmcli connection modify "Wired connection 1" ipv4.dns "1.1.1.1 1.0.0.1" ipv4.ignore-auto-dns yes
 sudo nmcli connection up "Wired connection 1"
 ```
 
@@ -61,6 +61,25 @@ Refreshed Tailscale's network monitor and resolved the health check warning:
 sudo systemctl restart tailscaled
 ```
 
+### 5. Bypass ISP Transpacific Detour via Cloudflare WARP
+When ISP (Converge ICT) BGP peering routes Asia game servers (e.g. Genshin Tokyo Alibaba Cloud `47.74.39.4`) across the Pacific to the US and back (causing 340ms+ latency), Cloudflare WARP routes client traffic directly via Cloudflare's private backbone:
+```bash
+sudo pacman -S cloudflare-warp-bin
+sudo systemctl enable --now warp-svc
+warp-cli --accept-tos registration new
+warp-cli --accept-tos connect
+# Exclude Discord from WARP tunnel to prevent RTC/voice/websocket issues:
+for domain in discord.com discord.gg discordapp.com discordapp.net discord.media discordcdn.com gateway.discord.gg; do
+  warp-cli --accept-tos tunnel host add "$domain"
+done
+# Disable IPv6 on CloudflareWARP interface to prevent Discord WebRTC RTC stalls:
+# /etc/udev/rules.d/99-cloudflare-warp.rules
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="CloudflareWARP", RUN+="/usr/bin/sysctl -w net.ipv6.conf.CloudflareWARP.disable_ipv6=1"
+```
+Tailscale CGNAT (`100.64.0.0/10`) and local LAN (`192.168.0.0/16`) are excluded by default in WARP settings, ensuring zero disruption to local streaming or mesh connectivity.
+
+Automated via `genshin-warp-auto.service` (`~/.local/bin/genshin-warp-auto`): WARP automatically connects when `GenshinImpact.exe` is detected and disconnects upon game exit, keeping normal web browsing and Discord 100% on native fiber.
+
 ---
 
 ## Verification Results
@@ -72,6 +91,7 @@ sudo systemctl restart tailscaled
 | **Speedtest Throughput** | Erratic / choked | **423.43 Mbps Down / 496.85 Mbps Up** |
 | **Tailscale Health** | Warning: resolved-nm misconfigured | **Clean (Healthy)** |
 | **AUR / Dual-stack Tools** | `os error 101` unreachable | **Instant resolution** |
+| **Genshin Tokyo Asia Server** | 342.0 ms (Converge US detour) | **69.3 ms (Cloudflare WARP route)** |
 
 ---
 

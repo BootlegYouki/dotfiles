@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Caelestia
+import Caelestia.I18n
 import qs.components
 import qs.components.effects
 import qs.services
@@ -38,13 +39,17 @@ MouseArea {
         if (!mon)
             return [];
 
-        const special = mon.lastIpcObject.specialWorkspace;
-        const wsId = special.name ? special.id : mon.activeWorkspace.id;
+        const special = mon.lastIpcObject?.specialWorkspace;
+        const wsId = special?.name ? special.id : mon.activeWorkspace?.id;
+        if (wsId === undefined)
+            return [];
 
-        return Hypr.toplevels.values.filter(c => c.workspace?.id === wsId).sort((a, b) => {
+        return Hypr.toplevelsForWs(wsId).sort((a, b) => {
             // Pinned first, then fullscreen, then floating, then any other
-            const ac = a.lastIpcObject;
-            const bc = b.lastIpcObject;
+            const ac = a?.lastIpcObject;
+            const bc = b?.lastIpcObject;
+            if (!ac || !bc)
+                return !ac - !bc; // Missing IPC last
             return (bc.pinned - ac.pinned) || ((bc.fullscreen !== 0) - (ac.fullscreen !== 0)) || (bc.floating - ac.floating);
         });
     }
@@ -54,10 +59,14 @@ MouseArea {
             if (!client)
                 continue;
 
+            const ipc = client.lastIpcObject;
+            if (!ipc?.at || !ipc?.size)
+                continue;
+
             let {
                 at: [cx, cy],
                 size: [cw, ch]
-            } = client.lastIpcObject;
+            } = ipc;
             cx -= screen.x;
             cy -= screen.y;
             if (cx <= x && cy <= y && cx + cw >= x && cy + ch >= y) {
@@ -74,7 +83,15 @@ MouseArea {
     function save(): void {
         const tmpfile = Qt.resolvedUrl(`/tmp/caelestia-picker-${Quickshell.processId}-${Date.now()}.png`);
         CUtils.saveItem(screencopy, tmpfile, Qt.rect(Math.ceil(rsx), Math.ceil(rsy), Math.floor(sw), Math.floor(sh)), path => {
-            Quickshell.execDetached(["sh", "-c", "mkdir -p ~/Pictures/Screenshots && file=$HOME/Pictures/Screenshots/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png && cp " + path + " \"$file\" && wl-copy --type image/png < \"$file\" && notify-send -i \"$file\" 'Screenshot Saved' \"Saved to ~/Pictures/Screenshots/$(basename \"$file\")\""]);
+            Quickshell.execDetached([
+                "sh",
+                "-c",
+                "mkdir -p ~/Pictures/Screenshots && " +
+                "file=$HOME/Pictures/Screenshots/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png && " +
+                "cp " + path + " \"$file\" && " +
+                "wl-copy --type image/png < \"$file\" && " +
+                "notify-send -a 'caelestia-cli' -i \"$file\" 'Screenshot taken' 'Screenshot copied to clipboard'"
+            ]);
             closeAnim.start();
         });
     }
@@ -82,7 +99,7 @@ MouseArea {
     onClientsChanged: checkClientRects(mouseX, mouseY)
 
     anchors.fill: parent
-    opacity: root.loader.freeze ? 1 : 0
+    opacity: 0
     hoverEnabled: true
     cursorShape: Qt.CrossCursor
 
@@ -95,15 +112,15 @@ MouseArea {
 
         opacity = 1;
 
-        const c = clients[0];
-        if (c) {
-            const cx = c.lastIpcObject.at[0] - screen.x;
-            const cy = c.lastIpcObject.at[1] - screen.y;
+        const ipc = clients[0]?.lastIpcObject;
+        if (ipc?.at && ipc?.size) {
+            const cx = ipc.at[0] - screen.x;
+            const cy = ipc.at[1] - screen.y;
             onClient = true;
             sx = cx;
             sy = cy;
-            ex = cx + c.lastIpcObject.size[0];
-            ey = cy + c.lastIpcObject.size[1];
+            ex = cx + ipc.size[0];
+            ey = cy + ipc.size[1];
         } else {
             sx = screen.width / 2 - 100;
             sy = screen.height / 2 - 100;
@@ -181,7 +198,7 @@ MouseArea {
         }
         PropertyAction {
             target: root.loader
-            property: "active"
+            property: "activeAsync"
             value: false
         }
     }
@@ -200,7 +217,7 @@ MouseArea {
     Loader {
         id: screencopy
 
-        asynchronous: false
+        asynchronous: true
         anchors.fill: parent
 
         active: root.loader.freeze
@@ -268,8 +285,6 @@ MouseArea {
     }
 
     Behavior on opacity {
-        enabled: !root.loader.freeze
-
         Anim {
             type: Anim.StandardLarge
         }

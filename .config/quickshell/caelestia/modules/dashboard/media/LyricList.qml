@@ -87,34 +87,11 @@ Item {
         }
     }
 
-    Timer {
-        id: noLyricsDelay
-        interval: 1500
-        running: false
-        property bool triggered: false
-        onTriggered: {
-            triggered = true;
-            root.flag = !root.flag;
-        }
-    }
-
     state: {
-        flag; // For some reason it doesn't update sometimes, so use this to force an update
-        if (converting || Lyrics.loading) {
-            noLyricsDelay.stop();
-            noLyricsDelay.triggered = false;
+        if (converting || Lyrics.loading)
             return "loading";
-        }
-        if (Lyrics.hasLyrics && lyricList && lyricList.length > 0) {
-            noLyricsDelay.stop();
-            noLyricsDelay.triggered = false;
+        if (Lyrics.hasLyrics && lyricList && lyricList.length > 0)
             return "hasLyrics";
-        }
-        
-        if (!noLyricsDelay.running && !noLyricsDelay.triggered) {
-            noLyricsDelay.start();
-            return "loading"; // Keep loading while waiting
-        }
         return "noLyrics";
     }
 

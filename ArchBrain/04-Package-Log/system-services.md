@@ -18,6 +18,7 @@ Authoritative log of active systemd system-level services, user-level daemons, a
 - **`hypr-gnome-mouse-sync.service`**: Daemon syncing GNOME dconf mouse settings into Hyprland.
 - **`caelestia-romaji.service`**: Transliteration daemon for fast Caelestia launcher search.
 - **`hypr-kdeconnect-portal.service`**: RemoteDesktop portal connecting KDE Connect to Hyprland.
+- **`genshin-warp-auto.service`**: Lifecycle daemon automatically connecting Cloudflare WARP when `GenshinImpact.exe` launches and disconnecting upon game exit.
 
 ### Applets & Integrations
 - **`app-arch-update-tray.service`**: CachyOS / Arch update status indicator tray.
@@ -41,6 +42,7 @@ Authoritative log of active systemd system-level services, user-level daemons, a
 - **`tailscaled.service`**: Tailscale mesh VPN daemon.
 - **`proton.VPN.service`**: Proton VPN background connection service.
 - **`ufw.service`**: Uncomplicated Firewall protecting local ports.
+- **`warp-svc.service`**: Cloudflare WARP daemon for gaming routing optimization and ISP detour bypass.
 - **`genshin-f-macro.service`**: Event-driven background macro daemon.
 - **`systemd-resolved.service`**: Local caching DNS stub resolver.
 - **`systemd-timesyncd.service`**: Network Time Protocol (NTP) clock synchronization.

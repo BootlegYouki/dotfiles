@@ -81,10 +81,19 @@ Caelestia features persistent vertical special workspace drawer docks. Smooth cy
 - `SUPER + Period` / `Comma`: Next / Previous Wallpaper (triggers `sync-sddm-pixie` hook)
 
 ### Utilities & Toggles
+- `SUPER + SHIFT + S`: Interactive Screenshot Tool (`caelestia:screenshotFreezeClip` via AreaPicker). Freezes screen, auto-snaps to window geometry or drag region with pixel zoom loupe, and immediately auto-copies to clipboard (`wl-copy`) and saves to `~/Pictures/Screenshots/` with zero preview popup.
+- `Print`: Fullscreen Screenshot (`caelestia screenshot`).
 - `SUPER + SHIFT + N`: Toggle Night Light (4000K warm temperature via `nightlight`)
 - `SUPER + ALT + A`: Startup Applications Manager (`autostart-manager`)
 - `CTRL + SHIFT + Escape`: Task Manager / System Monitor (opens `special:sysmon` running `btop`)
 - `ALT + TAB`: Cursor toggle across monitors
+
+---
+
+## Caelestia Shell v2.5.0 Modernization
+- **Workspaces Pill & Window Icons**: Redesigned active workspace pill indicator (`ActiveIndicator.qml`, `Workspace.qml`) powered by C++ `LazyListView` virtualization. Dynamically groups active workspace dot with open/focused app icons (e.g. `>_` terminal) and animates trail transitions.
+- **Performance Cards Consistency**: All Dashboard performance cards (`HeroCard`, `MemoryCard`, `StorageCard`, `NetworkCard`, `BatteryTank`) unified to `radius: Tokens.rounding.large` to prevent visual mismatches.
+- **Network Card**: Features live dual-line sparkline throughput graph, status icons (`swap_vert`, `download`, `upload`, `history`), and asynchronous rate formatters (`Units.formatBytes`).
 
 ---
 

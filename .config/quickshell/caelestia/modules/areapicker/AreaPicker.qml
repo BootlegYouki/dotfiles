@@ -52,28 +52,28 @@ Scope {
             root.freeze = false;
             root.closing = false;
             root.clipboardOnly = false;
-            root.active = true;
+            root.activeAsync = true;
         }
 
         function openFreeze(): void {
             root.freeze = true;
             root.closing = false;
             root.clipboardOnly = false;
-            root.active = true;
+            root.activeAsync = true;
         }
 
         function openClip(): void {
             root.freeze = false;
             root.closing = false;
             root.clipboardOnly = true;
-            root.active = true;
+            root.activeAsync = true;
         }
 
         function openFreezeClip(): void {
             root.freeze = true;
             root.closing = false;
             root.clipboardOnly = true;
-            root.active = true;
+            root.activeAsync = true;
         }
 
         target: "picker"
@@ -88,7 +88,7 @@ Scope {
             root.freeze = false;
             root.closing = false;
             root.clipboardOnly = false;
-            root.active = true;
+            root.activeAsync = true;
         }
     }
 
@@ -101,7 +101,7 @@ Scope {
             root.freeze = true;
             root.closing = false;
             root.clipboardOnly = false;
-            root.active = true;
+            root.activeAsync = true;
         }
     }
 
@@ -114,7 +114,7 @@ Scope {
             root.freeze = false;
             root.closing = false;
             root.clipboardOnly = true;
-            root.active = true;
+            root.activeAsync = true;
         }
     }
 
@@ -127,7 +127,7 @@ Scope {
             root.freeze = true;
             root.closing = false;
             root.clipboardOnly = true;
-            root.active = true;
+            root.activeAsync = true;
         }
     }
 }

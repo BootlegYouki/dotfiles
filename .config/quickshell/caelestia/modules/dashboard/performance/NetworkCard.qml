@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Caelestia.Config
 import Caelestia.Components
+import Caelestia.I18n
 import Caelestia.Services
 import qs.components
 import qs.components.misc
@@ -38,7 +39,7 @@ StyledRect {
             }
 
             StyledText {
-                text: qsTr("Network")
+                text: Tr.tr("Network")
                 font: Tokens.font.title.medium
             }
         }
@@ -49,16 +50,15 @@ StyledRect {
             Layout.bottomMargin: Tokens.spacing.small
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
 
             SparklineItem {
                 id: sparkline
 
-                property real targetMax: Math.max(NetworkUsage.downloadBuffer.maximum, NetworkUsage.uploadBuffer.maximum, 1024)
+                property real targetMax: 1024
                 property real smoothMax: targetMax
 
                 anchors.fill: parent
-                opacity: NetworkUsage.downloadBuffer.count >= 2 ? 1 : 0
+                visible: root.visible && NetworkUsage.downloadBuffer.count >= 2
                 line1: NetworkUsage.uploadBuffer // qmllint disable missing-type
                 line1Color: Colours.palette.m3secondary
                 line1FillAlpha: 0.15
@@ -70,19 +70,13 @@ StyledRect {
 
                 Connections {
                     function onValuesChanged(): void {
-                        sparkline.targetMax = Math.max(NetworkUsage.downloadBuffer.maximum, NetworkUsage.uploadBuffer.maximum, 1024);
-                        slideAnim.restart();
+                        if (root.visible) {
+                            sparkline.targetMax = Math.max(NetworkUsage.downloadBuffer.maximum, NetworkUsage.uploadBuffer.maximum, 1024);
+                            slideAnim.restart();
+                        }
                     }
 
                     target: NetworkUsage.downloadBuffer
-                }
-
-                Connections {
-                    function onValuesChanged(): void {
-                        sparkline.targetMax = Math.max(NetworkUsage.downloadBuffer.maximum, NetworkUsage.uploadBuffer.maximum, 1024);
-                    }
-
-                    target: NetworkUsage.uploadBuffer
                 }
 
                 NumberAnimation {
@@ -99,18 +93,12 @@ StyledRect {
                 Behavior on smoothMax {
                     Anim {}
                 }
-
-                Behavior on opacity {
-                    Anim {
-                        type: Anim.DefaultEffects
-                    }
-                }
             }
 
             // "Collecting data" placeholder
             StyledText {
                 anchors.centerIn: parent
-                text: qsTr("Collecting data...")
+                text: Tr.tr("Collecting data...")
                 font: Tokens.font.body.small
                 color: Colours.palette.m3outline
                 visible: NetworkUsage.downloadBuffer.count < 2
@@ -129,7 +117,7 @@ StyledRect {
             }
 
             StyledText {
-                text: qsTr("Download")
+                text: Tr.trCtx("Download", "network throughput")
                 font: Tokens.font.body.small
                 color: Colours.palette.m3onSurfaceVariant
             }
@@ -139,10 +127,7 @@ StyledRect {
             }
 
             StyledText {
-                text: {
-                    const fmt = NetworkUsage.formatBytesRate(NetworkUsage.downloadSpeed ?? 0);
-                    return fmt ? `${fmt.value.toFixed(1)} ${fmt.unit}` : "0.0 B/s";
-                }
+                text: Units.formatBytes(NetworkUsage.downloadSpeed ?? 0, true)
                 font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
                 color: Colours.palette.m3tertiary
             }
@@ -160,7 +145,7 @@ StyledRect {
             }
 
             StyledText {
-                text: qsTr("Upload")
+                text: Tr.trCtx("Upload", "network throughput")
                 font: Tokens.font.body.small
                 color: Colours.palette.m3onSurfaceVariant
             }
@@ -170,10 +155,7 @@ StyledRect {
             }
 
             StyledText {
-                text: {
-                    const fmt = NetworkUsage.formatBytesRate(NetworkUsage.uploadSpeed ?? 0);
-                    return fmt ? `${fmt.value.toFixed(1)} ${fmt.unit}` : "0.0 B/s";
-                }
+                text: Units.formatBytes(NetworkUsage.uploadSpeed ?? 0, true)
                 font: Tokens.font.body.builders.medium.weight(Font.Medium).build()
                 color: Colours.palette.m3secondary
             }
@@ -191,7 +173,7 @@ StyledRect {
             }
 
             StyledText {
-                text: qsTr("Total")
+                text: Tr.trCtx("Total", "total network data transferred")
                 font: Tokens.font.body.small
                 color: Colours.palette.m3onSurfaceVariant
             }
@@ -202,9 +184,9 @@ StyledRect {
 
             StyledText {
                 text: {
-                    const down = NetworkUsage.formatBytes(NetworkUsage.downloadTotal ?? 0);
-                    const up = NetworkUsage.formatBytes(NetworkUsage.uploadTotal ?? 0);
-                    return (down && up) ? `↓${down.value.toFixed(1)}${down.unit} ↑${up.value.toFixed(1)}${up.unit}` : "↓0.0B ↑0.0B";
+                    const down = Units.formatBytes(NetworkUsage.downloadTotal ?? 0);
+                    const up = Units.formatBytes(NetworkUsage.uploadTotal ?? 0);
+                    return `↓${down} ↑${up}`;
                 }
                 font: Tokens.font.body.small
                 color: Colours.palette.m3onSurfaceVariant

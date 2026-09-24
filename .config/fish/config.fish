@@ -39,6 +39,11 @@ if status is-interactive
     abbr la 'ls -a'
     abbr lla 'ls -la'
 
+    # Cloudflare WARP Gaming Route
+    abbr warp-on 'warp-cli connect'
+    abbr warp-off 'warp-cli disconnect'
+    abbr warp-status 'warp-cli status'
+
     # Custom colours
     cat ~/.local/state/caelestia/sequences.txt 2> /dev/null
 

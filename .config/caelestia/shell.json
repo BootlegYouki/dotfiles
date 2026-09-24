@@ -26,10 +26,31 @@
             "compact": true
         },
         "workspaces": {
+            "showWindowsOnSpecialWorkspaces": false,
             "specialWorkspaceIcons": [
                 {
                     "icon": "terminal",
                     "name": "dev"
+                },
+                {
+                    "icon": "forum",
+                    "name": "communication"
+                },
+                {
+                    "icon": "music_cast",
+                    "name": "music"
+                },
+                {
+                    "icon": "checklist",
+                    "name": "todo"
+                },
+                {
+                    "icon": "monitor_heart",
+                    "name": "sysmon"
+                },
+                {
+                    "icon": "star",
+                    "name": "special"
                 }
             ],
             "windowIcons": [
@@ -245,9 +266,10 @@
         "wallpaperDir": "~/Pictures/Wallpapers"
     },
     "services": {
-        "useFahrenheit": false,
-        "useFahrenheitPerformance": false,
-        "useTwelveHourClock": false
+        "weatherUnits": "auto",
+        "sensorUnits": "celsius",
+        "dataUnits": "binary",
+        "clockFormat": "twentyFourHour"
     },
     "sidebar": {
         "dragThreshold": 80,
