@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Automatically connect Cloudflare WARP when Genshin Impact is running,
+# and disconnect when Genshin Impact exits.
+
+# On startup, ensure WARP is disconnected if Genshin is not currently running
+if ! pgrep -f "GenshinImpact.exe" >/dev/null 2>&1; then
+    status=$(warp-cli --accept-tos status 2>/dev/null | grep -i "Status update:" | awk '{print $3}')
+    if [ "$status" = "Connected" ]; then
+        warp-cli --accept-tos disconnect >/dev/null 2>&1
+    fi
+fi
+
+was_running=false
+
+while true; do
+    if pgrep -f "GenshinImpact.exe" >/dev/null 2>&1; then
+        if [ "$was_running" = false ]; then
+            warp-cli --accept-tos connect >/dev/null 2>&1
+            notify-send -u normal -i network-vpn -a "Genshin Auto-WARP" "Genshin Impact Running" "Connected to Cloudflare WARP (~70ms ping)." 2>/dev/null
+            was_running=true
+        fi
+    else
+        if [ "$was_running" = true ]; then
+            warp-cli --accept-tos disconnect >/dev/null 2>&1
+            notify-send -u low -i network-wireless -a "Genshin Auto-WARP" "Genshin Impact Closed" "WARP disconnected (Returned to native fiber)." 2>/dev/null
+            was_running=false
+        fi
+    fi
+    sleep 2
+done
